@@ -2,35 +2,34 @@ package com.minenash.customhud.HudElements.supplier;
 
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.data.Flags;
-import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.util.function.Supplier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class SpecialIdSupplier extends IdentifierSupplier {
 
-    public static final Entry TARGET_BLOCK_ID = of( () -> Registries.BLOCK.getId(ComplexData.targetBlock.getBlock()),
-            () -> Block.getRawIdFromState(ComplexData.targetBlock),
+    public static final Entry TARGET_BLOCK_ID = of( () -> BuiltInRegistries.BLOCK.getKey(ComplexData.targetBlock.getBlock()),
+            () -> Block.getId(ComplexData.targetBlock),
             () -> !ComplexData.targetBlock.isAir());
 
-    public static final Entry TARGET_FLUID_ID = of( () -> Registries.FLUID.getId(ComplexData.targetFluid.getFluid()),
-            () -> Fluid.STATE_IDS.getRawId(ComplexData.targetFluid),
+    public static final Entry TARGET_FLUID_ID = of( () -> BuiltInRegistries.FLUID.getKey(ComplexData.targetFluid.getType()),
+            () -> Fluid.FLUID_STATE_REGISTRY.getId(ComplexData.targetFluid),
             () -> !ComplexData.targetFluid.isEmpty());
 
     @Deprecated
-    public static final Entry ITEM_ID = of( () -> Registries.ITEM.getId(CLIENT.player.getMainHandStack().getItem()),
-            () -> Item.getRawId(CLIENT.player.getMainHandStack().getItem()),
-            () -> !CLIENT.player.getMainHandStack().isEmpty());
+    public static final Entry ITEM_ID = of( () -> BuiltInRegistries.ITEM.getKey(CLIENT.player.getMainHandItem().getItem()),
+            () -> Item.getId(CLIENT.player.getMainHandItem().getItem()),
+            () -> !CLIENT.player.getMainHandItem().isEmpty());
 
     @Deprecated
-    public static final Entry OFFHAND_ITEM_ID = of( () -> Registries.ITEM.getId(CLIENT.player.getOffHandStack().getItem()),
-            () -> Item.getRawId(CLIENT.player.getOffHandStack().getItem()),
-            () -> !CLIENT.player.getOffHandStack().isEmpty());
+    public static final Entry OFFHAND_ITEM_ID = of( () -> BuiltInRegistries.ITEM.getKey(CLIENT.player.getOffhandItem().getItem()),
+            () -> Item.getId(CLIENT.player.getOffhandItem().getItem()),
+            () -> !CLIENT.player.getOffhandItem().isEmpty());
 
 
     public record Entry(Supplier<Identifier> identifierSupplier, Supplier<Number> numberSupplier, Supplier<Boolean> booleanSupplier) {}

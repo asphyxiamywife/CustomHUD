@@ -33,7 +33,7 @@
 //    public static Identifier font;
 //    public static HudTheme theme;
 //
-//    public static void render(DrawContext context, float tickDelta) {
+//    public static void extractRenderState(DrawContext context, float tickDelta) {
 //
 //        Profile profile = ProfileManager.getActive();
 //        if (profile == null || client.getDebugHud().shouldShowDebugHud())
@@ -242,7 +242,7 @@
 //            }
 //
 //            if (piece.element instanceof IconElement ie )
-//                try { ie.render(context, piece); }
+//                try { ie.extractRenderState(context, piece); }
 //                catch (Exception e){
 //                    CustomHud.LOGGER.catching(e);
 //                }
@@ -259,16 +259,16 @@
 //
 //            DebugHud hud = client.inGameHud.getDebugHud();
 //            switch (profile.leftChart) {
-//                case FPS -> hud.renderingChart.render(context, 0, hud.renderingChart.getWidth(center));
-//                case TICK -> hud.tickChart.render(context, 0, hud.tickChart.getWidth(center));
-//                case PING -> hud.pingChart.render(context, 0, hud.pingChart.getWidth(center));
-//                case PACKET_SIZE -> hud.packetSizeChart.render(context, 0, hud.packetSizeChart.getWidth(center));
+//                case FPS -> hud.renderingChart.extractRenderState(context, 0, hud.renderingChart.getWidth(center));
+//                case TICK -> hud.tickChart.extractRenderState(context, 0, hud.tickChart.getWidth(center));
+//                case PING -> hud.pingChart.extractRenderState(context, 0, hud.pingChart.getWidth(center));
+//                case PACKET_SIZE -> hud.packetSizeChart.extractRenderState(context, 0, hud.packetSizeChart.getWidth(center));
 //            }
 //            switch (profile.rightChart) {
-//                case FPS -> { int w = hud.renderingChart.getWidth(center); hud.renderingChart.render(context, right - w, w); }
-//                case TICK -> { int w = hud.tickChart.getWidth(center); hud.tickChart.render(context, right - w, w); }
-//                case PING -> { int w = hud.pingChart.getWidth(center); hud.pingChart.render(context, right - w, w); }
-//                case PACKET_SIZE -> { int w = hud.packetSizeChart.getWidth(center); hud.packetSizeChart.render(context, right - w, w); }
+//                case FPS -> { int w = hud.renderingChart.getWidth(center); hud.renderingChart.extractRenderState(context, right - w, w); }
+//                case TICK -> { int w = hud.tickChart.getWidth(center); hud.tickChart.extractRenderState(context, right - w, w); }
+//                case PING -> { int w = hud.pingChart.getWidth(center); hud.pingChart.extractRenderState(context, right - w, w); }
+//                case PACKET_SIZE -> { int w = hud.packetSizeChart.getWidth(center); hud.packetSizeChart.extractRenderState(context, right - w, w); }
 //            }
 //        }
 //

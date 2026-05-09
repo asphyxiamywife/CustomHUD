@@ -3,11 +3,11 @@ package com.minenash.customhud.HudElements.icon;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.render.RenderPiece;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
 import org.joml.Matrix3x2fStack;
 
 import java.util.UUID;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class IconElement extends FunctionalElement {
 
@@ -28,7 +28,7 @@ public abstract class IconElement extends FunctionalElement {
         referenceCorner = flags.iconReferenceCorner;
     }
 
-    public abstract void render(DrawContext context, RenderPiece piece);
+    public abstract void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece);
     public int getTextWidth() {
         return width;
     };
@@ -45,8 +45,8 @@ public abstract class IconElement extends FunctionalElement {
         matrices.translate(-renderWidth/2, -renderHeight/2);
     }
 
-    public void renderItemStack(DrawContext context, int x, int y, ItemStack stack, boolean fitInLine) {
-        Matrix3x2fStack matrices = context.getMatrices();
+    public void renderItemStack(GuiGraphicsExtractor context, int x, int y, ItemStack stack, boolean fitInLine) {
+        Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
         matrices.translate(x + shiftX, y + shiftY - 2);
         int size = fitInLine ? 11 : 16;
@@ -56,7 +56,7 @@ public abstract class IconElement extends FunctionalElement {
         rotate(matrices, 16, 16);
         rotate(matrices, 16, 16);
 
-        context.drawItem(stack, 0, 0);
+        context.item(stack, 0, 0);
         matrices.popMatrix();
 
     }

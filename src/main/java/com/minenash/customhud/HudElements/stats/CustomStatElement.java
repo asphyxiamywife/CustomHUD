@@ -1,10 +1,10 @@
 package com.minenash.customhud.HudElements.stats;
 
 import com.minenash.customhud.data.Flags;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
+import net.minecraft.stats.Stat;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.stat.Stat;
-import net.minecraft.util.Identifier;
 
 public class CustomStatElement implements HudElement {
 
@@ -19,7 +19,7 @@ public class CustomStatElement implements HudElement {
     }
 
     private int get() {
-        return MinecraftClient.getInstance().player.getStatHandler().getStat(stat);
+        return Minecraft.getInstance().player.getStats().getValue(stat);
     }
 
     @Override

@@ -3,9 +3,7 @@ package com.minenash.customhud;
 import com.google.gson.*;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
@@ -19,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.minecraft.client.KeyMapping;
 
 public class ConfigManager {
 
@@ -166,7 +165,7 @@ public class ConfigManager {
             Profile p = profiles.get(name);
             if (p != null && !order.contains(p)) {
                 String keyTranslation = obj.get("key").getAsString();
-                p.keyBinding.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
+                p.keyBinding.setKey(InputConstants.getKey(keyTranslation));
                 p.cycle = obj.get("cycle").getAsBoolean();
                 order.add(p);
             }
@@ -193,13 +192,13 @@ public class ConfigManager {
                 String modifierTranslation = obj.has("modifier") ? obj.get("modifier").getAsString() : null;
 
                 if (p.toggles.containsKey(name))
-                    p.toggles.get(name).key.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
+                    p.toggles.get(name).key.setKey(InputConstants.getKey(keyTranslation));
                 else {
-                    KeyBinding key = new KeyBinding("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
-                    key.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
-                    KeyBinding modifier = new KeyBinding("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+                    KeyMapping key = new KeyMapping("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+                    key.setKey(InputConstants.getKey(keyTranslation));
+                    KeyMapping modifier = new KeyMapping("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
                     if (modifierTranslation != null)
-                        modifier.setBoundKey(InputUtil.fromTranslationKey(modifierTranslation));
+                        modifier.setKey(InputConstants.getKey(modifierTranslation));
                     p.toggles.put(name, new Toggle(name, false, -1, false, modifier, key));
                 }
             }
@@ -226,7 +225,7 @@ public class ConfigManager {
         for (Profile profile : ProfileManager.getProfiles()) {
             JsonObject obj = new JsonObject();
             obj.addProperty("name", profile.name);
-            obj.addProperty("key", profile.keyBinding.getBoundKeyTranslationKey());
+            obj.addProperty("key", profile.keyBinding.saveString());
             obj.addProperty("cycle", profile.cycle);
             profiles.add(obj);
         }
@@ -240,8 +239,8 @@ public class ConfigManager {
                 JsonObject obj = new JsonObject();
                 obj.addProperty("profile", profile.name);
                 obj.addProperty("name", toggle.name);
-                obj.addProperty("key", toggle.key.getBoundKeyTranslationKey());
-                obj.addProperty("modifier", toggle.modifier.getBoundKeyTranslationKey());
+                obj.addProperty("key", toggle.key.saveString());
+                obj.addProperty("modifier", toggle.modifier.saveString());
                 obj.addProperty("value", toggle.value);
                 toggleBinds.add(obj);
             }

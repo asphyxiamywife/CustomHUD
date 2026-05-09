@@ -1,13 +1,13 @@
 package com.minenash.customhud.mixin.music;
 
-import net.minecraft.client.sound.MusicTracker;
-import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.MusicManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(MusicTracker.class)
+@Mixin(MusicManager.class)
 public interface MusicTrackerAccess {
 
-    @Accessor SoundInstance getCurrent();
+    @Accessor SoundInstance getCurrentMusic();
 
 }

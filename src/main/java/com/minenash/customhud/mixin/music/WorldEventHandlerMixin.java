@@ -1,11 +1,6 @@
 package com.minenash.customhud.mixin.music;
 
 import com.minenash.customhud.complex.MusicAndRecordTracker;
-import net.minecraft.block.jukebox.JukeboxSong;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.world.WorldEventHandler;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,15 +9,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
+import net.minecraft.client.renderer.LevelEventHandler;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.JukeboxSong;
 
-@Mixin(WorldEventHandler.class)
+@Mixin(LevelEventHandler.class)
 public class WorldEventHandlerMixin {
 
-    @Shadow @Final private Map<BlockPos, SoundInstance> playingSongs;
+    @Shadow @Final private Map<BlockPos, SoundInstance> playingJukeboxSongs;
 
     @Inject(method = "playJukeboxSong", at = @At("TAIL"))
-    private void getRecord(RegistryEntry<JukeboxSong> song, BlockPos jukeboxPos, CallbackInfo ci) {
-        MusicAndRecordTracker.setRecord(song, playingSongs.get(jukeboxPos), jukeboxPos);
+    private void getRecord(Holder<JukeboxSong> song, BlockPos jukeboxPos, CallbackInfo ci) {
+        MusicAndRecordTracker.setRecord(song, playingJukeboxSongs.get(jukeboxPos), jukeboxPos);
     }
 
 }

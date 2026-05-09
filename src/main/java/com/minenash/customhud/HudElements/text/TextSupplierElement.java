@@ -2,34 +2,33 @@ package com.minenash.customhud.HudElements.text;
 
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.data.Flags;
-import net.minecraft.text.Text;
-
 import java.util.function.Supplier;
+import net.minecraft.network.chat.Component;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class TextSupplierElement extends TextElement {
 
-    public static final Supplier<Text> DISPLAY_NAME = () -> CLIENT.player.getDisplayName();
-    public static final Supplier<Text> ACTIONBAR_MSG = () -> CLIENT.inGameHud.overlayRemaining == 0 ? null : CLIENT.inGameHud.overlayMessage;
-    public static final Supplier<Text> TITLE_MSG = () -> CLIENT.inGameHud.title;
-    public static final Supplier<Text> SUBTITLE_MSG = () -> CLIENT.inGameHud.titleRemainTicks == 0 ? null : CLIENT.inGameHud.subtitle;
-    public static final Supplier<Text> RECORD_NAME = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().name : null;
-    public static final Supplier<Text> PLAYER_TEAM_NAME = () -> CLIENT.player.getScoreboardTeam() == null ? null : CLIENT.player.getScoreboardTeam().getDisplayName();
+    public static final Supplier<Component> DISPLAY_NAME = () -> CLIENT.player.getDisplayName();
+    public static final Supplier<Component> ACTIONBAR_MSG = () -> CLIENT.gui.overlayMessageTime == 0 ? null : CLIENT.gui.overlayMessageString;
+    public static final Supplier<Component> TITLE_MSG = () -> CLIENT.gui.title;
+    public static final Supplier<Component> SUBTITLE_MSG = () -> CLIENT.gui.titleTime == 0 ? null : CLIENT.gui.subtitle;
+    public static final Supplier<Component> RECORD_NAME = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().name : null;
+    public static final Supplier<Component> PLAYER_TEAM_NAME = () -> CLIENT.player.getTeam() == null ? null : CLIENT.player.getTeam().getDisplayName();
 
 
-    private final Supplier<Text> supplier;
+    private final Supplier<Component> supplier;
 
-    public TextSupplierElement(Supplier<Text> supplier, Flags flags) {
+    public TextSupplierElement(Supplier<Component> supplier, Flags flags) {
         this.supplier = supplier;
     }
 
     public int getTextWidth() {
-        return CLIENT.textRenderer.getWidth(getText());
+        return CLIENT.font.width(getText());
     }
 
-    public Text getText() {
-        return sanitize(supplier, Text.literal("-"));
+    public Component getText() {
+        return sanitize(supplier, Component.literal("-"));
     }
 
     @Override
@@ -40,7 +39,7 @@ public class TextSupplierElement extends TextElement {
     @Override
     public Number getNumber() {
         try {
-            Text text = supplier.get();
+            Component text = supplier.get();
             return text == null ? Double.NaN : text.getString().length();
         }
         catch (Exception e) {

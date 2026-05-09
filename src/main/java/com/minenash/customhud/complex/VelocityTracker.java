@@ -1,9 +1,8 @@
 package com.minenash.customhud.complex;
 
 import com.minenash.customhud.conditionals.Operation;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.Arrays;
+import net.minecraft.util.Mth;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -48,7 +47,7 @@ public class VelocityTracker {
     public void tick() {
         var p = CLIENT.player;
 
-        int smooth = MathHelper.clamp((int) smoothing.getValue(), 0, 19);
+        int smooth = Mth.clamp((int) smoothing.getValue(), 0, 19);
         int pastIndex = past(smooth+1);
 
         double changeX = trackX ? Math.abs(p.getX() - pastXs[pastIndex]) : 0;

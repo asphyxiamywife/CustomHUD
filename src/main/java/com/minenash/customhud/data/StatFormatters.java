@@ -1,6 +1,6 @@
 package com.minenash.customhud.data;
 
-import net.minecraft.stat.StatFormatter;
+import net.minecraft.stats.StatFormatter;
 
 public class StatFormatters {
 

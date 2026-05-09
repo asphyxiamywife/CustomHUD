@@ -7,16 +7,16 @@ import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.ClientBrandRetriever;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.biome.source.util.VanillaBiomeParameters;
-import net.minecraft.world.gen.densityfunction.DensityFunctions;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.level.biome.OverworldBiomeBuilder;
+import net.minecraft.world.level.levelgen.NoiseRouterData;
 import org.apache.commons.lang3.text.WordUtils;
 import oshi.hardware.CentralProcessor;
 
@@ -26,38 +26,38 @@ import static com.minenash.customhud.HudElements.supplier.EntryNumberSuppliers.*
 
 public class StringSupplierElement implements HudElement {
 
-    private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final Minecraft client = Minecraft.getInstance();
     private static Entity cameraEntity() { return client.getCameraEntity(); }
-    private static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
+    private static BlockPos blockPos() { return client.getCameraEntity().blockPosition(); }
 
     public static final Supplier<String> PROFILE_NAME = () -> ProfileManager.getActive() == null ? null : ProfileManager.getActive().name;
 
-    public static final Supplier<String> VERSION = () -> SharedConstants.getGameVersion().name();
-    public static final Supplier<String> CLIENT_VERSION = client::getGameVersion;
+    public static final Supplier<String> VERSION = () -> SharedConstants.getCurrentVersion().name();
+    public static final Supplier<String> CLIENT_VERSION = client::getLaunchedVersion;
     public static final Supplier<String> MODDED_NAME = ClientBrandRetriever::getClientModName;
     public static final Supplier<String> USERNAME = () -> client.player.getGameProfile().name() == null ? null : client.player.getGameProfile().name();
     public static final Supplier<String> UUID = () -> client.player.getGameProfile().id().toString();
 
-    public static final Supplier<String> SERVER_BRAND = () -> client.player.networkHandler.getBrand();
-    public static final Supplier<String> SERVER_NAME = () -> client.getCurrentServerEntry().name;
-    public static final Supplier<String> SERVER_ADDRESS = () -> client.getCurrentServerEntry().address;
-    public static final Supplier<String> WORLD_NAME = () -> !client.isIntegratedServerRunning() ? null : client.getServer().getSaveProperties().getLevelName();
+    public static final Supplier<String> SERVER_BRAND = () -> client.player.connection.serverBrand();
+    public static final Supplier<String> SERVER_NAME = () -> client.getCurrentServer().name;
+    public static final Supplier<String> SERVER_ADDRESS = () -> client.getCurrentServer().ip;
+    public static final Supplier<String> WORLD_NAME = () -> !client.hasSingleplayerServer() ? null : client.getSingleplayerServer().getWorldData().getLevelName();
 
-    public static final Supplier<String> DIMENSION = () -> WordUtils.capitalize(client.world.getRegistryKey().getValue().getPath().replace("_"," "));
-    public static final Supplier<String> BIOME = () -> I18n.translate("biome." + client.world.getBiome(blockPos()).getKey().get().getValue().toString().replace(':', '.'));
+    public static final Supplier<String> DIMENSION = () -> WordUtils.capitalize(client.level.dimension().identifier().getPath().replace("_"," "));
+    public static final Supplier<String> BIOME = () -> I18n.get("biome." + client.level.getBiome(blockPos()).unwrapKey().get().identifier().toString().replace(':', '.'));
 
     private static final String[] moon_phases = new String[]{"full moon", "waning gibbous", "last quarter", "waning crescent", "new moon", "waxing crescent", "first quarter", "waxing gibbous"};
-    public static final Supplier<String> MOON_PHASE_WORD = () -> ComplexData.clientChunk.isEmpty() ? null : moon_phases[(int) (client.world.getTimeOfDay() / 24000L % 8L)];
+    public static final Supplier<String> MOON_PHASE_WORD = () -> ComplexData.clientChunk.isEmpty() ? null : moon_phases[(int) (client.level.getOverworldClockTime() / 24000L % 8L)];
 
     public static final Supplier<String> TIME_AM_PM = () -> ComplexData.timeOfDay < 12000 ? "am" : "pm";
 
-    public static final Supplier<String> FACING4 = () -> cameraEntity().getHorizontalFacing().getId();
-    public static final Supplier<String> FACING4_SHORT = () -> cameraEntity().getHorizontalFacing().getId().substring(0, 1).toUpperCase();
+    public static final Supplier<String> FACING4 = () -> cameraEntity().getDirection().getName();
+    public static final Supplier<String> FACING4_SHORT = () -> cameraEntity().getDirection().getName().substring(0, 1).toUpperCase();
     public static final Supplier<String> FACING_TOWARDS_XZ = () ->
-            cameraEntity().getHorizontalFacing() == Direction.EAST || cameraEntity().getHorizontalFacing() == Direction.WEST ? "X" : "Z";
+            cameraEntity().getDirection() == Direction.EAST || cameraEntity().getDirection() == Direction.WEST ? "X" : "Z";
 
     public static final Supplier<String> FACING8 = () -> {
-        float yaw = MathHelper.wrapDegrees(cameraEntity().getYaw());
+        float yaw = Mth.wrapDegrees(cameraEntity().getYRot());
         if (yaw > 157.5 || yaw < -157.5) return "north";
         if (yaw > 112.5) return "northwest";
         if (yaw > 67.5)  return "west";
@@ -68,7 +68,7 @@ public class StringSupplierElement implements HudElement {
         return "south";
     };
     public static final Supplier<String> FACING8_SHORT = () -> {
-        float yaw = MathHelper.wrapDegrees(cameraEntity().getYaw());
+        float yaw = Mth.wrapDegrees(cameraEntity().getYRot());
         if (yaw > 157.5 || yaw < -157.5) return "N";
         if (yaw > 112.5) return "NW";
         if (yaw > 67.5)  return "W";
@@ -88,15 +88,15 @@ public class StringSupplierElement implements HudElement {
 
     public static final Supplier<String> MUSIC_NAME = () -> MusicAndRecordTracker.isMusicPlaying ? MusicAndRecordTracker.musicName : null;
 
-    public static final Supplier<String> BIOME_BUILDER_PEAKS = () -> isNoise() ? VanillaBiomeParameters.getPeaksValleysDescription(DensityFunctions.getPeaksValleysNoise((float)sample(sampler().ridges()))) : null;
-    public static final Supplier<String> BIOME_BUILDER_CONTINENTS = () -> isNoise() ? par.getContinentalnessDescription(sample(sampler().continents())) : null;
+    public static final Supplier<String> BIOME_BUILDER_PEAKS = () -> isNoise() ? OverworldBiomeBuilder.getDebugStringForPeaksAndValleys(NoiseRouterData.peaksAndValleys((float)sample(sampler().ridges()))) : null;
+    public static final Supplier<String> BIOME_BUILDER_CONTINENTS = () -> isNoise() ? par.getDebugStringForContinentalness(sample(sampler().continents())) : null;
 
-    public static final Supplier<String> VILLAGER_BIOME = () -> ComplexData.targetEntity instanceof VillagerEntity ve ? WordUtils.capitalize(ve.getVillagerData().type().toString()) : null;
-    public static final Supplier<String> VILLAGER_LEVEL_WORD = () -> ComplexData.targetEntity instanceof VillagerEntity ve ? I18n.translate("merchant.level." + ve.getVillagerData().level()) : null;
+    public static final Supplier<String> VILLAGER_BIOME = () -> ComplexData.targetEntity instanceof Villager ve ? WordUtils.capitalize(ve.getVillagerData().type().toString()) : null;
+    public static final Supplier<String> VILLAGER_LEVEL_WORD = () -> ComplexData.targetEntity instanceof Villager ve ? I18n.get("merchant.level." + ve.getVillagerData().level()) : null;
 
 
-    public static final Supplier<String> RESOURCE_PACK_VERSION = () -> SharedConstants.getGameVersion().packVersion(ResourceType.CLIENT_RESOURCES).toString();
-    public static final Supplier<String> DATA_PACK_VERSION = () -> SharedConstants.getGameVersion().packVersion(ResourceType.SERVER_DATA).toString();
+    public static final Supplier<String> RESOURCE_PACK_VERSION = () -> SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).toString();
+    public static final Supplier<String> DATA_PACK_VERSION = () -> SharedConstants.getCurrentVersion().packVersion(PackType.SERVER_DATA).toString();
 
     private final Supplier<String> supplier;
 

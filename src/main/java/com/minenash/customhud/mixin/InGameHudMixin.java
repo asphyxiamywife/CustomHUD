@@ -5,12 +5,9 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Crosshairs;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.option.AttackIndicator;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,19 +16,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = InGameHud.class, priority = 900)
+@Mixin(value = Gui.class, priority = 900)
 public abstract class InGameHudMixin {
 
-    @ModifyExpressionValue(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/debug/DebugHudProfile;isEntryVisible(Lnet/minecraft/util/Identifier;)Z"))
+    @ModifyExpressionValue(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/debug/DebugScreenEntryList;isCurrentlyEnabled(Lnet/minecraft/resources/Identifier;)Z"), require = 0)
     private boolean getDebugCrosshairEnable(boolean original) {
         return ProfileManager.getActive() != null  && ProfileManager.getActive().crosshair == Crosshairs.NONE;
     }
 
-    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V", ordinal = 0))
-    private boolean skipNormalCrosshairRendering0(DrawContext instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height) {
+    @WrapWithCondition(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V", ordinal = 0), require = 0)
+    private boolean skipNormalCrosshairRendering0(GuiGraphicsExtractor instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height) {
         return ProfileManager.getActive() == null  || ProfileManager.getActive().crosshair == Crosshairs.NORMAL;
     }
 }
-
 
 

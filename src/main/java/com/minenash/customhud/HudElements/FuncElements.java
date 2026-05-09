@@ -6,12 +6,11 @@ import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.NumberFlags;
-import net.minecraft.stat.StatFormatter;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
 import java.util.function.Function;
 import java.util.function.Supplier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.stats.StatFormatter;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -55,9 +54,9 @@ public abstract class FuncElements<T> implements HudElement {
     }
 
     public static class Tex<T> extends TextElement {
-        private final Function<T, Text> function;
+        private final Function<T, Component> function;
         private final Supplier<T> supplier;
-        public Tex(Supplier<T> supplier, Function<T,Text> func) { this.supplier = supplier; function = func;}
+        public Tex(Supplier<T> supplier, Function<T,Component> func) { this.supplier = supplier; function = func;}
 
         @Override public String getString() { return getText().getString(); }
         @Override public boolean getBoolean() { return getNumber().intValue() > 0; }
@@ -66,7 +65,7 @@ public abstract class FuncElements<T> implements HudElement {
                 T sup = supplier.get();
                 if (sup == null)
                     return Double.NaN;
-                Text text = function.apply(sup);
+                Component text = function.apply(sup);
                 return text == null ? Double.NaN : text.getString().length();
 
             }
@@ -75,8 +74,8 @@ public abstract class FuncElements<T> implements HudElement {
             }
         }
 
-        @Override public int getTextWidth() { return CLIENT.textRenderer.getWidth(getText()); }
-        @Override public Text getText() { return FuncElements.sanitize(supplier, function, Text.literal("-")); }
+        @Override public int getTextWidth() { return CLIENT.font.width(getText()); }
+        @Override public Component getText() { return FuncElements.sanitize(supplier, function, Component.literal("-")); }
     }
 
     public static class Num<T> extends FuncElements<T> implements NumElement {
@@ -149,7 +148,7 @@ public abstract class FuncElements<T> implements HudElement {
     }
 
     public static class SpecialText<T> extends TextElement {
-        public record TextEntry<T>(Function<T,Text> text, Function<T,Number> num, Function<T,Boolean> bool) {}
+        public record TextEntry<T>(Function<T,Component> text, Function<T,Number> num, Function<T,Boolean> bool) {}
 
         private final Supplier<T> supplier;
         private final TextEntry<T> entry;
@@ -159,8 +158,8 @@ public abstract class FuncElements<T> implements HudElement {
         @Override public Number getNumber() { return FuncElements.sanitize(supplier, entry.num, Double.NaN); }
         @Override public boolean getBoolean() { return FuncElements.sanitize(supplier, entry.bool, false); }
 
-        @Override public int getTextWidth() { return CLIENT.textRenderer.getWidth(getText()); }
-        @Override public Text getText() { return FuncElements.sanitize(supplier, entry.text, Text.literal("-")); }
+        @Override public int getTextWidth() { return CLIENT.font.width(getText()); }
+        @Override public Component getText() { return FuncElements.sanitize(supplier, entry.text, Component.literal("-")); }
 
     }
 

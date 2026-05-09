@@ -1,9 +1,9 @@
 package com.minenash.customhud.HudElements.stats;
 
 import com.minenash.customhud.data.Flags;
+import net.minecraft.client.Minecraft;
+import net.minecraft.stats.StatType;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.stat.StatType;
 
 public class TypedStatElement<T> implements HudElement {
 
@@ -20,16 +20,16 @@ public class TypedStatElement<T> implements HudElement {
     }
 
     private int get() {
-        return type.hasStat(entry) ? MinecraftClient.getInstance().player.getStatHandler().getStat(type.getOrCreateStat(entry)) : 0;
+        return type.contains(entry) ? Minecraft.getInstance().player.getStats().getValue(type.get(entry)) : 0;
     }
 
     @Override
     public String getString() {
-        if (!type.hasStat(entry))
+        if (!type.contains(entry))
             return "0";
 
-        int value =  MinecraftClient.getInstance().player.getStatHandler().getStat(type, entry);
-        return flags.formatted ? type.getOrCreateStat(entry).format(value) : String.format("%."+ flags.precision +"f", value * flags.scale);
+        int value =  Minecraft.getInstance().player.getStats().getValue(type, entry);
+        return flags.formatted ? type.get(entry).format(value) : String.format("%."+ flags.precision +"f", value * flags.scale);
     }
 
     @Override

@@ -11,49 +11,48 @@ import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.*;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.DebugHud;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.render.*;
-import net.minecraft.text.StyleSpriteSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profilers;
-
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.profiling.Profiler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CustomHudRenderer3 {
 
-    private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static final Identifier defaultFont = Identifier.of("minecraft", "default");
+    private static final Minecraft client = Minecraft.getInstance();
+    private static final Identifier defaultFont = Identifier.fromNamespaceAndPath("minecraft", "default");
 
-    public static StyleSpriteSource font;
+    public static FontDescription font;
     public static HudTheme theme;
 
-    public static void render(DrawContext context, RenderTickCounter tick) {
+    public static void extractRenderState(GuiGraphicsExtractor context, DeltaTracker tick) {
 
         Profile profile = ProfileManager.getActive();
-        if (profile == null || client.getDebugHud().shouldShowDebugHud() && client.debugHudEntryList.isF3Enabled()
-                || (profile.hudHiddenBehavior == HudHiddenBehavior.HIDE && client.options.hudHidden)
-                || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.options.hudHidden && client.currentScreen == null))
+        if (profile == null || client.getDebugOverlay().showDebugScreen() && client.debugEntries.isOverlayVisible()
+                || (profile.hudHiddenBehavior == HudHiddenBehavior.HIDE && client.options.hideGui)
+                || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.options.hideGui && client.screen == null))
             return;
 
-        if (profile.baseTheme.getTargetGuiScale() != client.getWindow().getScaleFactor())
-            client.onResolutionChanged();
+        if (profile.baseTheme.getTargetGuiScale() != client.getWindow().getGuiScale())
+            client.resizeGui();
 
-        boolean isChatOpen = client.currentScreen instanceof ChatScreen;
+        boolean isChatOpen = client.screen instanceof ChatScreen;
 
         List<RenderPiece> pieces = new ArrayList<>();
         List<RenderPiece> wipPieces = new ArrayList<>();
 
-        Profilers.get().push("custom_hud");
-        Profilers.get().push("processing");
-        context.getMatrices().pushMatrix();
+        Profiler.get().push("custom_hud");
+        Profiler.get().push("processing");
+        context.pose().pushMatrix();
 
-        context.getMatrices().scale(profile.baseTheme.getScale(), profile.baseTheme.getScale());
+        context.pose().scale(profile.baseTheme.getScale(), profile.baseTheme.getScale());
 
         for (Section section : profile.sections) {
             if (section == null || isChatOpen && section.hideOnChat)
@@ -89,7 +88,7 @@ public class CustomHudRenderer3 {
                             str = leftTrim(str);
                         str = formatting.getFormatting() + str;
                         wipPieces.add(new RenderPiece(str, null, theme.font, xOffset + section.hPaddingOffset(theme), yOffset + theme.padding.top(), formatting.getColor(), theme.bgColor, theme.textShadow, theme.lineSpacing == 0));
-                        xOffset += client.textRenderer.getWidth(str);
+                        xOffset += client.font.width(str);
                         builder.setLength(0);
                     }
                     if (e instanceof FunctionalElement.NewLine) {
@@ -192,13 +191,13 @@ public class CustomHudRenderer3 {
 
             int sectionXOffset = (int)(section.xOffset.getValue() + switch (section.sAlign) {
                 case LEFT -> 3;
-                case RIGHT ->  (int) (client.getWindow().getScaledWidth() * (1 / theme.getScale()))   - width - 1;
-                case CENTER -> (int) (client.getWindow().getScaledWidth() * (1 / theme.getScale()))/2 - width/2;
+                case RIGHT ->  (int) (client.getWindow().getGuiScaledWidth() * (1 / theme.getScale()))   - width - 1;
+                case CENTER -> (int) (client.getWindow().getGuiScaledWidth() * (1 / theme.getScale()))/2 - width/2;
             });
             int sectionYOffset = (int) (section.yOffset.getValue() + (
                 section instanceof Section.Top ? 1 :
-                section instanceof Section.Bottom ? (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale())) - totalHeight - 8:
-                                                    (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale()))/2 - totalHeight/2 - 1
+                section instanceof Section.Bottom ? (int) (client.getWindow().getGuiScaledHeight() * (1 / theme.getScale())) - totalHeight - 8:
+                                                    (int) (client.getWindow().getGuiScaledHeight() * (1 / theme.getScale()))/2 - totalHeight/2 - 1
             ));
 
             if (section.textAlign == Section.Align.RIGHT) {
@@ -223,53 +222,33 @@ public class CustomHudRenderer3 {
 
         }
 
-        Profilers.get().pop();
-        Profilers.get().push("rendering");
+        Profiler.get().pop();
+        Profiler.get().push("rendering");
 
         for (RenderPiece piece : pieces) {
             font = piece.font;
             if (piece.element instanceof IconElement ie )
-                try { ie.render(context, piece); }
+                try { ie.extractRenderState(context, piece); }
                 catch (Exception e){
                     CustomHud.LOGGER.catching(e);
                 }
             else if (piece.element instanceof String value && !value.isEmpty())
-                context.drawText(client.textRenderer, value, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
-            else if (piece.element instanceof Text text) {
+                context.text(client.font, value, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
+            else if (piece.element instanceof Component text) {
                 text = text.getStyle().getFont().equals(defaultFont) ? text.copy().setStyle(text.getStyle().withFont(font)) : text;
-                context.drawText(client.textRenderer, text, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y - 1 : piece.y, piece.color, piece.shadow);
+                context.text(client.font, text, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y - 1 : piece.y, piece.color, piece.shadow);
             }
 
         }
 
-        if (profile.charts) {
-            int right = context.getScaledWindowWidth();
-            int center = right / 2;
-
-            DebugHud hud = client.inGameHud.getDebugHud();
-            switch (profile.leftChart) {
-                case FPS -> hud.renderingChart.render(context, 0, hud.renderingChart.getWidth(center));
-                case TICK -> hud.tickChart.render(context, 0, hud.tickChart.getWidth(center));
-                case PING -> hud.pingChart.render(context, 0, hud.pingChart.getWidth(center));
-                case PACKET_SIZE -> hud.packetSizeChart.render(context, 0, hud.packetSizeChart.getWidth(center));
-            }
-            switch (profile.rightChart) {
-                case FPS -> { int w = hud.renderingChart.getWidth(center); hud.renderingChart.render(context, right - w, w); }
-                case TICK -> { int w = hud.tickChart.getWidth(center); hud.tickChart.render(context, right - w, w); }
-                case PING -> { int w = hud.pingChart.getWidth(center); hud.pingChart.render(context, right - w, w); }
-                case PACKET_SIZE -> { int w = hud.packetSizeChart.getWidth(center); hud.packetSizeChart.render(context, right - w, w); }
-            }
-        }
-
-
-        Profilers.get().pop();
-        context.getMatrices().popMatrix();
+        Profiler.get().pop();
+        context.pose().popMatrix();
         font = null;
         for (var e : profile.listEvents.values())
             e.reset();
         profile.boolEvents.clear();
 
-        Profilers.get().pop();
+        Profiler.get().pop();
 
     }
 

@@ -1,12 +1,12 @@
 package com.minenash.customhud.mixin;
 
 import com.minenash.customhud.ducks.SubtitleEntryDuck;
-import net.minecraft.client.gui.hud.SubtitlesHud;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.components.SubtitleOverlay;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(SubtitlesHud.SubtitleEntry.class)
+@Mixin(SubtitleOverlay.Subtitle.class)
 public class SubtitleEntryMixin implements SubtitleEntryDuck {
 
     @Unique public Identifier soundId;

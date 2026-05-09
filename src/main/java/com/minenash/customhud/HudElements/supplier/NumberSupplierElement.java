@@ -4,9 +4,8 @@ import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.NumberFlags;
-import net.minecraft.stat.StatFormatter;
-
 import java.util.function.Supplier;
+import net.minecraft.stats.StatFormatter;
 
 public class NumberSupplierElement implements HudElement, NumElement {
 

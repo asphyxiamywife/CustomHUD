@@ -6,44 +6,43 @@ import com.minenash.customhud.mixin.accessors.BlockPredicatesComponentAccessor;
 import com.minenash.customhud.mixin.accessors.DefaultAttributeContainerAccessor;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.Block;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.command.argument.ItemSlotArgumentType;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.component.type.BlockPredicatesComponent;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.boss.BossBar;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.commands.arguments.SlotArgument;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.util.Mth;
+import net.minecraft.world.BossEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.AdventureModePredicate;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.Scoreboard;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class AttributeHelpers {
 
-    public static final Function<String, EntityAttribute> ENTITY_ATTR_READER = (src) -> Registries.ATTRIBUTE.get(Identifier.tryParse(src));
-    public static final Function<String, ResourcePackProfile> DATA_PACK_READER = (src) ->
-        CLIENT.getServer() == null ? null : CLIENT.getServer().getDataPackManager().getProfile(src);
+    public static final Function<String, Attribute> ENTITY_ATTR_READER = (src) -> BuiltInRegistries.ATTRIBUTE.getValue(Identifier.tryParse(src));
+    public static final Function<String, Pack> DATA_PACK_READER = (src) ->
+        CLIENT.getSingleplayerServer() == null ? null : CLIENT.getSingleplayerServer().getPackRepository().getPack(src);
 
     private static final Pattern TIMING_PERIOD_TO_SPECIAL = Pattern.compile("(?<!\\\\)\\.");
     public static final Function<String, String> PROFILER_TIMING_READER = (src) -> {
@@ -57,7 +56,7 @@ public class AttributeHelpers {
         if (src.isBlank())
             return null;
         try {
-            return ItemSlotArgumentType.itemSlot().parse(new StringReader(switch (src) {
+            return SlotArgument.slot().parse(new StringReader(switch (src) {
                 case "head", "chest", "legs", "feet" -> "armor." + src;
                 case "mainhand", "offhand" -> "weapon." + src;
                 case "main", "off" -> "weapon." + src + "hand";
@@ -75,56 +74,56 @@ public class AttributeHelpers {
 
     public record ReceivedPower(Direction direction, int power, int strongPower) {}
 
-    public static PlayerListEntry getPlayer(String src) {
-        PlayerListEntry p = CLIENT.getNetworkHandler().getPlayerListEntry(src);
+    public static PlayerInfo getPlayer(String src) {
+        PlayerInfo p = CLIENT.getConnection().getPlayerInfo(src);
         if (p != null)
             return p;
         try {
-            return CLIENT.getNetworkHandler().getPlayerListEntry(UUID.fromString(src));
+            return CLIENT.getConnection().getPlayerInfo(UUID.fromString(src));
         }
         catch (Exception ignored) {}
         return null;
     }
 
     public static Entity getFullEntity(Entity entity) {
-        return CLIENT.getServer() == null || entity == null? entity :
-                CLIENT.getServer().getWorld(entity.getEntityWorld().getRegistryKey()).getEntity(entity.getUuid());
+        return CLIENT.getSingleplayerServer() == null || entity == null? entity :
+                CLIENT.getSingleplayerServer().getLevel(entity.level().dimension()).getEntity(entity.getUUID());
     }
-    public static EntityAttributeInstance getEntityAttr(Entity entity, EntityAttribute attribute) {
+    public static AttributeInstance getEntityAttr(Entity entity, Attribute attribute) {
         Entity e = getFullEntity(entity);
         if (!(e instanceof LivingEntity le)) return null;
-        return le.getAttributeInstance(Registries.ATTRIBUTE.getEntry(attribute));
+        return le.getAttribute(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute));
     }
 
     public static List<?> getEntityAttributes(Entity entity) {
         entity = getFullEntity(entity);
         if (!(entity instanceof LivingEntity le) ) return Collections.EMPTY_LIST;
         AttributeContainerAccessor container = (AttributeContainerAccessor) le.getAttributes();
-        Map<EntityAttribute, EntityAttributeInstance> instances = new HashMap<>(((DefaultAttributeContainerAccessor)container.getDefaultAttributes()).getInstances());
-        instances.putAll(container.getCustom());
-        return Arrays.asList( (entity.getEntityWorld().isClient() ?
-                instances.values().stream().filter(a -> a.getAttribute().value().isTracked()) : instances.values().stream())
-                .sorted(Comparator.comparing(a -> I18n.translate(a.getAttribute().value().getTranslationKey()))).toArray() );
+        Map<Attribute, AttributeInstance> instances = new HashMap<>(((DefaultAttributeContainerAccessor)container.getSupplier()).getInstances());
+        instances.putAll(container.getAttributes());
+        return Arrays.asList( (entity.level().isClientSide() ?
+                instances.values().stream().filter(a -> a.getAttribute().value().isClientSyncable()) : instances.values().stream())
+                .sorted(Comparator.comparing(a -> I18n.get(a.getAttribute().value().getDescriptionId()))).toArray() );
     }
 
-    public record ItemAttribute(EntityAttribute attribute, EntityAttributeModifier modifier, String slot) {}
+    public record ItemAttribute(Attribute attribute, AttributeModifier modifier, String slot) {}
     public static List<ItemAttribute> getItemStackAttributes(ItemStack stack) {
         List<ItemAttribute> attributes = new ArrayList<>();
 
-        AttributeModifiersComponent component = stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+        ItemAttributeModifiers component = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         if (component != null)
             for (var entry : component.modifiers())
-                attributes.add( new ItemAttribute(entry.attribute().value(), entry.modifier(), entry.slot().asString()) );
+                attributes.add( new ItemAttribute(entry.attribute().value(), entry.modifier(), entry.slot().getSerializedName()) );
         return attributes;
     }
 
-    public static List<Text> getLore(ItemStack stack) {
-        LoreComponent component = stack.get(DataComponentTypes.LORE);
+    public static List<Component> getLore(ItemStack stack) {
+        ItemLore component = stack.get(DataComponents.LORE);
         return component != null ? component.lines() : new ArrayList<>();
     }
 
-    public static List<Block> getCanX(ItemStack stack, ComponentType<BlockPredicatesComponent> type) {
-        BlockPredicatesComponent component = stack.get(type);
+    public static List<Block> getCanX(ItemStack stack, DataComponentType<AdventureModePredicate> type) {
+        AdventureModePredicate component = stack.get(type);
         Set<Block> blocks = new HashSet<>();
         if (component != null) {
             for (var e : ((BlockPredicatesComponentAccessor) component).getPredicates()) {
@@ -142,7 +141,7 @@ public class AttributeHelpers {
         for (ItemStack stack : stacks) {
             if (stack.isEmpty()) continue;
             for (ItemStack cStack : compact) {
-                if (ItemStack.areItemsAndComponentsEqual(stack, cStack)) {
+                if (ItemStack.isSameItemSameComponents(stack, cStack)) {
                     cStack.setCount(cStack.getCount() + stack.getCount());
                     continue outer;
                 }
@@ -159,14 +158,14 @@ public class AttributeHelpers {
         Iterator<ItemStack> iter = null;
         get_iter:
         {
-            var bundle = stack.get(DataComponentTypes.BUNDLE_CONTENTS);
+            var bundle = stack.get(DataComponents.BUNDLE_CONTENTS);
             if (bundle != null) {
-                iter = bundle.iterate().iterator();
+                iter = bundle.itemCopyStream().iterator();
                 break get_iter;
             }
-            var container = stack.get(DataComponentTypes.CONTAINER);
+            var container = stack.get(DataComponents.CONTAINER);
             if (container != null) {
-                iter = container.iterateNonEmpty().iterator();
+                iter = container.nonEmptyItemCopyStream().iterator();
                 break get_iter;
             }
 //            var blockEntity = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
@@ -215,70 +214,70 @@ public class AttributeHelpers {
 //    }
 
     public static Scoreboard scoreboard() {
-        return CLIENT.getServer() != null ? CLIENT.getServer().getScoreboard() : CLIENT.world.getScoreboard();
+        return CLIENT.getSingleplayerServer() != null ? CLIENT.getSingleplayerServer().getScoreboard() : CLIENT.level.getScoreboard();
     }
     public static boolean entryOnline(String entry) {
-        if (null != (CLIENT.getServer() != null ? CLIENT.getServer().getPlayerManager().getPlayer(entry) : CLIENT.getNetworkHandler().getPlayerListEntry(entry)))
+        if (null != (CLIENT.getSingleplayerServer() != null ? CLIENT.getSingleplayerServer().getPlayerList().getPlayerByName(entry) : CLIENT.getConnection().getPlayerInfo(entry)))
             return true;
         if (ComplexData.serverWorld == null)
             return false;
         try {
-            return ComplexData.serverWorld.entityManager.has(UUID.fromString(entry));
+            return ComplexData.serverWorld.entityManager.isLoaded(UUID.fromString(entry));
         }
         catch (Exception ignored) {}
         return false;
     }
 
     public static List<?> bossbars(boolean all) {
-        if (CLIENT.getServer() == null)
-            return Arrays.asList(CLIENT.inGameHud.getBossBarHud().bossBars.entrySet().toArray());
+        if (CLIENT.getSingleplayerServer() == null)
+            return Arrays.asList(CLIENT.gui.getBossOverlay().events.entrySet().toArray());
 
-        List<BossBar> serverBossbars = new ArrayList<>();
-        serverBossbars.addAll(CLIENT.getServer().getBossBarManager().commandBossBars.values());
+        List<BossEvent> serverBossbars = new ArrayList<>();
+        serverBossbars.addAll(CLIENT.getSingleplayerServer().getCustomBossEvents().events.values());
         serverBossbars.addAll(ComplexData.bossbars.values());
 
         if (all)
             return serverBossbars;
 
-        Set<UUID> client = CLIENT.inGameHud.getBossBarHud().bossBars.keySet();
-        return Arrays.asList( serverBossbars.stream().filter(bar -> client.contains(bar.getUuid())).toArray() );
+        Set<UUID> client = CLIENT.gui.getBossOverlay().events.keySet();
+        return Arrays.asList( serverBossbars.stream().filter(bar -> client.contains(bar.getId())).toArray() );
     }
 
-    public static BossBar getBossBar(String input) {
-        boolean client = CLIENT.getServer() == null;
+    public static BossEvent getBossBar(String input) {
+        boolean client = CLIENT.getSingleplayerServer() == null;
         try {
             UUID uuid = UUID.fromString(input);
             if (client)
-                return CLIENT.inGameHud.getBossBarHud().bossBars.get(uuid);
-            for (BossBar bar : CLIENT.getServer().getBossBarManager().commandBossBars.values())
-                if (bar.getUuid() == uuid)
+                return CLIENT.gui.getBossOverlay().events.get(uuid);
+            for (BossEvent bar : CLIENT.getSingleplayerServer().getCustomBossEvents().events.values())
+                if (bar.getId() == uuid)
                     return bar;
-            BossBar bb = ComplexData.bossbars.get(uuid);
+            BossEvent bb = ComplexData.bossbars.get(uuid);
             if (bb != null)
                 return bb;
         }
         catch (Exception ignored) {}
 
         if (client) {
-            for (BossBar bar : CLIENT.inGameHud.getBossBarHud().bossBars.values())
+            for (BossEvent bar : CLIENT.gui.getBossOverlay().events.values())
                 if (bar.getName().getString().equalsIgnoreCase(input))
                     return bar;
         }
         else {
-            BossBar bar = CLIENT.getServer().getBossBarManager().get(Identifier.tryParse(input));
+            BossEvent bar = CLIENT.getSingleplayerServer().getCustomBossEvents().get(Identifier.tryParse(input));
             if (bar != null)
                 return bar;
-            for (BossBar bar2 : CLIENT.getServer().getBossBarManager().commandBossBars.values())
+            for (BossEvent bar2 : CLIENT.getSingleplayerServer().getCustomBossEvents().events.values())
                 if (bar2.getName().getString().equalsIgnoreCase(input))
                     return bar2;
-            for (BossBar bar2 : ComplexData.bossbars.values())
+            for (BossEvent bar2 : ComplexData.bossbars.values())
                 if (bar2.getName().getString().equalsIgnoreCase(input))
                     return bar2;
         }
         return null;
     }
 
-    public static int getBossBarColor(BossBar bar) {
+    public static int getBossBarColor(BossEvent bar) {
         return switch (bar.getColor()) {
             case PINK -> 0xEC00B8;
             case BLUE -> 0x00B7EC;
@@ -290,18 +289,18 @@ public class AttributeHelpers {
         };
     }
 
-    public static double getRelativeYaw(Vec3d player, Vec3d other) {
-        return MathHelper.wrapDegrees(CLIENT.player.getYaw() - Math.toDegrees( MathHelper.atan2(-(other.getX() - player.getX()), other.getZ() - player.getZ()) ));
+    public static double getRelativeYaw(Vec3 player, Vec3 other) {
+        return Mth.wrapDegrees(CLIENT.player.getYRot() - Math.toDegrees( Mth.atan2(-(other.x() - player.x()), other.z() - player.z()) ));
     }
-    public static double getRelativePitch(Vec3d player, Vec3d other) {
-        double xDist = other.getX() - player.getX();
-        double zDist = other.getZ() - player.getZ();
-        return MathHelper.wrapDegrees(CLIENT.player.getPitch() + Math.toDegrees( MathHelper.atan2(other.getY() - player.getY(), Math.sqrt(xDist*xDist + zDist*zDist ) )));
+    public static double getRelativePitch(Vec3 player, Vec3 other) {
+        double xDist = other.x() - player.x();
+        double zDist = other.z() - player.z();
+        return Mth.wrapDegrees(CLIENT.player.getXRot() + Math.toDegrees( Mth.atan2(other.y() - player.y(), Math.sqrt(xDist*xDist + zDist*zDist ) )));
     }
 
-    public static boolean isFabricRP(ResourcePackProfile pack) {
-        TextContent content = pack.getInfo().title().getContent();
-        return pack.getId().equals("fabric") || content instanceof TranslatableTextContent ttc && (ttc.getKey().equals("pack.name.fabricMod") || ttc.getKey().equals("pack.name.fabricMods"));
+    public static boolean isFabricRP(Pack pack) {
+        ComponentContents content = pack.location().title().getContents();
+        return pack.getId().equals("fabric") || content instanceof TranslatableContents ttc && (ttc.getKey().equals("pack.name.fabricMod") || ttc.getKey().equals("pack.name.fabricMods"));
     }
 
 }

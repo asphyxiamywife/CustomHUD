@@ -4,19 +4,18 @@ import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.resource.Resource;
-import net.minecraft.util.Identifier;
-
+import com.mojang.blaze3d.platform.NativeImage;
 import java.io.IOException;
 import java.util.Optional;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
 
 public class SimpleTextureIconElement extends IconElement {
-    private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static final Identifier TEXTURE_NOT_FOUND = Identifier.of("textures/item/barrier.png");
+    private static final Minecraft client = Minecraft.getInstance();
+    private static final Identifier TEXTURE_NOT_FOUND = Identifier.parse("textures/item/barrier.png");
 
     private final Identifier texture;
     private final int textureWidth;
@@ -38,7 +37,7 @@ public class SimpleTextureIconElement extends IconElement {
         try {
             Optional<Resource> resource = client.getResourceManager().getResource(texture);
             if (resource.isPresent())
-                img = NativeImage.read(resource.get().getInputStream());
+                img = NativeImage.read(resource.get().open());
         }
         catch (IOException e) { CustomHud.LOGGER.catching(e); }
 
@@ -76,14 +75,14 @@ public class SimpleTextureIconElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, RenderPiece piece) {
+    public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         if (width == 0)
             return;
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2);
-        rotate(context.getMatrices(), width, height);
-        context.drawTexture(pipeline, texture, 0, 0, 0, 0, width, height, textureWidth, textureHeight, textureWidth, textureHeight);
-        context.getMatrices().popMatrix();
+        context.pose().pushMatrix();
+        context.pose().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2);
+        rotate(context.pose(), width, height);
+        context.blit(pipeline, texture, 0, 0, 0, 0, width, height, textureWidth, textureHeight, textureWidth, textureHeight);
+        context.pose().popMatrix();
     }
 
 

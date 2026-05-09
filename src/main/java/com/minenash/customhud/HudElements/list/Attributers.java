@@ -17,22 +17,20 @@ import com.minenash.customhud.registry.ParseContext;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-import net.minecraft.village.TradeOffer;
-import net.minecraft.village.TradedItem;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.ItemCost;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.ItemLike;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.*;
@@ -68,7 +66,7 @@ public class Attributers {
     public static final Attributer PLAYER = (pid, sup, name, flags, context) -> {
         if (name.startsWith("team:")) {
             String attr = name.substring(5);
-            Supplier sup2 = () -> ((PlayerListEntry) sup.get()).getScoreboardTeam();
+            Supplier sup2 = () -> ((PlayerInfo) sup.get()).getTeam();
             return TEAM2.get(pid, sup2, attr, flags, context);
         }
 
@@ -191,9 +189,9 @@ public class Attributers {
         if (name.startsWith("enchant:"))
             return VariableParser.attrElement(name, src -> src, true,
                     (enchant) -> () -> {
-                        var registry = CLIENT.world.getRegistryManager().getOptional(RegistryKeys.ENCHANTMENT);
+                        var registry = CLIENT.level.registryAccess().lookup(Registries.ENCHANTMENT);
                         if (registry.isEmpty()) return null;
-                        var entry = registry.get().getEntry(Identifier.tryParse(enchant));
+                        var entry = registry.get().get(Identifier.tryParse(enchant));
                         if (entry.isEmpty()) return null;
                         ItemStack stack = (ItemStack) sup.get();
                         if (stack.isEmpty()) return null;
@@ -429,17 +427,17 @@ public class Attributers {
             boolean isIcon = attr.equals("icon");
             Supplier sup2 = switch (name.substring(0, collinIndex)) {
                 case "first" -> isIcon ?
-                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getDisplayedFirstBuyItem()
-                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getDisplayedFirstBuyItem();
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((MerchantOffer) (piece == null ? sup.get() : piece.value)).getCostA()
+                        : (Supplier<ItemStack>) () -> ((MerchantOffer)sup.get()).getCostA();
                 case "first_base" -> isIcon ?
-                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getOriginalFirstBuyItem()
-                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getOriginalFirstBuyItem();
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((MerchantOffer) (piece == null ? sup.get() : piece.value)).getBaseCostA()
+                        : (Supplier<ItemStack>) () -> ((MerchantOffer)sup.get()).getBaseCostA();
                 case "second" -> isIcon ?
-                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getDisplayedSecondBuyItem()
-                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getDisplayedSecondBuyItem();
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((MerchantOffer) (piece == null ? sup.get() : piece.value)).getCostB()
+                        : (Supplier<ItemStack>) () -> ((MerchantOffer)sup.get()).getCostB();
                 case "result" -> isIcon ?
-                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getSellItem()
-                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSellItem();
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((MerchantOffer) (piece == null ? sup.get() : piece.value)).getResult()
+                        : (Supplier<ItemStack>) () -> ((MerchantOffer)sup.get()).getResult();
                 default -> null;
             };
             if (sup2 != null)
@@ -461,14 +459,14 @@ public class Attributers {
             default -> null;
         };
     };
-    private static ItemStack secondItem(Optional<TradedItem> item) {
+    private static ItemStack secondItem(Optional<ItemCost> item) {
         return item.isEmpty() ? new ItemStack(Items.AIR) : item.get().itemStack();
     }
 
     public static final Attributer ITEM_CONVERTABLE_TAG_ENTRY = (pid, sup, name, flags, context) -> switch (name) {
         case "name" -> new Tex(sup, TAG_ENTRY_NAME);
         case "", "id" -> new Id(sup, TAG_ENTRY_ID,flags);
-        case "icon" -> new RichItemSupplierIconElement(pid, () -> new ItemStack(((ItemConvertible) sup.get()).asItem()), flags, false);
+        case "icon" -> new RichItemSupplierIconElement(pid, () -> new ItemStack(((ItemLike) sup.get()).asItem()), flags, false);
         default -> null;
     };
 

@@ -1,27 +1,26 @@
 package com.minenash.customhud.HudElements.text;
 
 import com.minenash.customhud.data.Flags;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.function.Supplier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class TitleMsgElement extends TextSupplierElement {
-    public TitleMsgElement(Supplier<Text> supplier, Flags flags) { super(supplier, flags); }
+    public TitleMsgElement(Supplier<Component> supplier, Flags flags) { super(supplier, flags); }
 
     @Override
     public int getColor(int current) {
         int l = 0;
-        if (CLIENT.inGameHud.titleRemainTicks > CLIENT.inGameHud.titleFadeOutTicks + CLIENT.inGameHud.titleStayTicks) {
-            float o = (float)(CLIENT.inGameHud.titleFadeInTicks + CLIENT.inGameHud.titleStayTicks + CLIENT.inGameHud.titleFadeOutTicks) - CLIENT.inGameHud.titleRemainTicks;
-            l = (int)(o * 255.0F / CLIENT.inGameHud.titleFadeInTicks);
+        if (CLIENT.gui.titleTime > CLIENT.gui.titleFadeOutTime + CLIENT.gui.titleStayTime) {
+            float o = (float)(CLIENT.gui.titleFadeInTime + CLIENT.gui.titleStayTime + CLIENT.gui.titleFadeOutTime) - CLIENT.gui.titleTime;
+            l = (int)(o * 255.0F / CLIENT.gui.titleFadeInTime);
         }
 
-        if (CLIENT.inGameHud.titleRemainTicks <= CLIENT.inGameHud.titleFadeOutTicks)
-            l = (int)(CLIENT.inGameHud.titleRemainTicks * 255.0F / CLIENT.inGameHud.titleFadeOutTicks);
+        if (CLIENT.gui.titleTime <= CLIENT.gui.titleFadeOutTime)
+            l = (int)(CLIENT.gui.titleTime * 255.0F / CLIENT.gui.titleFadeOutTime);
 
-        return (current & 0xFFFFFF) | MathHelper.clamp(l, 0, 255) << 24 & 0xFF000000;
+        return (current & 0xFFFFFF) | Mth.clamp(l, 0, 255) << 24 & 0xFF000000;
     }
 }

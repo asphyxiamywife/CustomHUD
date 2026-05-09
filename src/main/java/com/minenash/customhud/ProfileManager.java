@@ -2,9 +2,9 @@ package com.minenash.customhud;
 
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 import java.io.IOException;
@@ -92,13 +92,13 @@ public class ProfileManager {
 //            "Open in your text editor" :
 //            "Open in your text editor\n\nNot opening? Shift-click to edit using the backup editor";
     public static final String openTooltipStr = "Open in your text editor";
-    public static final Tooltip openTooltip = Tooltip.of(Text.literal(openTooltipStr));
+    public static final Tooltip openTooltip = Tooltip.create(Component.literal(openTooltipStr));
     public static void open(Profile profile) {
         if (profile != null)
 //            if (Screen.hasShiftDown() && !MinecraftClient.IS_SYSTEM_MAC)
 //                EditorWindow.open(profile);
 //            else
-                new Thread(() -> Util.getOperatingSystem().open(CustomHud.PROFILE_FOLDER.resolve(profile.name + ".txt").toFile())).start();
+                new Thread(() -> Util.getPlatform().openFile(CustomHud.PROFILE_FOLDER.resolve(profile.name + ".txt").toFile())).start();
 
     }
 
@@ -125,9 +125,9 @@ public class ProfileManager {
         } catch (IOException e) {
             CustomHud.LOGGER.error("Can't rename profile, IO Exception");
             CustomHud.LOGGER.catching(e);
-            CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
-                    Text.literal("§cUnable to Rename Profile"),
-                    Text.literal("§eIO Exception")
+            CLIENT.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+                    Component.literal("§cUnable to Rename Profile"),
+                    Component.literal("§eIO Exception")
             ));
         }
     }

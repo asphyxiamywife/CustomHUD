@@ -1,27 +1,27 @@
 package com.minenash.customhud.mixin;
 
 import com.minenash.customhud.complex.ComplexData;
-import net.minecraft.entity.boss.BossBar;
-import net.minecraft.entity.boss.CommandBossBar;
-import net.minecraft.network.packet.s2c.play.BossBarS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.UUID;
+import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
+import net.minecraft.server.bossevents.CustomBossEvent;
+import net.minecraft.world.BossEvent;
 
-@Mixin(BossBarS2CPacket.class)
+@Mixin(ClientboundBossEventPacket.class)
 public class BossBarS2CPacketMixin {
 
-    @Inject(method = "add", at = @At("HEAD"))
-    private static void addBossBar(BossBar bar, CallbackInfoReturnable<BossBarS2CPacket> cir) {
-        if (!(bar instanceof CommandBossBar))
-            ComplexData.bossbars.put(bar.getUuid(), bar);
+    @Inject(method = "createAddPacket", at = @At("HEAD"))
+    private static void addBossBar(BossEvent bar, CallbackInfoReturnable<ClientboundBossEventPacket> cir) {
+        if (!(bar instanceof CustomBossEvent))
+            ComplexData.bossbars.put(bar.getId(), bar);
     }
 
-    @Inject(method = "remove", at = @At("HEAD"))
-    private static void removeBossBar(UUID uuid, CallbackInfoReturnable<BossBarS2CPacket> cir) {
+    @Inject(method = "createRemovePacket", at = @At("HEAD"))
+    private static void removeBossBar(UUID uuid, CallbackInfoReturnable<ClientboundBossEventPacket> cir) {
         ComplexData.bossbars.remove(uuid);
     }
 

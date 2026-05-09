@@ -1,7 +1,7 @@
 package com.minenash.customhud.HudElements.interfaces;
 
 import com.minenash.customhud.data.Flags;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public interface IdElement {
 

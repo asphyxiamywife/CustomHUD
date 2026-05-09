@@ -4,7 +4,7 @@ import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.errors.Errors;
-import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

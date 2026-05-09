@@ -4,18 +4,17 @@ import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.IdElement;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.data.Flags;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class IdentifierSupplier implements HudElement, IdElement {
-    private static BlockPos blockPos() { return CLIENT.getCameraEntity().getBlockPos(); }
+    private static BlockPos blockPos() { return CLIENT.getCameraEntity().blockPosition(); }
 
-    public static final Supplier<Identifier> DIMENSION_ID = () -> CLIENT.world.getRegistryKey().getValue();
-    public static final Supplier<Identifier> BIOME_ID = () -> CLIENT.world.getBiome(blockPos()).getKey().get().getValue();
+    public static final Supplier<Identifier> DIMENSION_ID = () -> CLIENT.level.dimension().identifier();
+    public static final Supplier<Identifier> BIOME_ID = () -> CLIENT.level.getBiome(blockPos()).unwrapKey().get().identifier();
     public static final Supplier<Identifier> MUSIC_ID = () -> MusicAndRecordTracker.isMusicPlaying ? MusicAndRecordTracker.musicId : null;
     public static final Supplier<Identifier> RECORD_ID = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().id : null;
 

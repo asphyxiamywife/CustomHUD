@@ -1,11 +1,11 @@
 package com.minenash.customhud.ducks;
 
-import net.minecraft.resource.PackVersion;
-import net.minecraft.util.dynamic.Range;
+import net.minecraft.server.packs.metadata.pack.PackFormat;
+import net.minecraft.util.InclusiveRange;
 
 public interface ResourcePackProfileMetadataDuck {
 
-    Range<PackVersion> customhud$getPackVersionRange();
-    void customhud$setPackVersionRange(Range<PackVersion> version);
+    InclusiveRange<PackFormat> customhud$getPackVersionRange();
+    void customhud$setPackVersionRange(InclusiveRange<PackFormat> version);
 
 }

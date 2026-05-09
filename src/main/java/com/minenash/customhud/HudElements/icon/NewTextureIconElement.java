@@ -6,19 +6,18 @@ import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.resource.Resource;
-import net.minecraft.util.Identifier;
-
+import com.mojang.blaze3d.platform.NativeImage;
 import java.io.IOException;
 import java.util.Optional;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
 
 public class NewTextureIconElement extends IconElement {
-    private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static final Identifier TEXTURE_NOT_FOUND = Identifier.of("textures/item/barrier.png");
+    private static final Minecraft client = Minecraft.getInstance();
+    private static final Identifier TEXTURE_NOT_FOUND = Identifier.parse("textures/item/barrier.png");
 
     private final Identifier texture;
     private final Operation u;
@@ -47,7 +46,7 @@ public class NewTextureIconElement extends IconElement {
         try {
             Optional<Resource> resource = client.getResourceManager().getResource(texture);
             if (resource.isPresent())
-                img = NativeImage.read(resource.get().getInputStream());
+                img = NativeImage.read(resource.get().open());
         }
         catch (IOException e) { CustomHud.LOGGER.catching(e); }
 
@@ -90,14 +89,14 @@ public class NewTextureIconElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, RenderPiece piece) {
+    public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         if (calcWidth == 0 || calcHeight == 0)
             return;
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(piece.x+shiftX, piece.y+shiftY-2 - (referenceCorner? 0 : (calcHeight*scale-calcHeight)/(scale*2)));
-        rotate(context.getMatrices(), calcWidth, calcHeight);
-        context.drawTexture(pipeline, texture, 0, 0,  calcU, calcV, calcWidth, calcHeight, (int) calcRegionWidth, (int) calcRegionHeight, textureWidth, textureHeight);
-        context.getMatrices().popMatrix();
+        context.pose().pushMatrix();
+        context.pose().translate(piece.x+shiftX, piece.y+shiftY-2 - (referenceCorner? 0 : (calcHeight*scale-calcHeight)/(scale*2)));
+        rotate(context.pose(), calcWidth, calcHeight);
+        context.blit(pipeline, texture, 0, 0,  calcU, calcV, calcWidth, calcHeight, (int) calcRegionWidth, (int) calcRegionHeight, textureWidth, textureHeight);
+        context.pose().popMatrix();
     }
 
     int calcU = 0;

@@ -3,13 +3,12 @@ package com.minenash.customhud;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Style;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -17,7 +16,7 @@ import java.util.Arrays;
 
 public class UpdateChecker {
 
-    private static final String mcVersion = MinecraftClient.getInstance().getGameVersion();
+    private static final String mcVersion = Minecraft.getInstance().getLaunchedVersion();
     private static final String currentVersion;
     static {
         String modVersionRaw = FabricLoader.getInstance().getModContainer("custom_hud").get().getMetadata().getVersion().getFriendlyString();
@@ -26,7 +25,7 @@ public class UpdateChecker {
 
     public static String[] latestKnownVersion = null;
 
-    public static Text updateMessage = null;
+    public static Component updateMessage = null;
 
     public static void check() {
         if (currentVersion.contains("beta") || currentVersion.contains("alpha"))
@@ -57,11 +56,11 @@ public class UpdateChecker {
             return;
 
         latestKnownVersion = version;
-        updateMessage = Text.literal("§eCustomHUD v" + versionRaw + " is available! ")
-                .append(Text.literal("[Modrinth]").setStyle(Style.EMPTY
-                        .withFormatting(Formatting.GREEN, Formatting.UNDERLINE)
+        updateMessage = Component.literal("§eCustomHUD v" + versionRaw + " is available! ")
+                .append(Component.literal("[Modrinth]").setStyle(Style.EMPTY
+                        .applyFormats(ChatFormatting.GREEN, ChatFormatting.UNDERLINE)
                         .withClickEvent(new ClickEvent.OpenUrl(URI.create(info.get("link").getAsString())))
-                        .withHoverEvent(new HoverEvent.ShowText(Text.literal("Download on Modrinth")))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("Download on Modrinth")))
                 )).append("\nWhat's New:\n §7" + info.get("msg").getAsString());
         ConfigManager.save();
 

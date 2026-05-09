@@ -1,24 +1,24 @@
 package com.minenash.customhud.mixin;
 
 import com.minenash.customhud.ducks.ResourcePackProfileMetadataDuck;
-import net.minecraft.resource.PackVersion;
-import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.util.dynamic.Range;
+import net.minecraft.server.packs.metadata.pack.PackFormat;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.util.InclusiveRange;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(ResourcePackProfile.Metadata.class)
+@Mixin(Pack.Metadata.class)
 public class ResourcePackProfileMetadataMixin implements ResourcePackProfileMetadataDuck {
 
-    @Unique private Range<PackVersion> version = null;
+    @Unique private InclusiveRange<PackFormat> version = null;
 
     @Override
-    public Range<PackVersion> customhud$getPackVersionRange() {
+    public InclusiveRange<PackFormat> customhud$getPackVersionRange() {
         return version;
     }
 
     @Override
-    public void customhud$setPackVersionRange(Range<PackVersion> version) {
+    public void customhud$setPackVersionRange(InclusiveRange<PackFormat> version) {
         this.version = version;
     }
 }

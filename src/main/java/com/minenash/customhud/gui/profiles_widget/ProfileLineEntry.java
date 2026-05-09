@@ -6,27 +6,26 @@ import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.gui.NewConfigScreen.Mode;
 import com.minenash.customhud.gui.TogglesScreen;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.network.chat.Component;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class ProfileLineEntry extends LineEntry {
 
-    public final ButtonWidget selected, cycled, toggles;
-    private final ButtonWidget keybind, edit, error;
-    private final ButtonWidget delete, up, down;
-    public final TextFieldWidget editName;
+    public final Button selected, cycled, toggles;
+    private final Button keybind, edit, error;
+    private final Button delete, up, down;
+    public final EditBox editName;
     private final ProfileLinesWidget widget;
 
     public final Profile profile;
@@ -39,7 +38,7 @@ public class ProfileLineEntry extends LineEntry {
 
         this.selected = button(ProfileManager.getActive() == profile ? "☑" : "☐", "Swap to this profile", 16, (b) -> {
             ProfileManager.setActive(profile);
-            b.setTooltip(Tooltip.of(Text.literal(ProfileManager.getActive() == profile ? "Turn off this profile" : "Swap to this profile")));
+            b.setTooltip(Tooltip.create(Component.literal(ProfileManager.getActive() == profile ? "Turn off this profile" : "Swap to this profile")));
         });
 
 //        String editText = "Will open in your text editor\n\n Not opening? Shift-click to edit in game";
@@ -47,10 +46,10 @@ public class ProfileLineEntry extends LineEntry {
         this.edit = button("Edit", ProfileManager.openTooltipStr, 40, (b) -> ProfileManager.open(profile));
         this.cycled = button(profile.cycle ? "☑" : "☐", "Include this profile in the profile cycle", 16, (b) -> {
             profile.cycle = !profile.cycle;
-            b.setMessage(Text.literal(profile.cycle ? "☑" : "☐"));
+            b.setMessage(Component.literal(profile.cycle ? "☑" : "☐"));
         });
 
-        this.keybind = button(profile.keyBinding.getBoundKeyLocalizedText().getString(), "Keybind to switch to this profile", 80, (b) -> {
+        this.keybind = button(profile.keyBinding.getTranslatedKeyMessage().getString(), "Keybind to switch to this profile", 80, (b) -> {
             widget.screen.selectedKeybind = profile.keyBinding;
             widget.update();
         });
@@ -62,37 +61,31 @@ public class ProfileLineEntry extends LineEntry {
         this.up = button("§a↑", 16, b -> widget.move(this, -1));
         this.down = button("§c↓", 16, b -> widget.move(this, 1));
 
-        this.editName = new TextFieldWidget(CLIENT.textRenderer, 0, 0, 200, 16, Text.literal("Edit Name"));
-        this.editName.setText(profile.name);
-        this.editName.setTooltip(Tooltip.of(Text.literal("Click to edit name")));
-        this.editName.setFocusUnlocked(true);
-        this.editName.setTextPredicate( str -> {
-            for (int i = 0; i < str.length(); i++)
-                if (invalidCharacters.contains(str.charAt(i)))
-                    return false;
-            return true;
-        });
-        this.editName.setChangedListener((n) -> widget.screen.editing = this);
+        this.editName = new EditBox(CLIENT.font, 0, 0, 200, 16, Component.literal("Edit Name"));
+        this.editName.setValue(profile.name);
+        this.editName.setTooltip(Tooltip.create(Component.literal("Click to edit name")));
+        this.editName.setCanLoseFocus(true);
+        this.editName.setResponder((n) -> widget.screen.editing = this);
     }
 
     private static final List<Character> invalidCharacters = List.of('\\', '/', ':', '*', '?', '"', '<', '>', '|');
 
     public void update() {
-        keybind.setMessage(this.profile.keyBinding.getBoundKeyLocalizedText());
+        keybind.setMessage(this.profile.keyBinding.getTranslatedKeyMessage());
         if (widget.screen.selectedKeybind == profile.keyBinding)
 //            keyButton.setMessage(keyButton.getMessage().copy().formatted(Formatting.YELLOW, Formatting.UNDERLINE));
-            keybind.setMessage(Text.literal("> ")
-                    .append(keybind.getMessage().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE))
-                    .append(" <").formatted(Formatting.YELLOW));
+            keybind.setMessage(Component.literal("> ")
+                    .append(keybind.getMessage().copy().withStyle(ChatFormatting.WHITE, ChatFormatting.UNDERLINE))
+                    .append(" <").withStyle(ChatFormatting.YELLOW));
 
         editName.setFocused(false);
-        if (!editName.getText().equals(profile.name)) {
-            ProfileManager.rename(profile, editName.getText());
+        if (!editName.getValue().equals(profile.name)) {
+            ProfileManager.rename(profile, editName.getValue());
         }
     }
 
     @Override
-    public void render(DrawContext context, int mX, int mY, boolean hovered, float delta) {
+    public void extractContent(GuiGraphicsExtractor context, int mX, int mY, boolean hovered, float delta) {
         int x = getContentX();
         int y = getContentY();
         int eWidth = getContentWidth();
@@ -101,17 +94,17 @@ public class ProfileLineEntry extends LineEntry {
         editName.setY(y);
         editName.setWidth(eWidth - 16 - 20 - 16 - 42 - 82 - 18 - (profile.toggles.isEmpty() ? 0 : 50) - 3);
 
-        if (editName.isSelected() || editName.isMouseOver(mX, mY))
-            editName.render(context, mX, mY, delta);
+        if (editName.isHoveredOrFocused() || editName.isMouseOver(mX, mY))
+            editName.extractRenderState(context, mX, mY, delta);
         else {
-            if (!editName.getText().equals(profile.name)) {
-                ProfileManager.rename(profile, editName.getText());
+            if (!editName.getValue().equals(profile.name)) {
+                ProfileManager.rename(profile, editName.getValue());
                 displayName = profile.name;
             }
-            context.drawTextWithShadow(CLIENT.textRenderer, truncateName(x, eWidth), x + 16 + 20 + 4, y + 4, 0xFFFFFFFF);
+            context.text(CLIENT.font, truncateName(x, eWidth), x + 16 + 20 + 4, y + 4, 0xFFFFFFFF);
         }
 
-        selected.setMessage(Text.literal(ProfileManager.getActive() == profile ? "☑" : "☐"));
+        selected.setMessage(Component.literal(ProfileManager.getActive() == profile ? "☑" : "☐"));
         posAndRender(context, mX, mY, delta, x, y, eWidth, selected, 2);
 
         if (widget.screen.mode == Mode.DELETE) {
@@ -120,11 +113,11 @@ public class ProfileLineEntry extends LineEntry {
         }
         if (widget.screen.mode == Mode.REORDER) {
             down.active = widget.children().get(widget.children().size()-2) != this;
-            down.setMessage(Text.literal(down.active ? "§c↓" : "§4↓"));
+            down.setMessage(Component.literal(down.active ? "§c↓" : "§4↓"));
             posAndRender(context, mX, mY, delta, x, y, eWidth, down, -16-18);
 
             up.active = widget.children().get(0) != this;
-            up.setMessage(Text.literal(up.active ? "§a↑" : "§2↑"));
+            up.setMessage(Component.literal(up.active ? "§a↑" : "§2↑"));
             posAndRender(context, mX, mY, delta, x, y, eWidth, up, -16-18-18);
             return;
         }
@@ -142,7 +135,7 @@ public class ProfileLineEntry extends LineEntry {
 
     private String truncateName(int x, int eWidth) {
         String name = displayName;
-        int width = CLIENT.textRenderer.getWidth(name);
+        int width = CLIENT.font.width(name);
         int maxWidth = x + eWidth + switch (widget.screen.mode) {
             case NORMAL ->  -16-42-82-18-(profile.toggles.isEmpty() ? 0 : 50);
             case REORDER -> -16-18-18;
@@ -151,19 +144,19 @@ public class ProfileLineEntry extends LineEntry {
         if (maxWidth > width)
             return name;
 
-        maxWidth -= CLIENT.textRenderer.getWidth("…") + 2;
+        maxWidth -= CLIENT.font.width("…") + 2;
 
         while(width > maxWidth) {
             name = name.substring(0, name.length() - 1);
-            width = CLIENT.textRenderer.getWidth(name);
+            width = CLIENT.font.width(name);
         }
         return name + "…";
     }
 
-    @Override public List<? extends Selectable> selectableChildren() { return widgets(); }
-    @Override public List<? extends Element> children() { return widgets(); }
-    public List<ClickableWidget> widgets() {
-        List<ClickableWidget> widgets = new ArrayList<>(6);
+    @Override public List<? extends NarratableEntry> narratables() { return widgets(); }
+    @Override public List<? extends GuiEventListener> children() { return widgets(); }
+    public List<AbstractWidget> widgets() {
+        List<AbstractWidget> widgets = new ArrayList<>(6);
         widgets.add(selected);
         widgets.add(editName);
         if (widget.screen.mode == Mode.DELETE)

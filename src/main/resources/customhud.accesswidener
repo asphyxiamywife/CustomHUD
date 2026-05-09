@@ -1,70 +1,67 @@
-accessWidener	v1	named
-accessible	class	net/minecraft/client/option/GameOptions$Visitor
-extendable	method	net/minecraft/client/gui/widget/EntryListWidget	getEntryAtPosition	(DD)Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;
-accessible	field	net/minecraft/entity/projectile/FishingBobberEntity	CAUGHT_FISH	Lnet/minecraft/entity/data/TrackedData;
-accessible  method  net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround (Lnet/minecraft/util/math/BlockPos;)Z
-accessible	field	net/minecraft/client/sound/SoundManager	soundSystem	Lnet/minecraft/client/sound/SoundSystem;
-accessible	field	net/minecraft/client/sound/SoundSystem	soundEngine	Lnet/minecraft/client/sound/SoundEngine;
-accessible	field	net/minecraft/client/sound/SoundEngine	streamingSources	Lnet/minecraft/client/sound/SoundEngine$SourceSet;
-accessible	field	net/minecraft/client/sound/SoundEngine	staticSources	Lnet/minecraft/client/sound/SoundEngine$SourceSet;
-accessible	class	net/minecraft/client/sound/SoundEngine$SourceSet
-accessible	field	net/minecraft/client/particle/ParticleManager	particles	Ljava/util/Map;
-accessible	field	net/minecraft/client/gui/hud/BossBarHud	bossBars	Ljava/util/Map;
-accessible	field	net/minecraft/entity/boss/BossBarManager	commandBossBars	Ljava/util/Map;
-accessible	method	net/minecraft/client/gui/hud/BossBarHud	renderBossBar	(Lnet/minecraft/client/gui/DrawContext;IILnet/minecraft/entity/boss/BossBar;)V
-accessible	field	net/minecraft/client/world/ClientChunkManager	chunks	Lnet/minecraft/client/world/ClientChunkManager$ClientChunkMap;
-accessible	class	net/minecraft/client/world/ClientChunkManager$ClientChunkMap
-accessible	field	net/minecraft/client/world/ClientChunkManager$ClientChunkMap	chunks	Ljava/util/concurrent/atomic/AtomicReferenceArray;
-accessible  field   net/minecraft/client/world/ClientWorld entityManager    Lnet/minecraft/world/entity/ClientEntityManager;
-accessible	field	net/minecraft/world/entity/ClientEntityManager	index	Lnet/minecraft/world/entity/EntityIndex;
-accessible	field	net/minecraft/world/entity/ClientEntityManager	cache	Lnet/minecraft/world/entity/SectionedEntityCache;
-accessible	field	net/minecraft/world/entity/ClientEntityManager	tickingChunkSections	Lit/unimi/dsi/fastutil/longs/LongSet;
-accessible	field	net/minecraft/server/world/ServerWorld	entityManager	Lnet/minecraft/server/world/ServerEntityManager;
-accessible	field	net/minecraft/server/world/ServerEntityManager	index	Lnet/minecraft/world/entity/EntityIndex;
-accessible	field	net/minecraft/server/world/ServerEntityManager	cache	Lnet/minecraft/world/entity/SectionedEntityCache;
-accessible	field	net/minecraft/server/world/ServerEntityManager	entityUuids	Ljava/util/Set;
-accessible	field	net/minecraft/server/world/ServerEntityManager	trackingStatuses	Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
-accessible	field	net/minecraft/server/world/ServerEntityManager	managedStatuses	Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
-accessible	field	net/minecraft/server/world/ServerEntityManager	loadingQueue	Ljava/util/Queue;
-accessible	field	net/minecraft/server/world/ServerEntityManager	pendingUnloads	Lit/unimi/dsi/fastutil/longs/LongSet;
-accessible  field   net/minecraft/client/option/KeyBinding  timesPressed    I
-accessible  method  net/minecraft/scoreboard/Scoreboard getScores (Ljava/lang/String;)Lnet/minecraft/scoreboard/Scores;
-accessible field net/minecraft/scoreboard/Scores scores Lit/unimi/dsi/fastutil/objects/Reference2ObjectOpenHashMap;
-accessible field net/minecraft/client/gui/hud/InGameHud SCOREBOARD_ENTRY_COMPARATOR Ljava/util/Comparator;
-accessible field net/minecraft/client/gui/screen/Screen drawables Ljava/util/List;
-accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
-accessible class net/minecraft/client/MinecraftClient$LoadingContext
-accessible field net/minecraft/client/gui/hud/InGameHud overlayMessage Lnet/minecraft/text/Text;
-accessible field net/minecraft/client/gui/hud/InGameHud overlayRemaining I
-accessible field net/minecraft/client/gui/hud/InGameHud overlayTinted Z
-accessible field net/minecraft/client/gui/hud/InGameHud title Lnet/minecraft/text/Text;
-accessible field net/minecraft/client/gui/hud/InGameHud subtitle Lnet/minecraft/text/Text;
-accessible field net/minecraft/client/gui/hud/InGameHud titleRemainTicks I
-accessible field net/minecraft/client/gui/hud/InGameHud titleFadeOutTicks I
-accessible field net/minecraft/client/gui/hud/InGameHud titleStayTicks I
-accessible field net/minecraft/client/gui/hud/InGameHud titleFadeInTicks I
-accessible field net/minecraft/resource/ResourcePackProfile metaData Lnet/minecraft/resource/ResourcePackProfile$Metadata;
-accessible class net/minecraft/client/gui/hud/debug/MemoryDebugHudEntry$AllocationRateCalculator
-accessible method net/minecraft/client/gui/hud/debug/MemoryDebugHudEntry$AllocationRateCalculator <init> ()V
-accessible method net/minecraft/client/gui/hud/debug/MemoryDebugHudEntry$AllocationRateCalculator get (J)J
-accessible field net/minecraft/client/util/InputUtil$Key type Lnet/minecraft/client/util/InputUtil$Type;
-accessible method net/minecraft/client/gui/hud/BossBarHud renderBossBar (Lnet/minecraft/client/gui/DrawContext;IILnet/minecraft/entity/boss/BossBar;I[Lnet/minecraft/util/Identifier;[Lnet/minecraft/util/Identifier;)V
-accessible field net/minecraft/client/gui/hud/BossBarHud BACKGROUND_TEXTURES [Lnet/minecraft/util/Identifier;
-accessible field net/minecraft/client/gui/hud/BossBarHud PROGRESS_TEXTURES [Lnet/minecraft/util/Identifier;
-accessible field net/minecraft/client/gui/hud/BossBarHud NOTCHED_BACKGROUND_TEXTURES [Lnet/minecraft/util/Identifier;
-accessible field net/minecraft/client/gui/hud/BossBarHud NOTCHED_PROGRESS_TEXTURES [Lnet/minecraft/util/Identifier;
-accessible field net/minecraft/client/gui/hud/ChatHud messages Ljava/util/List;
-accessible field net/minecraft/client/gui/hud/DebugHud renderingChart Lnet/minecraft/client/gui/hud/debug/chart/RenderingChart;
-accessible field net/minecraft/client/gui/hud/DebugHud tickChart Lnet/minecraft/client/gui/hud/debug/chart/TickChart;
-accessible field net/minecraft/client/gui/hud/DebugHud pingChart Lnet/minecraft/client/gui/hud/debug/chart/PingChart;
-accessible field net/minecraft/client/gui/hud/DebugHud packetSizeChart Lnet/minecraft/client/gui/hud/debug/chart/PacketSizeChart;
-accessible field net/minecraft/client/gui/hud/debug/chart/PieChart profileResult Lnet/minecraft/util/profiler/ProfileResult;
-accessible class net/minecraft/client/gui/hud/SubtitlesHud$SubtitleEntry
-accessible field net/minecraft/client/gui/hud/SubtitlesHud$SubtitleEntry sounds Ljava/util/List;
-accessible class net/minecraft/client/gui/hud/SubtitlesHud$SoundEntry
-accessible field net/minecraft/client/gui/hud/SubtitlesHud$SoundEntry time J
-accessible field net/minecraft/client/gui/hud/SubtitlesHud$SoundEntry location Lnet/minecraft/util/math/Vec3d;
-accessible field net/minecraft/entity/player/ItemCooldownManager entries Ljava/util/Map;
-accessible field net/minecraft/entity/player/ItemCooldownManager tick I
-accessible class net/minecraft/entity/player/ItemCooldownManager$Entry
-accessible field net/minecraft/client/render/WorldRenderer worldRenderState Lnet/minecraft/client/render/state/WorldRenderState;
+accessWidener	v1	official
+accessible	class	net/minecraft/client/Options$FieldAccess
+extendable	method	net/minecraft/client/gui/components/AbstractSelectionList	getEntryAtPosition	(DD)Lnet/minecraft/client/gui/components/AbstractSelectionList$Entry;
+accessible	field	net/minecraft/world/entity/projectile/FishingHook	DATA_BITING	Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible	method	net/minecraft/world/entity/projectile/FishingHook	calculateOpenWater	(Lnet/minecraft/core/BlockPos;)Z
+accessible	field	net/minecraft/client/sounds/SoundManager	soundEngine	Lnet/minecraft/client/sounds/SoundEngine;
+accessible	field	net/minecraft/client/sounds/SoundEngine	library	Lcom/mojang/blaze3d/audio/Library;
+accessible	field	com/mojang/blaze3d/audio/Library	staticChannels	Lcom/mojang/blaze3d/audio/Library$ChannelPool;
+accessible	field	com/mojang/blaze3d/audio/Library	streamingChannels	Lcom/mojang/blaze3d/audio/Library$ChannelPool;
+accessible	class	com/mojang/blaze3d/audio/Library$ChannelPool
+accessible	field	net/minecraft/client/particle/ParticleEngine	particles	Ljava/util/Map;
+accessible	field	net/minecraft/client/gui/components/BossHealthOverlay	events	Ljava/util/Map;
+accessible	field	net/minecraft/server/bossevents/CustomBossEvents	events	Ljava/util/Map;
+accessible	field	net/minecraft/client/multiplayer/ClientChunkCache	storage	Lnet/minecraft/client/multiplayer/ClientChunkCache$Storage;
+accessible	class	net/minecraft/client/multiplayer/ClientChunkCache$Storage
+accessible	field	net/minecraft/client/multiplayer/ClientChunkCache$Storage	chunks	Ljava/util/concurrent/atomic/AtomicReferenceArray;
+accessible	field	net/minecraft/client/multiplayer/ClientLevel	entityStorage	Lnet/minecraft/world/level/entity/TransientEntitySectionManager;
+accessible	field	net/minecraft/world/level/entity/TransientEntitySectionManager	entityStorage	Lnet/minecraft/world/level/entity/EntityLookup;
+accessible	field	net/minecraft/world/level/entity/TransientEntitySectionManager	sectionStorage	Lnet/minecraft/world/level/entity/EntitySectionStorage;
+accessible	field	net/minecraft/world/level/entity/TransientEntitySectionManager	tickingChunks	Lit/unimi/dsi/fastutil/longs/LongSet;
+accessible	field	net/minecraft/server/level/ServerLevel	entityManager	Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;
+accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager	visibleEntityStorage	Lnet/minecraft/world/level/entity/EntityLookup;
+accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager	sectionStorage	Lnet/minecraft/world/level/entity/EntitySectionStorage;
+accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager	knownUuids	Ljava/util/Set;
+accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager	chunkVisibility	Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager	chunkLoadStatuses	Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager	loadingInbox	Ljava/util/Queue;
+accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager	chunksToUnload	Lit/unimi/dsi/fastutil/longs/LongSet;
+accessible	field	net/minecraft/client/KeyMapping	clickCount	I
+accessible	method	net/minecraft/world/scores/Scoreboard	getOrCreatePlayerInfo	(Ljava/lang/String;)Lnet/minecraft/world/scores/PlayerScores;
+accessible	field	net/minecraft/world/scores/PlayerScores	scores	Lit/unimi/dsi/fastutil/objects/Reference2ObjectOpenHashMap;
+accessible	field	net/minecraft/client/gui/Gui	SCORE_DISPLAY_ORDER	Ljava/util/Comparator;
+accessible	field	net/minecraft/client/gui/screens/Screen	renderables	Ljava/util/List;
+accessible	field	net/minecraft/client/KeyMapping	key	Lcom/mojang/blaze3d/platform/InputConstants$Key;
+accessible	class	net/minecraft/client/Minecraft$GameLoadCookie
+accessible	field	net/minecraft/client/gui/Gui	overlayMessageString	Lnet/minecraft/network/chat/Component;
+accessible	field	net/minecraft/client/gui/Gui	overlayMessageTime	I
+accessible	field	net/minecraft/client/gui/Gui	animateOverlayMessageColor	Z
+accessible	field	net/minecraft/client/gui/Gui	title	Lnet/minecraft/network/chat/Component;
+accessible	field	net/minecraft/client/gui/Gui	subtitle	Lnet/minecraft/network/chat/Component;
+accessible	field	net/minecraft/client/gui/Gui	titleTime	I
+accessible	field	net/minecraft/client/gui/Gui	titleFadeOutTime	I
+accessible	field	net/minecraft/client/gui/Gui	titleStayTime	I
+accessible	field	net/minecraft/client/gui/Gui	titleFadeInTime	I
+accessible	field	net/minecraft/server/packs/repository/Pack	metadata	Lnet/minecraft/server/packs/repository/Pack$Metadata;
+accessible	class	net/minecraft/client/gui/components/debug/DebugEntryMemory$AllocationRateCalculator
+accessible	method	net/minecraft/client/gui/components/debug/DebugEntryMemory$AllocationRateCalculator	<init>	()V
+accessible	method	net/minecraft/client/gui/components/debug/DebugEntryMemory$AllocationRateCalculator	bytesAllocatedPerSecond	(J)J
+accessible	field	com/mojang/blaze3d/platform/InputConstants$Key	type	Lcom/mojang/blaze3d/platform/InputConstants$Type;
+accessible	field	net/minecraft/client/gui/components/BossHealthOverlay	BAR_BACKGROUND_SPRITES	[Lnet/minecraft/resources/Identifier;
+accessible	field	net/minecraft/client/gui/components/BossHealthOverlay	BAR_PROGRESS_SPRITES	[Lnet/minecraft/resources/Identifier;
+accessible	field	net/minecraft/client/gui/components/BossHealthOverlay	OVERLAY_BACKGROUND_SPRITES	[Lnet/minecraft/resources/Identifier;
+accessible	field	net/minecraft/client/gui/components/BossHealthOverlay	OVERLAY_PROGRESS_SPRITES	[Lnet/minecraft/resources/Identifier;
+accessible	field	net/minecraft/client/gui/components/ChatComponent	allMessages	Ljava/util/List;
+accessible	field	net/minecraft/client/gui/components/DebugScreenOverlay	fpsChart	Lnet/minecraft/client/gui/components/debugchart/FpsDebugChart;
+accessible	field	net/minecraft/client/gui/components/DebugScreenOverlay	tpsChart	Lnet/minecraft/client/gui/components/debugchart/TpsDebugChart;
+accessible	field	net/minecraft/client/gui/components/DebugScreenOverlay	pingChart	Lnet/minecraft/client/gui/components/debugchart/PingDebugChart;
+accessible	field	net/minecraft/client/gui/components/DebugScreenOverlay	bandwidthChart	Lnet/minecraft/client/gui/components/debugchart/BandwidthDebugChart;
+accessible	field	net/minecraft/client/gui/components/debugchart/ProfilerPieChart	profilerPieChartResults	Lnet/minecraft/util/profiling/ProfileResults;
+accessible	class	net/minecraft/client/gui/components/SubtitleOverlay$Subtitle
+accessible	field	net/minecraft/client/gui/components/SubtitleOverlay$Subtitle	playedAt	Ljava/util/List;
+accessible	class	net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt
+accessible	field	net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt	time	J
+accessible	field	net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt	location	Lnet/minecraft/world/phys/Vec3;
+accessible	field	net/minecraft/world/item/ItemCooldowns	cooldowns	Ljava/util/Map;
+accessible	field	net/minecraft/world/item/ItemCooldowns	tickCount	I
+accessible	class	net/minecraft/world/item/ItemCooldowns$CooldownInstance

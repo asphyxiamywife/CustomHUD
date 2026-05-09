@@ -8,10 +8,9 @@ import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
 import com.minenash.customhud.HudElements.list.ListCountElement;
 import com.minenash.customhud.complex.ListManager;
-import net.minecraft.util.Identifier;
-
 import java.util.List;
 import java.util.function.Function;
+import net.minecraft.resources.Identifier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -41,7 +40,7 @@ public interface Operation {
                 return 0;
             }
             if (!(element instanceof MultiElement me))
-                return CLIENT.textRenderer.getWidth(element.getString());
+                return CLIENT.font.width(element.getString());
 
             double length = 0;
             for (HudElement e : me.expand())

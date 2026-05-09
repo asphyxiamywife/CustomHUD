@@ -4,11 +4,11 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.customhud.CustomHud;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,100 +16,100 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static com.minenash.customhud.data.DisableElement.*;
 
-@Mixin(value = InGameHud.class, priority = 10000)
+@Mixin(value = Gui.class, priority = 10000)
 public abstract class InGameHudMixin {
 
-    @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    public void customhud$disableHotbar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true, require = 0)
+    public void customhud$disableHotbar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(HOTBAR))
             ci.cancel();
     }
 
-    @Inject(method = "renderBossBarHud", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableBossBar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractBossOverlay", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableBossBar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(BOSSBARS))
             ci.cancel();
     }
 
-    @Inject(method = "renderStatusBars", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableStatusBars(DrawContext context, CallbackInfo ci) {
+    @Inject(method = "extractPlayerHealth", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableStatusBars(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(STATUS_BARS))
             ci.cancel();
     }
 
-    @WrapOperation(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderArmor(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;IIII)V"))
-    public void customhud$disableArmor(DrawContext context, PlayerEntity player, int i, int j, int k, int x, Operation<Void> original) {
+    @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractArmor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;IIII)V"), require = 0)
+    public void customhud$disableArmor(GuiGraphicsExtractor context, Player player, int i, int j, int k, int x, Operation<Void> original) {
         if (CustomHud.isNotDisabled(ARMOR))
             original.call(context, player, i, j, k, x);
     }
 
-    @WrapOperation(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHealthBar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;IIIIFIIIZ)V"))
-    public void customhud$disableHealthBar(InGameHud instance, DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking, Operation<Void> original) {
+    @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractHearts(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;IIIIFIIIZ)V"), require = 0)
+    public void customhud$disableHealthBar(Gui instance, GuiGraphicsExtractor context, Player player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking, Operation<Void> original) {
         if (CustomHud.isNotDisabled(HEALTH))
             original.call(instance, context, player, x, y, lines, regeneratingHeartIndex, maxHealth, lastHealth, health, absorption, blinking);
     }
 
-    @WrapOperation(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderFood(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;II)V"))
-    public void customhud$disableHunger(InGameHud instance, DrawContext context, PlayerEntity player, int top, int right, Operation<Void> original) {
+    @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractFood(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;II)V"), require = 0)
+    public void customhud$disableHunger(Gui instance, GuiGraphicsExtractor context, Player player, int top, int right, Operation<Void> original) {
         if (CustomHud.isNotDisabled(HUNGER))
             original.call(instance, context, player, top, right);
     }
 
-    @WrapOperation(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderAirBubbles(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;III)V"))
-    public void customhud$disableAir(InGameHud instance, DrawContext context, PlayerEntity player, int heartCount, int top, int left, Operation<Void> original) {
+    @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractAirBubbles(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;III)V"), require = 0)
+    public void customhud$disableAir(Gui instance, GuiGraphicsExtractor context, Player player, int heartCount, int top, int left, Operation<Void> original) {
         if (CustomHud.isNotDisabled(AIR))
             original.call(instance, context, player, heartCount, top, left);
     }
 
-    @Inject(method = "renderMountHealth", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableHorseHealth(DrawContext context, CallbackInfo ci) {
+    @Inject(method = "extractVehicleHealth", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableHorseHealth(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(HORSE) || CustomHud.isDisabled(HORSE_HEALTH) || CustomHud.isDisabled(STATUS_BARS))
             ci.cancel();
     }
 
-    @WrapWithCondition(method = "renderMainHud", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/bar/Bar;drawExperienceLevel(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/font/TextRenderer;I)V"))
-    public boolean customhud$disableXPLvl(DrawContext context, TextRenderer textRenderer, int level) {
+    @WrapWithCondition(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;renderExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"), require = 0)
+    public boolean customhud$disableXPLvl(GuiGraphicsExtractor context, Font textRenderer, int level) {
         return CustomHud.isNotDisabled(XP);
     }
 
-    @Inject(method = "renderHeldItemTooltip", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableHotbar(DrawContext context, CallbackInfo ci) {
+    @Inject(method = "extractSelectedItemName", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableHotbar(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(ITEM_TOOLTIP))
             ci.cancel();
     }
 
-    @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableStatusEffects(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractEffects", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableStatusEffects(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(STATUS_EFFECTS))
             ci.cancel();
     }
 
-    @Inject(method = "renderSubtitlesHud", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableSubtitles(DrawContext context, boolean defer, CallbackInfo ci) {
+    @Inject(method = "extractSubtitleOverlay", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableSubtitles(GuiGraphicsExtractor context, boolean defer, CallbackInfo ci) {
         if (CustomHud.isDisabled(SUBTITLES))
             ci.cancel();
     }
 
-    @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableScoreboard(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableScoreboard(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(SCOREBOARD))
             ci.cancel();
     }
 
-    @Inject(method = "renderChat", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableChat(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractChat", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableChat(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(CHAT))
             ci.cancel();
     }
 
-    @Inject(method = "renderTitleAndSubtitle", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableTitles(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractTitle", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableTitles(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(TITLES))
             ci.cancel();
     }
 
-    @Inject(method = "renderOverlayMessage", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableActionbarMsg(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractOverlayMessage", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    public void customhud$disableActionbarMsg(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(ACTIONBAR))
             ci.cancel();
     }

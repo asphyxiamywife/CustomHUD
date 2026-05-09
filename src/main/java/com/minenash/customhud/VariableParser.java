@@ -5,6 +5,8 @@ import com.minenash.customhud.HudElements.functional.GetValueElement;
 import com.minenash.customhud.HudElements.functional.SetValueElement;
 import com.minenash.customhud.HudElements.list.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
+import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
+import com.minenash.customhud.HudElements.functional.FunctionalElement.IgnoreErrorElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.icon.*;
 import com.minenash.customhud.HudElements.list.Attributers.Attributer;
@@ -24,25 +26,25 @@ import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.registry.CustomHudRegistry;
 import com.minenash.customhud.registry.ParseContext;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.terraformersmc.modmenu.ModMenu;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.scoreboard.ScoreHolder;
-import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.stat.StatType;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.Pair;
+import net.minecraft.IdentifierException;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.stats.StatType;
+import net.minecraft.stats.Stats;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.ScoreHolder;
 import org.lwjgl.glfw.GLFW;
 
 import java.text.SimpleDateFormat;
@@ -444,7 +446,7 @@ public class VariableParser {
             String main = flagParts[0];
 
             if (!crosshair) {
-                Item item = Registries.ITEM.get(Identifier.tryParse(main));
+                Item item = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(main));
                 if (item != Items.AIR) {
                     Flags flags = Flags.parse(profile.name, debugLine, flagParts);
                     return Flags.wrap(new ItemIconElement(new ItemStack(item), flags), flags);
@@ -547,11 +549,11 @@ public class VariableParser {
             ListProvider provider = null;
 
             if (p.startsWith("itag:") || p.startsWith("item_tag:")) {
-                provider = ListSuppliers.TAG_ENTRIES(Registries.ITEM, value);
+                provider = ListSuppliers.TAG_ENTRIES(BuiltInRegistries.ITEM, value);
                 ATTRIBUTER_MAP.put(provider, ITEM_CONVERTABLE_TAG_ENTRY);
             }
             else if (p.startsWith("btag:") || p.startsWith("block_tag:")) {
-                provider = ListSuppliers.TAG_ENTRIES(Registries.BLOCK, value);
+                provider = ListSuppliers.TAG_ENTRIES(BuiltInRegistries.BLOCK, value);
                 ATTRIBUTER_MAP.put(provider, ITEM_CONVERTABLE_TAG_ENTRY);
             }
             else if (p.startsWith("score:") && p.indexOf(':', 6) == -1) {
@@ -595,42 +597,42 @@ public class VariableParser {
             String objective = part.substring(collinIndex+1);
 
             return Flags.wrap(new NumberSupplierElement(() -> {
-                ScoreboardObjective obj = scoreboard().getNullableObjective(objective);
+                Objective obj = scoreboard().getObjective(objective);
                 if (obj == null) return null;
-                var score = scoreboard().getScore(ScoreHolder.fromName(player), obj);
-                return score == null ? 0 : score.getScore();
+                var score = scoreboard().getPlayerScoreInfo(ScoreHolder.forNameOnly(player), obj);
+                return score == null ? 0 : score.value();
             }, flags), flags);
         }
 
         if (part.startsWith("pscore:") || part.startsWith("player_score:")) {
             String p = part.substring(part.indexOf(':')+1);
             return Flags.wrap(new NumberSupplierElement(() -> {
-                ScoreboardObjective obj = scoreboard().getNullableObjective(p);
+                Objective obj = scoreboard().getObjective(p);
                 if (obj == null) return null;
-                var score = scoreboard().getScore(ScoreHolder.fromProfile(CLIENT.player.getGameProfile()), obj);
-                return score == null ? 0 : score.getScore();
+                var score = scoreboard().getPlayerScoreInfo(ScoreHolder.fromGameProfile(CLIENT.player.getGameProfile()), obj);
+                return score == null ? 0 : score.value();
             }, flags), flags);
         }
 
         if (part.startsWith("stat:")) {
             String stat = part.substring(5);
 
-            HudElement element = stat("mined:",   Stats.MINED,   Registries.BLOCK, stat, flags, enabled);
-            if (element == null) element = stat("crafted:", Stats.CRAFTED, Registries.ITEM,  stat, flags, enabled);
-            if (element == null) element = stat("used:",    Stats.USED,    Registries.ITEM,  stat, flags, enabled);
-            if (element == null) element = stat("broken:",  Stats.BROKEN,  Registries.ITEM,  stat, flags, enabled);
-            if (element == null) element = stat("dropped:", Stats.DROPPED, Registries.ITEM,  stat, flags, enabled);
-            if (element == null) element = stat("picked_up:", Stats.PICKED_UP, Registries.ITEM, stat, flags, enabled);
-            if (element == null) element = stat("killed:",    Stats.KILLED,    Registries.ENTITY_TYPE, stat, flags, enabled);
-            if (element == null) element = stat("killed_by:", Stats.KILLED_BY, Registries.ENTITY_TYPE, stat, flags, enabled);
+            HudElement element = stat("mined:",   Stats.BLOCK_MINED,   BuiltInRegistries.BLOCK, stat, flags, enabled);
+            if (element == null) element = stat("crafted:", Stats.ITEM_CRAFTED, BuiltInRegistries.ITEM,  stat, flags, enabled);
+            if (element == null) element = stat("used:",    Stats.ITEM_USED,    BuiltInRegistries.ITEM,  stat, flags, enabled);
+            if (element == null) element = stat("broken:",  Stats.ITEM_BROKEN,  BuiltInRegistries.ITEM,  stat, flags, enabled);
+            if (element == null) element = stat("dropped:", Stats.ITEM_DROPPED, BuiltInRegistries.ITEM,  stat, flags, enabled);
+            if (element == null) element = stat("picked_up:", Stats.ITEM_PICKED_UP, BuiltInRegistries.ITEM, stat, flags, enabled);
+            if (element == null) element = stat("killed:",    Stats.ENTITY_KILLED,    BuiltInRegistries.ENTITY_TYPE, stat, flags, enabled);
+            if (element == null) element = stat("killed_by:", Stats.ENTITY_KILLED_BY, BuiltInRegistries.ENTITY_TYPE, stat, flags, enabled);
 
             if (element != null)
                 return Flags.wrap(element, flags);
 
-            Identifier statId = Registries.CUSTOM_STAT.get(Identifier.of(stat));
-            if (Stats.CUSTOM.hasStat(statId)) {
+            Identifier statId = BuiltInRegistries.CUSTOM_STAT.getValue(Identifier.parse(stat));
+            if (Stats.CUSTOM.contains(statId)) {
                 enabled.updateStats = true;
-                return Flags.wrap(new CustomStatElement(Stats.CUSTOM.getOrCreateStat(statId), flags), flags);
+                return Flags.wrap(new CustomStatElement(Stats.CUSTOM.get(statId), flags), flags);
             }
             Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_STATISTIC, stat);
             return null;
@@ -641,7 +643,7 @@ public class VariableParser {
             int dotIndex = method.lastIndexOf('.');
             if (dotIndex != -1)
                 method = method.substring(0, dotIndex);
-            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(null, () -> CLIENT.player.getScoreboardTeam(), method, flags, null );
+            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(null, () -> CLIENT.player.getTeam(), method, flags, null );
             if (element instanceof CreateListElement cle) {
                 String attr = dotIndex == -1 ? "" : flagParts[0].substring(dotIndex + 1);
                 cle.attribute = Attributers.get(new ListProviderSet().with(cle.entry), attr, new Flags(), profile, debugLine);
@@ -657,14 +659,14 @@ public class VariableParser {
 
             try {
                 if (!icon && part.startsWith("#"))
-                    return new ItemTagCountElement(Identifier.of(part.substring(1)), flags);
-                Item item = Registries.ITEM.get(Identifier.of(part));
+                    return new ItemTagCountElement(Identifier.parse(part.substring(1)), flags);
+                Item item = BuiltInRegistries.ITEM.getValue(Identifier.parse(part));
                 if (item != Items.AIR)
                     return Flags.wrap(icon ? new ItemCountIconElement(item, flags) : new ItemCountElement(item, flags), flags);
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ITEM_ID, part);
                 return null;
             }
-            catch (InvalidIdentifierException e) {
+            catch (IdentifierException e) {
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ITEM_ID, part);
                 return null;
             }
@@ -672,11 +674,11 @@ public class VariableParser {
 
         if (part.startsWith("s:") || part.startsWith("setting:")) {
             String setting = part.substring(part.indexOf(':') + 1).toLowerCase();
-            Pair<HudElement,Pair<ErrorType,String>> element = SettingsElement.create(setting, flags);
+            Tuple<HudElement,Tuple<ErrorType,String>> element = SettingsElement.create(setting, flags);
 
-            if (element.getLeft() != null)
-                return Flags.wrap(element.getLeft(), flags);
-            Errors.addError(profile.name, debugLine, original, element.getRight().getLeft(), element.getRight().getRight());
+            if (element.getA() != null)
+                return Flags.wrap(element.getA(), flags);
+            Errors.addError(profile.name, debugLine, original, element.getB().getA(), element.getB().getB());
             return null;
         }
 
@@ -691,11 +693,11 @@ public class VariableParser {
                 setting = "key_" + setting;
             }
 
-            GameOptions options = MinecraftClient.getInstance().options;
+            Options options = Minecraft.getInstance().options;
             String key = setting.substring(4);
-            for (KeyBinding binding : options.allKeys)
-                if (binding.getId().equalsIgnoreCase(key))
-                    return Flags.wrap(new BooleanSupplierElement(binding::isPressed), flags);
+            for (KeyMapping binding : options.keyMappings)
+                if (binding.getName().equalsIgnoreCase(key))
+                    return Flags.wrap(new BooleanSupplierElement(binding::isDown), flags);
 
             Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_KEYBIND, context);
             return null;
@@ -711,8 +713,8 @@ public class VariableParser {
             Toggle toggle = profile.toggles.get(name);
             if (toggle == null) //Replace with saved key
                 toggle = new Toggle(name.replace('_', ' '), false, debugLine, true,
-                        new KeyBinding("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT),
-                        new KeyBinding("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT));
+                        new KeyMapping("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT),
+                        new KeyMapping("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT));
             else
                 toggle.lines.add(debugLine);
 
@@ -736,9 +738,9 @@ public class VariableParser {
             return new TextSupplierElement( () -> {
                 Toggle toggle = ProfileManager.getActive().toggles.get(name);
                 if (toggle == null) return null;
-                Text out = toggle.key.getBoundKeyLocalizedText();
+                Component out = toggle.key.getTranslatedKeyMessage();
                 if (!toggle.modifier.isUnbound())
-                    out = toggle.modifier.getBoundKeyLocalizedText().copy().append(" + ").append(out);
+                    out = toggle.modifier.getTranslatedKeyMessage().copy().append(" + ").append(out);
                 return out;
             }, flags );
         }
@@ -756,8 +758,8 @@ public class VariableParser {
                 name = "key." + name;
             }
 
-            InputUtil.Key key;
-            try { key = InputUtil.fromTranslationKey(name); }
+            InputConstants.Key key;
+            try { key = InputConstants.getKey(name); }
             catch(Exception ignored) { key = null; }
             if (key == null) {
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_KEY, name);
@@ -767,8 +769,8 @@ public class VariableParser {
             Toggle toggle = profile.toggles.get(" " + name); //Space indicates key variant
             if (toggle == null)
                 toggle = new Toggle(name, true, debugLine, true,
-                        new KeyBinding("customhud_key_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT),
-                        new KeyBinding("customhud_key_toggle_" + randomUUID(), key.getCode(), CustomHud.TOGGLES_KB_CAT));
+                        new KeyMapping("customhud_key_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT),
+                        new KeyMapping("customhud_key_toggle_" + randomUUID(), key.getValue(), CustomHud.TOGGLES_KB_CAT));
             else
                 toggle.lines.add(debugLine);
 
@@ -819,7 +821,7 @@ public class VariableParser {
             case "target_block_icon", "target_icon", "tbicon": enabled.targetBlock = enabled.world = true;
                 return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetBlock == null ? null : new ItemStack(ComplexData.targetBlock.getBlock()), flags, false), flags);
             case "target_fluid_icon", "tficon": enabled.targetFluid = enabled.world = true;
-                return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetFluid == null ? null : new ItemStack(ComplexData.targetFluid.getFluid().getBucketItem()), flags, false), flags);
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetFluid == null ? null : new ItemStack(ComplexData.targetFluid.getType().getBucket()), flags, false), flags);
             case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsgElement(flags), flags);
             case "title_msg", "title": return Flags.wrap(new TitleMsgElement(TITLE_MSG, flags), flags);
             case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);
@@ -854,7 +856,7 @@ public class VariableParser {
         if (!stat.startsWith(prefix))
             return null;
 
-        Optional<?> entry = registry.getOptionalValue( Identifier.of(stat.substring(prefix.length())) );
+        Optional<?> entry = registry.getOptional( Identifier.parse(stat.substring(prefix.length())) );
         if (entry.isPresent()) {
             enabled.updateStats = true;
             return new TypedStatElement(type, entry.get(), flags);
@@ -908,7 +910,7 @@ public class VariableParser {
         return null;
     }
 
-    private static Supplier<Text> getTextSupplier(String element, ComplexData.Enabled enabled) {
+    private static Supplier<Component> getTextSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
             case "display_name", "name" -> DISPLAY_NAME;
             case "target_entity_name", "ten" -> {enabled.targetEntity = true; yield TARGET_ENTITY_NAME;}
@@ -1508,10 +1510,10 @@ public class VariableParser {
             return null;
 
         var flags = getPrefix(provider, flagParts, profile.name, debugLine, variable);
-        return new ListProviderSet.Entry(provider, randomUUID(), flags.getLeft(), flags.getRight());
+        return new ListProviderSet.Entry(provider, randomUUID(), flags.getA(), flags.getB());
     }
 
-    public static Pair<String,Boolean> getPrefix(ListProvider provider, String[] flagParts, String profile, int line, String part) {
+    public static Tuple<String,Boolean> getPrefix(ListProvider provider, String[] flagParts, String profile, int line, String part) {
         String prefix = Attributers.defaultPrefix(provider);
         boolean reversed = false;
         for (int i = 1; i < flagParts.length; i++) {
@@ -1525,7 +1527,7 @@ public class VariableParser {
                 Errors.addError(profile, line, part, ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, flagParts[i]);
             }
         }
-        return new Pair<>(prefix, reversed);
+        return new Tuple<>(prefix, reversed);
     }
     public static boolean getReversed(String[] flagParts) {
         for (int i = 1; i < flagParts.length; i++)
@@ -1635,7 +1637,7 @@ public class VariableParser {
         if (provider == null)
             return null;
         var flags = getPrefix(provider, flagParts, profile.name, debugLine, original);
-        return listElement( new ListProviderSet.Entry(provider, randomUUID(), flags.getLeft(), flags.getRight()), part, commaIndex, profile, debugLine, enabled, original, listProviders);
+        return listElement( new ListProviderSet.Entry(provider, randomUUID(), flags.getA(), flags.getB()), part, commaIndex, profile, debugLine, enabled, original, listProviders);
     }
 
 
@@ -1710,7 +1712,7 @@ public class VariableParser {
 
     public static HudElement getAttributeElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
         if (part.startsWith("item:"))
-            return attrElement(part, SLOT_READER, false, (slot) -> () -> CLIENT.player.getStackReference(slot).get(),
+            return attrElement(part, SLOT_READER, false, (slot) -> () -> CLIENT.player.getSlot(slot).get(),
                     ITEM, ErrorType.UNKNOWN_SLOT, ErrorType.UNKNOWN_ITEM_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("attribute:"))
@@ -1723,14 +1725,14 @@ public class VariableParser {
 
         if (part.startsWith("hooked_entity_attribute:") || part.startsWith("hooked_entity_attr:") || part.startsWith("hea:"))
             return attrElement(part, ENTITY_ATTR_READER, true,
-                    (attr) -> () -> getEntityAttr(CLIENT.player.fishHook == null ? null : CLIENT.player.fishHook.getHookedEntity(), attr),
+                    (attr) -> () -> getEntityAttr(CLIENT.player.fishing == null ? null : CLIENT.player.fishing.getHookedIn(), attr),
                     ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("target_block_property:") || part.startsWith("target_property:") || part.startsWith("tbprop:")) {
             HudElement e = attrElement(part, src -> src, false,
                     (prop) -> () -> {
-                        for (var p : ComplexData.targetBlock.getEntries().entrySet())
-                            if (p.getKey().getName().equalsIgnoreCase(prop))
+                        for (var p : ComplexData.targetBlock.getValues().toList())
+                            if (p.property().getName().equalsIgnoreCase(prop))
                                 return p;
                         return null;
                     },
@@ -1745,12 +1747,12 @@ public class VariableParser {
                     PLAYER, null, ErrorType.UNKNOWN_TEAM_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("team:"))
-            return attrElement(part, src -> src, false, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),
+            return attrElement(part, src -> src, false, (team) -> () -> CLIENT.level.getScoreboard().getPlayerTeam(team),
                     TEAM, null, ErrorType.UNKNOWN_TEAM_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("objective:")) {
             enabled.serverWorld = true;
-            return attrElement(part, src -> src, false, (name) -> () -> AttributeHelpers.scoreboard().getNullableObjective(name),
+            return attrElement(part, src -> src, false, (name) -> () -> AttributeHelpers.scoreboard().getObjective(name),
                     SCOREBOARD_OBJECTIVE, null, ErrorType.UNKNOWN_OBJECTIVE_METHOD, profile, debugLine, enabled, original);
         }
 
@@ -1759,7 +1761,7 @@ public class VariableParser {
                     BOSSBAR, null, ErrorType.UNKNOWN_BOSSBAR_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("effect:"))
-            return attrElement(part, src -> Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(src)).orElse(null), true, (effect) -> () -> CLIENT.player.getStatusEffect(effect),
+            return attrElement(part, src -> BuiltInRegistries.MOB_EFFECT.get(Identifier.tryParse(src)).orElse(null), true, (effect) -> () -> CLIENT.player.getEffect(effect),
                     EFFECT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("mod:")) {
@@ -1772,7 +1774,7 @@ public class VariableParser {
         }
 
         if (part.startsWith("resource_pack:"))
-            return attrElement(part, (src) -> CLIENT.getResourcePackManager().getProfile(src), false, (pack) -> () -> pack,
+            return attrElement(part, (src) -> CLIENT.getResourcePackRepository().getPack(src), false, (pack) -> () -> pack,
                     PACK, ErrorType.UNKNOWN_RESOURCE_PACK, ErrorType.UNKNOWN_PACK_METHOD, profile, debugLine, enabled, original );
 
         if (part.startsWith("data_pack:") || part.startsWith("datapack:"))

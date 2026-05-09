@@ -9,13 +9,12 @@ import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.errors.ErrorException;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
-import net.minecraft.util.Pair;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import net.minecraft.util.Tuple;
 
 @SuppressWarnings("DuplicatedCode")
 public class ExpressionParser {
@@ -202,10 +201,10 @@ public class ExpressionParser {
     }
 
     private static int parseVariable(List<Token> tokens, char[] chars, int i, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listSuppliers) {
-        Pair<Token,Integer> func = getFunctionStart(chars, i);
+        Tuple<Token,Integer> func = getFunctionStart(chars, i);
         if (func != null) {
-            tokens.add(func.getLeft());
-            return func.getRight();
+            tokens.add(func.getA());
+            return func.getB();
         }
 
         StringBuilder builder = new StringBuilder();
@@ -254,7 +253,7 @@ public class ExpressionParser {
     private static final Function<Double,Double> LOG_2 = (in) -> Math.log(in) / Math.log(2);
     private static double round(double in) { return Math.round(in * 100000) / 100000D; }
 
-    private static Pair<Token,Integer> getFunctionStart(char[] chars, int i) {
+    private static Tuple<Token,Integer> getFunctionStart(char[] chars, int i) {
         int pren = -1;
         for (int j = i; j < chars.length; j++) {
             if (chars[j] == '(') {
@@ -295,7 +294,7 @@ public class ExpressionParser {
 
             default -> null;
         };
-        return func == null ? null : new Pair<>(new Token(TokenType.START_PREN, func), funcStr.length()+1);
+        return func == null ? null : new Tuple<>(new Token(TokenType.START_PREN, func), funcStr.length()+1);
 
     }
     private static boolean isFunc(char c) {
@@ -308,7 +307,7 @@ public class ExpressionParser {
         if (func == null)
             original.set(start, new Token(TokenType.FULL_PREN, new ArrayList<>(original.subList(start+1, end))));
         else
-            original.set(start, new Token(TokenType.FUNCTION, new Pair<>( func, new ArrayList<>(original.subList(start+1, end)))));
+            original.set(start, new Token(TokenType.FUNCTION, new Tuple<>( func, new ArrayList<>(original.subList(start+1, end)))));
         for (; end > start; end--)
             original.remove(end);
     }
@@ -441,21 +440,21 @@ public class ExpressionParser {
                 throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No operation");
         }
 
-        Pair<List<List<Token>>, List<MathOperator>> ifNullPairs = split(tokens, List.of(MathOperator.IF_NULL));
+        Tuple<List<List<Token>>, List<MathOperator>> ifNullPairs = split(tokens, List.of(MathOperator.IF_NULL));
         List<Operation> ops0 = new ArrayList<>();
 
-        for (var partTokens0 : ifNullPairs.getLeft()) {
-            Pair<List<List<Token>>, List<MathOperator>> addPairs = split(partTokens0, List.of(MathOperator.ADD, MathOperator.SUBTRACT));
+        for (var partTokens0 : ifNullPairs.getA()) {
+            Tuple<List<List<Token>>, List<MathOperator>> addPairs = split(partTokens0, List.of(MathOperator.ADD, MathOperator.SUBTRACT));
             List<Operation> ops1 = new ArrayList<>();
 
-            for (var partTokens : addPairs.getLeft()) {
-                Pair<List<List<Token>>, List<MathOperator>> multiplyPairs = split(partTokens, List.of(MathOperator.MULTIPLY, MathOperator.DIVIDE, MathOperator.MOD));
+            for (var partTokens : addPairs.getA()) {
+                Tuple<List<List<Token>>, List<MathOperator>> multiplyPairs = split(partTokens, List.of(MathOperator.MULTIPLY, MathOperator.DIVIDE, MathOperator.MOD));
                 List<Operation> ops2 = new ArrayList<>();
 
-                for (var partPartToken : multiplyPairs.getLeft()) {
-                    Pair<List<List<Token>>, List<MathOperator>> exponentPairs = split(partPartToken, List.of(MathOperator.EXPONENT));
+                for (var partPartToken : multiplyPairs.getA()) {
+                    Tuple<List<List<Token>>, List<MathOperator>> exponentPairs = split(partPartToken, List.of(MathOperator.EXPONENT));
                     List<HudElement> elements = new ArrayList<>();
-                    for (var partPartPartToken : exponentPairs.getLeft()) {
+                    for (var partPartPartToken : exponentPairs.getA()) {
 
                         if (partPartPartToken.size() > 1)
                             throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No operation between values");
@@ -464,13 +463,13 @@ public class ExpressionParser {
                     if (elements.size() == 1)
                         ops2.add(new Operation.Element(elements.get(0)));
                     else
-                        ops2.add(new Operation.MathOperation(elements, exponentPairs.getRight()));
+                        ops2.add(new Operation.MathOperation(elements, exponentPairs.getB()));
                 }
-                ops1.add(ops2.size() == 1 ? ops2.get(0) : new Operation.MathOperationsOp(ops2, multiplyPairs.getRight()));
+                ops1.add(ops2.size() == 1 ? ops2.get(0) : new Operation.MathOperationsOp(ops2, multiplyPairs.getB()));
             }
-            ops0.add( ops1.size() == 1 ? ops1.get(0) : new Operation.MathOperationsOp(ops1, addPairs.getRight()) );
+            ops0.add( ops1.size() == 1 ? ops1.get(0) : new Operation.MathOperationsOp(ops1, addPairs.getB()) );
         }
-        return ops0.size() == 1 ? ops0.get(0) : new Operation.MathOperationsOp(ops0, ifNullPairs.getRight());
+        return ops0.size() == 1 ? ops0.get(0) : new Operation.MathOperationsOp(ops0, ifNullPairs.getB());
 
     }
 
@@ -484,8 +483,8 @@ public class ExpressionParser {
             case BOOLEAN -> new SudoElements.Bool((Boolean) token.value());
             case FULL_PREN -> new SudoElements.Op(getConditional((List<Token>) token.value(), false));
             case FUNCTION -> {
-                Pair<Function<Double,Double>,List<Token>> pair = (Pair<Function<Double, Double>, List<Token>>) token.value();
-                yield new SudoElements.Op(new Operation.Func(pair.getLeft(), getConditional(pair.getRight(), false)));
+                Tuple<Function<Double,Double>,List<Token>> pair = (Tuple<Function<Double, Double>, List<Token>>) token.value();
+                yield new SudoElements.Op(new Operation.Func(pair.getA(), getConditional(pair.getB(), false)));
             }
             case TERNARY -> {
                 TernaryTokens tokens = (TernaryTokens) token.value();
@@ -511,8 +510,8 @@ public class ExpressionParser {
             case VARIABLE -> new Operation.Element((HudElement) token.value());
             case NEGATED_VARIABLE -> new Operation.Negate((HudElement) token.value());
             case FUNCTION -> {
-                Pair<Function<Double,Double>,List<Token>> pair = (Pair<Function<Double, Double>, List<Token>>) token.value();
-                yield new Operation.Func(pair.getLeft(), getConditional(pair.getRight(), false));
+                Tuple<Function<Double,Double>,List<Token>> pair = (Tuple<Function<Double, Double>, List<Token>>) token.value();
+                yield new Operation.Func(pair.getA(), getConditional(pair.getB(), false));
             }
             case TERNARY -> {
                 TernaryTokens tokens = (TernaryTokens) token.value();
@@ -546,7 +545,7 @@ public class ExpressionParser {
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
-    private static Pair<List<List<Token>>, List<MathOperator>> split(List<Token> tokens, List<MathOperator> ops) {
+    private static Tuple<List<List<Token>>, List<MathOperator>> split(List<Token> tokens, List<MathOperator> ops) {
         List<List<Token>> sections = new ArrayList<>();
         List<MathOperator> operators = new ArrayList<>();
         List<Token> current = new ArrayList<>();
@@ -561,7 +560,7 @@ public class ExpressionParser {
                 current.add(token);
         }
         sections.add(current);
-        return new Pair<>(sections, operators);
+        return new Tuple<>(sections, operators);
     }
 
 

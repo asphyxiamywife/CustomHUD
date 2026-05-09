@@ -3,10 +3,9 @@ package com.minenash.customhud.HudElements.icon;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.CustomHudRenderer3;
 import com.minenash.customhud.render.RenderPiece;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemIconElement extends IconElement {
 
@@ -19,7 +18,7 @@ public class ItemIconElement extends IconElement {
 
     @Override
     public Number getNumber() {
-        return Item.getRawId(stack.getItem());
+        return Item.getId(stack.getItem());
     }
 
     @Override
@@ -28,7 +27,7 @@ public class ItemIconElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, RenderPiece piece) {
+    public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         renderItemStack(context, piece.x, piece.y, stack, piece.shiftTextUpOrFitItemIcon);
     }
 

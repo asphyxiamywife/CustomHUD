@@ -10,20 +10,21 @@ import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.gui.TogglesScreen;
 import com.minenash.customhud.render.CustomHudRenderer3;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -37,7 +38,7 @@ import java.util.stream.Stream;
 public class CustomHud implements ModInitializer {
 
 	//Debug: LD_PRELOAD=/home/jakob/Programs/renderdoc_1.25/lib/librenderdoc.so
-	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+	public static final Minecraft CLIENT = Minecraft.getInstance();
 	public static final Logger LOGGER = LogManager.getLogger("CustomHud");
 	public static boolean MODMENU_INSTALLED = false;
 
@@ -47,29 +48,29 @@ public class CustomHud implements ModInitializer {
 	public static final Path PROFILE_FOLDER = FabricLoader.getInstance().getConfigDir().resolve("custom-hud/profiles");
 	public static WatchService profileWatcher;
 
-	public static final KeyBinding.Category MAIN_KB_CAT = KeyBinding.Category.create(Identifier.of("customhud", "customhud"));
-	public static final KeyBinding.Category TOGGLES_KB_CAT = KeyBinding.Category.create(Identifier.of("customhud", "toggles"));
+	public static final KeyMapping.Category MAIN_KB_CAT = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("customhud", "customhud"));
+	public static final KeyMapping.Category TOGGLES_KB_CAT = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("customhud", "toggles"));
 
-	public static final KeyBinding kb_enable = registerKeyBinding("enable", GLFW.GLFW_KEY_UNKNOWN);
-	public static final KeyBinding kb_cycleProfiles = registerKeyBinding("cycle_profiles", GLFW.GLFW_KEY_GRAVE_ACCENT);
-	public static final KeyBinding kb_showErrors = registerKeyBinding("show_errors", GLFW.GLFW_KEY_B);
-	public static final KeyBinding kb_refreshProfilerTimings = registerKeyBinding("refresh_profiler_timings", GLFW.GLFW_KEY_UNKNOWN);
+	public static final KeyMapping kb_enable = registerKeyMapping("enable", GLFW.GLFW_KEY_UNKNOWN);
+	public static final KeyMapping kb_cycleProfiles = registerKeyMapping("cycle_profiles", GLFW.GLFW_KEY_GRAVE_ACCENT);
+	public static final KeyMapping kb_showErrors = registerKeyMapping("show_errors", GLFW.GLFW_KEY_B);
+	public static final KeyMapping kb_refreshProfilerTimings = registerKeyMapping("refresh_profiler_timings", GLFW.GLFW_KEY_UNKNOWN);
 
-	private static KeyBinding registerKeyBinding(String binding, int defaultKey) {
-		return KeyBindingHelper.registerKeyBinding(new KeyBinding("key.custom_hud." + binding, InputUtil.Type.KEYSYM, defaultKey, MAIN_KB_CAT));
+	private static KeyMapping registerKeyMapping(String binding, int defaultKey) {
+		return KeyMappingHelper.registerKeyMapping(new KeyMapping("key.custom_hud." + binding, InputConstants.Type.KEYSYM, defaultKey, MAIN_KB_CAT));
 	}
 
 	@Override
 	public void onInitialize() {
 //		UpdateChecker.check();
 
-		HudRenderCallback.EVENT.register(CustomHudRenderer3::render);
+		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("custom_hud", "hud"), CustomHudRenderer3::extractRenderState);
 
 
 		ClientTickEvents.END_CLIENT_TICK.register(CustomHud::onTick);
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			if (UpdateChecker.updateMessage != null)
-				client.getMessageHandler().onGameMessage(UpdateChecker.updateMessage, false);
+				client.getChatListener().handleSystemMessage(UpdateChecker.updateMessage, false);
 			EstimatedTick.reset();
 
 			var profile = ProfileManager.getActive();
@@ -113,7 +114,7 @@ public class CustomHud implements ModInitializer {
 
 	private static ComplexData.Enabled previousEnabled = ComplexData.Enabled.DISABLED;
 	private static int saveDelay = -1;
-	private static void onTick(MinecraftClient client) {
+	private static void onTick(Minecraft client) {
 		if (saveDelay > 0)
 			saveDelay--;
 		else if (saveDelay == 0) {
@@ -135,19 +136,19 @@ public class CustomHud implements ModInitializer {
 //		while (SWITCH_RENDERER.wasPressed()) {
 //			useNewRenderer = !useNewRenderer;
 //		}
-		while (kb_refreshProfilerTimings.wasPressed()) {
+		while (kb_refreshProfilerTimings.consumeClick()) {
 			ComplexData.refreshTimings = true;
 		}
-		while (kb_enable.wasPressed()) {
+		while (kb_enable.consumeClick()) {
 			ProfileManager.enabled = !ProfileManager.enabled;
 			saveDelay = 100;
 		}
-		while (kb_cycleProfiles.wasPressed()) {
+		while (kb_cycleProfiles.consumeClick()) {
 			ProfileManager.cycle();
 			saveDelay = 100;
 		}
 		for (Profile p : ProfileManager.getProfiles()) {
-			while (p.keyBinding.wasPressed()) {
+			while (p.keyBinding.consumeClick()) {
 				ProfileManager.setActive(p);
 				ProfileManager.enabled = true;
 				saveDelay = 100;
@@ -157,14 +158,14 @@ public class CustomHud implements ModInitializer {
 		Profile activeProfile = ProfileManager.getActive();
 		if (activeProfile != null) {
 			for (Toggle t : activeProfile.toggles.values()) {
-				boolean wasPressed = t.key.wasPressed();
+				boolean wasPressed = t.key.consumeClick();
 				if (isKeybindPressed(t.modifier) && wasPressed)
 					t.toggle();
 			}
 		}
 
-		while (kb_showErrors.wasPressed()) {
-			if (client.currentScreen == null)
+		while (kb_showErrors.consumeClick()) {
+			if (client.screen == null)
 				if (ProfileManager.getActive() != null && Errors.hasErrors(ProfileManager.getActive().name))
 					CLIENT.setScreen(new ErrorsScreen(null));
 				else
@@ -173,12 +174,12 @@ public class CustomHud implements ModInitializer {
 	}
 
 	public static final Map<Integer,Boolean> IS_MOUSE_DOWN = new HashMap<>(6);
-	public static boolean isKeybindPressed(KeyBinding key) {
+	public static boolean isKeybindPressed(KeyMapping key) {
 		if (key.isUnbound())
 			return true;
-		if (key.boundKey.type == InputUtil.Type.MOUSE)
-			return IS_MOUSE_DOWN.getOrDefault(KeyBindingHelper.getBoundKeyOf(key).getCode(), false);
-		return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow(), KeyBindingHelper.getBoundKeyOf(key).getCode());
+		if (key.key.type == InputConstants.Type.MOUSE)
+			return IS_MOUSE_DOWN.getOrDefault(KeyMappingHelper.getBoundKeyOf(key).getValue(), false);
+		return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), KeyMappingHelper.getBoundKeyOf(key).getValue());
 	}
 
 	public static boolean isNotDisabled(DisableElement element) {
@@ -223,11 +224,11 @@ public class CustomHud implements ModInitializer {
 				else {
 					profile = Profile.parseProfile(path, fileName);
 					ProfileManager.replace(profile);
-					if (CLIENT.currentScreen instanceof ErrorsScreen screen)
+					if (CLIENT.screen instanceof ErrorsScreen screen)
 						screen.changeProfile(profile);
-					if (CLIENT.currentScreen instanceof TogglesScreen screen)
+					if (CLIENT.screen instanceof TogglesScreen screen)
 						screen.changeProfile(profile);
-					if (CLIENT.currentScreen instanceof NewConfigScreen screen)
+					if (CLIENT.screen instanceof NewConfigScreen screen)
 						screen.init();
 				}
 			}
@@ -271,22 +272,22 @@ public class CustomHud implements ModInitializer {
 	}
 
 	public static void showToast(String profileName) {
-		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
-				Text.translatable("gui.custom_hud.profile_updated", profileName).formatted(Formatting.WHITE),
+		CLIENT.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+				Component.translatable("gui.custom_hud.profile_updated", profileName).withStyle(ChatFormatting.WHITE),
 				Errors.hasErrors(profileName) ?
-						Text.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")
-							.append(CLIENT.currentScreen instanceof TitleScreen ?
-								Text.literal("§7, view in config screen via modmenu ")
-								: Text.literal("§7, press ")
-									.append(((MutableText)kb_showErrors.getBoundKeyLocalizedText()).formatted(Formatting.AQUA))
+						Component.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")
+							.append(CLIENT.screen instanceof TitleScreen ?
+								Component.literal("§7, view in config screen via modmenu ")
+								: Component.literal("§7, press ")
+									.append(((MutableComponent)kb_showErrors.getTranslatedKeyMessage()).withStyle(ChatFormatting.AQUA))
 									.append("§7 to view"))
-						: Text.literal("§aNo errors found")
+						: Component.literal("§aNo errors found")
 		));
 	}
 	public static void showAllUpdatedToast() {
-		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
-				Text.literal("§fAll Profiles Updated"),
-				Text.literal("§aNo errors found")
+		CLIENT.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+				Component.literal("§fAll Profiles Updated"),
+				Component.literal("§aNo errors found")
 		));
 	}
 

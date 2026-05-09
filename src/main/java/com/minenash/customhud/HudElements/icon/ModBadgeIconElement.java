@@ -5,11 +5,11 @@ import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix3x2fStack;
 
 import java.util.UUID;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.util.Mth;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -21,12 +21,12 @@ public class ModBadgeIconElement extends IconElement{
     }
 
     @Override
-    public void render(DrawContext context, RenderPiece piece) {
-        Matrix3x2fStack matrices = context.getMatrices();
+    public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
+        Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
 
         Mod.Badge badge = (Mod.Badge) piece.value;
-        int width = CLIENT.textRenderer.getWidth(badge.getText()) + 6;
+        int width = CLIENT.font.width(badge.getText()) + 6;
 
         matrices.translate(piece.x + shiftX, piece.y + shiftY - 1);
         if (!referenceCorner)
@@ -35,13 +35,13 @@ public class ModBadgeIconElement extends IconElement{
         rotate(matrices, width+1, 9);
 
 
-        DrawingUtil.drawBadge(context, 0, 0, width, badge.getText().asOrderedText(),badge.getOutlineColor(), badge.getFillColor(), piece.color);
+        DrawingUtil.drawBadge(context, 0, 0, width, badge.getText().getVisualOrderText(),badge.getOutlineColor(), badge.getFillColor(), piece.color);
 
         matrices.popMatrix();
     }
 
     @Override
     public int getTextWidth() {
-        return width >= 0 ? width : MathHelper.ceil(scale*(CLIENT.textRenderer.getWidth( ((Mod.Badge)ListManager.getValue(providerID)).getText() ) + 6 + 1));
+        return width >= 0 ? width : Mth.ceil(scale*(CLIENT.font.width( ((Mod.Badge)ListManager.getValue(providerID)).getText() ) + 6 + 1));
     }
 }

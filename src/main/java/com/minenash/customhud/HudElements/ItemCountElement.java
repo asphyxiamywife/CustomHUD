@@ -3,9 +3,9 @@ package com.minenash.customhud.HudElements;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.NumberFlags;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.Item;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.Item;
 
 public class ItemCountElement implements HudElement {
 
@@ -24,8 +24,8 @@ public class ItemCountElement implements HudElement {
 
     @Override
     public Number getNumber() {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        return player == null ? 0 : player.getInventory().count(item);
+        LocalPlayer player = Minecraft.getInstance().player;
+        return player == null ? 0 : player.getInventory().countItem(item);
     }
 
     @Override

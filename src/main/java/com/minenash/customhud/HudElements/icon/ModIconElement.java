@@ -4,15 +4,15 @@ import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.fabric.FabricIconHandler;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
 import org.joml.Matrix3x2fStack;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.Identifier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -30,24 +30,24 @@ public class ModIconElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, RenderPiece piece) {
+    public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         Mod mod = (Mod) piece.value;
-        int size = (int)(10 * scale * CLIENT.options.getGuiScale().getValue());
+        int size = (int)(10 * scale * CLIENT.options.guiScale().get());
 
-        Identifier id = Identifier.of("custom_hud", size + "___" + mod.getId());
+        Identifier id = Identifier.fromNamespaceAndPath("custom_hud", size + "___" + mod.getId());
 
         if (!cached.contains(id)) {
             try {
-                NativeImageBackedTexture icon = mod.getIcon(handler, size);
-                CLIENT.getTextureManager().registerTexture(id, icon);
+                DynamicTexture icon = mod.getIcon(handler, size);
+                CLIENT.getTextureManager().register(id, icon);
                 cached.add(id);
             }
             catch (Exception e) {
-                id = Identifier.of("textures/misc/unknown_pack.png");
+                id = Identifier.parse("textures/misc/unknown_pack.png");
             }
         }
 
-        Matrix3x2fStack matrices = context.getMatrices();
+        Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
         matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
         if (!referenceCorner)
@@ -56,7 +56,7 @@ public class ModIconElement extends IconElement {
         int w = (int) (11 * scale);
         rotate(matrices, w, w);
 
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, id, 0, 0, 0, 0, w, w, w, w);
+        context.blit(RenderPipelines.GUI_TEXTURED, id, 0, 0, 0, 0, w, w, w, w);
         matrices.popMatrix();
     }
 

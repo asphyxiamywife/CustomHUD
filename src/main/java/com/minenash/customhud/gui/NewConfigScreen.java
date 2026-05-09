@@ -6,23 +6,23 @@ import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.gui.profiles_widget.LineEntry;
 import com.minenash.customhud.gui.profiles_widget.ProfileLineEntry;
 import com.minenash.customhud.gui.profiles_widget.ProfileLinesWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.navigation.GuiNavigation;
-import net.minecraft.client.gui.navigation.NavigationDirection;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Style;
-import net.minecraft.text.StyleSpriteSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 
@@ -33,77 +33,77 @@ import java.util.List;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.CustomHud.ignoreFirstToast;
-import static net.minecraft.client.gui.navigation.NavigationDirection.*;
+import static net.minecraft.client.gui.navigation.ScreenDirection.*;
 
 public class NewConfigScreen extends Screen {
 
     private final Screen parent;
-    private final TextRenderer font;
+    private final Font font;
 
     private ProfileLinesWidget profiles;
-    public KeyBinding selectedKeybind;
+    public KeyMapping selectedKeybind;
     public ProfileLineEntry editing;
 
     public enum Mode {NORMAL, REORDER, DELETE}
     public Mode mode = Mode.NORMAL;
 
     public NewConfigScreen(Screen parent) {
-        super(Text.translatable("sml.config.screen.title"));
+        super(Component.translatable("sml.config.screen.title"));
         this.parent = parent;
-        this.font = MinecraftClient.getInstance().textRenderer;
+        this.font = Minecraft.getInstance().font;
     }
 
     @Override
     public void init() {
-        clearChildren();
+        clearWidgets();
         profiles = new ProfileLinesWidget(this,30, height-32);
-        addDrawableChild(profiles);
+        addRenderableWidget(profiles);
 
-        this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Folder"),
-                button -> new Thread(() -> Util.getOperatingSystem().open(CustomHud.PROFILE_FOLDER.toFile())).start())
-                .position(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
+        this.addRenderableWidget( Button.builder(Component.literal("Open Folder"),
+                button -> new Thread(() -> Util.getPlatform().openFile(CustomHud.PROFILE_FOLDER.toFile())).start())
+                .pos(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
 
-        this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> close())
-                .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+        this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> onClose())
+                .pos(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
 
-        this.addDrawableChild( ButtonWidget.builder(Text.literal("Debug Log: " + (CustomHud.DEBUG_MODE ? "On" : "Off")),
-               (ButtonWidget button) -> {
+        this.addRenderableWidget( Button.builder(Component.literal("Debug Log: " + (CustomHud.DEBUG_MODE ? "On" : "Off")),
+               (Button button) -> {
                     CustomHud.DEBUG_MODE = !CustomHud.DEBUG_MODE;
-                    button.setMessage( Text.literal("Debug Log: " + (CustomHud.DEBUG_MODE ? "On" : "Off")) );
+                    button.setMessage( Component.literal("Debug Log: " + (CustomHud.DEBUG_MODE ? "On" : "Off")) );
                 })
-                .position(6, 6).size(86, 16).build() );
+                .pos(6, 6).size(86, 16).build() );
 
-        this.addDrawableChild( ButtonWidget.builder(linkText("D", " Support"),
-                button -> Util.getOperatingSystem().open("https://jakobt.dev/discord"))
-                .position(width - 68 - 4, 6).size(68, 16).build() );
+        this.addRenderableWidget( Button.builder(linkText("D", " Support"),
+                button -> Util.getPlatform().openUri("https://jakobt.dev/discord"))
+                .pos(width - 68 - 4, 6).size(68, 16).build() );
 
-        this.addDrawableChild( ButtonWidget.builder( Text.literal("Wiki / Docs"),
-                button -> Util.getOperatingSystem().open("https://customhud.dev/v3/getting_started"))
-                .position(width - 68 - 4 - 68 - 4, 6).size(68, 16).build() );
+        this.addRenderableWidget( Button.builder( Component.literal("Wiki / Docs"),
+                button -> Util.getPlatform().openUri("https://customhud.dev/v3/getting_started"))
+                .pos(width - 68 - 4 - 68 - 4, 6).size(68, 16).build() );
 
 
-        this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> close())
-                .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+        this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> onClose())
+                .pos(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
     }
 
-    private static final Style ICONS = Style.EMPTY.withFont(new StyleSpriteSource.Font(Identifier.of("custom_hud", "icons")));
-    private static final Style DEFAULT = Style.EMPTY.withFont(StyleSpriteSource.DEFAULT);
-    private Text linkText(String icon, String msg) {
-        return Text.literal(icon).setStyle(ICONS).append(Text.literal(msg).setStyle(DEFAULT));
-    }
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(font, Text.translatable("config.custom_hud.title"), this.width / 2, 11, 0xFFFFFFFF);
-        context.drawCenteredTextWithShadow(font, "§oDrag and drop profile files here to add it", this.width / 2, this.height-46, 0xFF888888);
-
+    private static final Style ICONS = Style.EMPTY.withFont(new FontDescription.Resource(Identifier.fromNamespaceAndPath("custom_hud", "icons")));
+    private static final Style DEFAULT = Style.EMPTY.withFont(FontDescription.DEFAULT);
+    private Component linkText(String icon, String msg) {
+        return Component.literal(icon).setStyle(ICONS).append(Component.literal(msg).setStyle(DEFAULT));
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
+        context.centeredText(font, Component.translatable("config.custom_hud.title"), this.width / 2, 11, 0xFFFFFFFF);
+        context.centeredText(font, "§oDrag and drop profile files here to add it", this.width / 2, this.height-46, 0xFF888888);
+
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if (selectedKeybind != null) {
-            selectedKeybind.setBoundKey(InputUtil.Type.MOUSE.createFromCode(click.button()));
+            selectedKeybind.setKey(InputConstants.Type.MOUSE.getOrCreate(click.button()));
             selectedKeybind = null;
             profiles.update();
             return true;
@@ -120,15 +120,15 @@ public class NewConfigScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
+    public boolean keyPressed(KeyEvent input) {
         if (selectedKeybind != null) {
-            selectedKeybind.setBoundKey(input.key() == GLFW.GLFW_KEY_ESCAPE ? InputUtil.UNKNOWN_KEY : InputUtil.fromKeyCode(input));
+            selectedKeybind.setKey(input.key() == GLFW.GLFW_KEY_ESCAPE ? InputConstants.UNKNOWN : InputConstants.getKey(input));
             selectedKeybind = null;
             profiles.update();
             return true;
         }
-        if (input.key() == CustomHud.kb_showErrors.boundKey.getCode() && ProfileManager.getActive() != null) {
-            client.setScreen( new ErrorsScreen(this) );
+        if (input.key() == CustomHud.kb_showErrors.key.getValue() && ProfileManager.getActive() != null) {
+            minecraft.setScreen( new ErrorsScreen(this) );
             return true;
         }
 
@@ -149,11 +149,11 @@ public class NewConfigScreen extends Screen {
                 for (var c : profiles.children())
                     if (c instanceof ProfileLineEntry e)
                         if (e.editName.isFocused())
-                            if (e.editName.getCursor() == 0)
+                            if (e.editName.getCursorPosition() == 0)
                                 return move(LEFT);
                             else break;
                         else if (e.cycled.isFocused()) {
-                            e.editName.setCursorToEnd(false);
+                            e.editName.moveCursorToEnd(false);
                             return move(LEFT);
                         }
             }
@@ -161,11 +161,11 @@ public class NewConfigScreen extends Screen {
                 for (var c : profiles.children())
                     if (c instanceof ProfileLineEntry e)
                         if (e.editName.isFocused())
-                            if (e.editName.getCursor() == e.editName.getText().length())
+                            if (e.editName.getCursorPosition() == e.editName.getValue().length())
                                 return move(RIGHT);
                             else break;
                         else if (e.selected.isFocused()) {
-                            e.editName.setCursorToStart(false);
+                            e.editName.moveCursorToStart(false);
                             return move(RIGHT);
                         }
             }
@@ -188,13 +188,13 @@ public class NewConfigScreen extends Screen {
         return super.keyPressed(input);
     }
 
-    private boolean move(NavigationDirection... ds) {
-        for (var d : ds) this.switchFocus( super.getNavigationPath(new GuiNavigation.Arrow(d)) );
+    private boolean move(ScreenDirection... ds) {
+        for (var d : ds) this.changeFocus( super.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(d)) );
         return true;
     }
 
     @Override
-    public void onFilesDropped(List<Path> paths) {
+    public void onFilesDrop(List<Path> paths) {
         CustomHud.logInDebugMode("Path's: " + paths);
 
         for (Path path : paths) {
@@ -205,13 +205,13 @@ public class NewConfigScreen extends Screen {
                 Files.copy(path, CustomHud.PROFILE_FOLDER.resolve(path.getFileName()));
             } catch (IOException e) {
                 CustomHud.LOGGER.warn("[CustomHud] Failed to copy profile from {} to {}", path, CustomHud.PROFILE_FOLDER.resolve(path.getFileName()));
-                SystemToast.addPackCopyFailure(client, path.toString());
+                SystemToast.onPackCopyFailure(minecraft, path.toString());
             }
         }
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         CLIENT.setScreen(parent);
         profiles.update();
         ConfigManager.save();

@@ -4,10 +4,10 @@ import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.CustomHudRenderer3;
 import com.minenash.customhud.render.RenderPiece;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class RecordIconElement extends IconElement {
 
@@ -19,7 +19,7 @@ public class RecordIconElement extends IconElement {
 
     @Override
     public Number getNumber() {
-        return MusicAndRecordTracker.isRecordPlaying ? Item.getRawId(MusicAndRecordTracker.getClosestRecord().icon.getItem()) : 0;
+        return MusicAndRecordTracker.isRecordPlaying ? Item.getId(MusicAndRecordTracker.getClosestRecord().icon.getItem()) : 0;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class RecordIconElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, RenderPiece piece) {
+    public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         renderItemStack(context, piece.x, piece.y, MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().icon : NO_RECORD, piece.shiftTextUpOrFitItemIcon);
     }
 

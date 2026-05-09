@@ -32,7 +32,7 @@
 //    public static Identifier font;
 //    public static HudTheme theme;
 //
-//    public static void render(DrawContext context, float tickDelta) {
+//    public static void extractRenderState(DrawContext context, float tickDelta) {
 //
 //        Profile profile = ProfileManager.getActive();
 //        if (profile == null || client.getDebugHud().shouldShowDebugHud())
@@ -215,7 +215,7 @@
 //        for (RenderPiece piece : pieces) {
 //            font = piece.font;
 //            if (piece.element instanceof IconElement ie )
-//                try { ie.render(context, piece); }
+//                try { ie.extractRenderState(context, piece); }
 //                catch (Exception e){
 //                    CustomHud.LOGGER.catching(e);
 //                }

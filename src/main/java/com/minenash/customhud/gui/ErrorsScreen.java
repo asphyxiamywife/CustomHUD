@@ -6,21 +6,19 @@ import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,7 +39,7 @@ public class ErrorsScreen extends Screen {
     }
 
     public ErrorsScreen(Screen parent, Profile profile) {
-        super(Text.literal((profile == null || profile.name == null ? "Unknown" : "'" + profile.name + "'") + " Errors"));
+        super(Component.literal((profile == null || profile.name == null ? "Unknown" : "'" + profile.name + "'") + " Errors"));
         this.parent = parent;
         this.profile = profile;
         openedFromNullScreen = parent == null;
@@ -55,7 +53,7 @@ public class ErrorsScreen extends Screen {
     protected void init() {
         children().clear();
         this.listWidget = new ErrorListWidget(profile);
-        this.addSelectableChild(listWidget);
+        this.addWidget(listWidget);
 
 //        profiles[0] = this.addDrawableChild( ButtonWidget.builder(Text.literal("Profile 1"), button -> changeProfile(1))
 //                .position(this.width / 2 - 40 - 90, 24).size(80, 20).build() );
@@ -67,24 +65,24 @@ public class ErrorsScreen extends Screen {
 //                .position(this.width / 2 - 40 + 90, 24).size(80, 20).build() );
 
         if (openedFromNullScreen) {
-            this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
-                    .position(this.width / 2 - 155, this.height - 26).size(100, 20)
+            this.addRenderableWidget( Button.builder(Component.literal("Open Profile"), button -> ProfileManager.open(profile))
+                    .pos(this.width / 2 - 155, this.height - 26).size(100, 20)
                     .tooltip(ProfileManager.openTooltip).build() );
 
-            this.addDrawableChild( ButtonWidget.builder(Text.literal("Profiles"), button -> CLIENT.setScreen( new NewConfigScreen(null) ))
-                    .position(this.width / 2 - 155 + 100 + 5, this.height - 26).size(100, 20).build() );
+            this.addRenderableWidget( Button.builder(Component.literal("Profiles"), button -> CLIENT.setScreen( new NewConfigScreen(null) ))
+                    .pos(this.width / 2 - 155 + 100 + 5, this.height - 26).size(100, 20).build() );
 
-            this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
-                    .position(this.width / 2 - 155 + 160 + 50, this.height - 26).size(100, 20).build() );
+            this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.setScreen(parent))
+                    .pos(this.width / 2 - 155 + 160 + 50, this.height - 26).size(100, 20).build() );
         }
         else {
-            this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
-                    .position(this.width / 2 - 155, this.height - 26).size(150, 20)
+            this.addRenderableWidget( Button.builder(Component.literal("Open Profile"), button -> ProfileManager.open(profile))
+                    .pos(this.width / 2 - 155, this.height - 26).size(150, 20)
                     .tooltip(ProfileManager.openTooltip).build() );
 
 
-            this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
-                    .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+            this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.setScreen(parent))
+                    .pos(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
         }
 
 
@@ -92,22 +90,22 @@ public class ErrorsScreen extends Screen {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         CLIENT.setScreen(parent);
     }
 
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
 
         y_offset = 0;
-        this.listWidget.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 0xFFFFFFFF);
+        this.listWidget.extractRenderState(context, mouseX, mouseY, delta);
+        context.centeredText(this.font, this.title, this.width / 2, 11, 0xFFFFFFFF);
 
-        for (var d : drawables)
-            d.render(context, mouseX, mouseY, delta);
+        for (var d : renderables)
+            d.extractRenderState(context, mouseX, mouseY, delta);
     }
 
-    class ErrorListWidget extends EntryListWidget<ErrorListWidget.ErrorEntry> {
+    class ErrorListWidget extends AbstractSelectionList<ErrorListWidget.ErrorEntry> {
 
         public ErrorListWidget(Profile profile) {
             super(CLIENT, ErrorsScreen.this.width, ErrorsScreen.this.height - 30 - 32, 30, /*ErrorsScreen.this.height - 36 + 4,*/ 18);
@@ -129,17 +127,17 @@ public class ErrorsScreen extends Screen {
         }
 
         @Override
-        protected int getScrollbarX() {
+        protected int scrollBarX() {
             return width - 8;
         }
 
         @Override
         protected ErrorEntry getEntryAtPosition(double x, double y) {
             // - this.headerHeight
-            int m = MathHelper.floor(y - (double)this.getY()) + (int)this.getScrollY() - 4;
-            int n = m / this.itemHeight;
+            int m = Mth.floor(y - (double)this.getY()) + (int)this.scrollAmount() - 4;
+            int n = m / this.defaultEntryHeight;
 
-            ErrorEntry entry = getSelectedOrNull();
+            ErrorEntry entry = getSelected();
             if (entry != null ) {
                 int index = children().indexOf( entry );
                 if (n >= index && n <= index + entry.expandedMsg.size())
@@ -149,7 +147,7 @@ public class ErrorsScreen extends Screen {
                 else if (n > index)
                     n -= entry.expandedMsg.size() + 1;
             }
-            return x < this.getScrollbarX() && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
+            return x < this.scrollBarX() && n >= 0 && m >= 0 && n < this.getItemCount() ? this.children().get(n) : null;
         }
 
         @Override
@@ -158,7 +156,7 @@ public class ErrorsScreen extends Screen {
         }
 
         @Override
-        protected void appendClickableNarrations(NarrationMessageBuilder builder) {}
+        protected void updateWidgetNarration(NarrationElementOutput builder) {}
 
         public class ErrorEntryHeader extends ErrorEntry {
 
@@ -167,21 +165,21 @@ public class ErrorsScreen extends Screen {
             }
 
             @Override
-            public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 int y = getY();
-                context.drawCenteredTextWithShadow(textRenderer, error.line().formatted(Formatting.UNDERLINE), lineColumnX, y + y_offset, 0xFFFFFFFF);
-                context.drawTextWithShadow(textRenderer, Text.literal(collapsedSource).formatted(Formatting.UNDERLINE), 36, y + y_offset, 0xFFFFFFFF);
-                context.drawTextWithShadow(textRenderer, Text.literal(collapsedMsg).formatted(Formatting.UNDERLINE), msgX, y + y_offset, 0xFFFFFFFF);
-                context.drawTextWithShadow(textRenderer, error.type().linkText.formatted(Formatting.WHITE), refX, y + y_offset, 0xFFFFFFFF);
+                context.centeredText(font, error.line().formatted(ChatFormatting.UNDERLINE), lineColumnX, y + y_offset, 0xFFFFFFFF);
+                context.text(font, Component.literal(collapsedSource).withStyle(ChatFormatting.UNDERLINE), 36, y + y_offset, 0xFFFFFFFF);
+                context.text(font, Component.literal(collapsedMsg).withStyle(ChatFormatting.UNDERLINE), msgX, y + y_offset, 0xFFFFFFFF);
+                context.text(font, error.type().linkText.withStyle(ChatFormatting.WHITE), refX, y + y_offset, 0xFFFFFFFF);
             }
         }
 
         @Environment(EnvType.CLIENT)
-        public class ErrorEntry extends EntryListWidget.Entry<ErrorEntry> {
+        public class ErrorEntry extends AbstractSelectionList.Entry<ErrorEntry> {
             final Errors.Error error;
             final String collapsedSource;
             final String collapsedMsg;
-            final List<OrderedText> expandedMsg;
+            final List<FormattedCharSequence> expandedMsg;
             final String expandedSource;
             final int msgX;
             final int refX, refLength;
@@ -191,10 +189,10 @@ public class ErrorsScreen extends Screen {
                 this.error = error;
                 msgX = 36 + sourceSectionWidth + 15;
 
-                refLength = error.type().linkText == null ? 0 : textRenderer.getWidth(error.type().linkText);
+                refLength = error.type().linkText == null ? 0 : font.width(error.type().linkText);
                 refX = error.type().linkText == null ? 0 : width - 28 - refLength;
 
-                expandedMsg = textRenderer.wrapLines(StringVisitable.plain( error.type().message + error.context() ), width - 36 - 16);
+                expandedMsg = font.split(FormattedText.of( error.type().message + error.context() ), width - 36 - 16);
                 collapsedMsg = ensureLength(error.type().message + error.context(), width - msgX - 16 - refLength, "…");
                 collapsedSource = ensureLength(error.source().replace('§', '&'), sourceSectionWidth,
                         error.source().startsWith("{{") ? "…}}" : error.source().startsWith("{") ? "…}" : "…");
@@ -203,47 +201,47 @@ public class ErrorsScreen extends Screen {
             }
 
             private String ensureLength(String str, int width, String suffix) {
-                if (textRenderer.getWidth(str) <= width)
+                if (font.width(str) <= width)
                     return str;
                 else {
                     str = str.substring(0, str.length() - suffix.length() + 1);
                     expands = true;
-                    int endWidth = textRenderer.getWidth("suffix");
-                    while (textRenderer.getWidth(str) > width - endWidth)
+                    int endWidth = font.width("suffix");
+                    while (font.width(str) > width - endWidth)
                         str = str.substring(0, str.length() - 1);
                     return str + suffix;
                 }
             }
 
-            public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 int y = getY();
                 if (hovered) {
-                    int extendedHeight = ErrorListWidget.this.getSelectedOrNull() == this ? (18 * expandedMsg.size()) : 0;
+                    int extendedHeight = ErrorListWidget.this.getSelected() == this ? (18 * expandedMsg.size()) : 0;
                     context.fill(0, y + y_offset, width, y + y_offset + 18 + extendedHeight, 0x22FFFFFF);
                     if (mouseX >= refX && mouseX <= refX + refLength)
-                        context.drawTooltip(textRenderer, Text.literal("§eClick to open the " + error.type().linkText.getString() + " page"), mouseX, mouseY);
+                        context.setTooltipForNextFrame(font, Component.literal("§eClick to open the " + error.type().linkText.getString() + " page"), mouseX, mouseY);
                 }
 
                 y += 6;
-                int ceX = getMaxScrollY()  > 0 ? width-16 : width-12;
+                int ceX = maxScrollAmount()  > 0 ? width-16 : width-12;
 
-                context.drawCenteredTextWithShadow(textRenderer, error.line(), lineColumnX, y + y_offset, 0xFFFFFFFF);
+                context.centeredText(font, error.line(), lineColumnX, y + y_offset, 0xFFFFFFFF);
                 if (refX > 0)
-                    context.drawTextWithShadow(textRenderer, error.type().linkText, refX, y + y_offset, 0xFFFFFFFF);
-                if (ErrorListWidget.this.getSelectedOrNull() != this) {
+                    context.text(font, error.type().linkText, refX, y + y_offset, 0xFFFFFFFF);
+                if (ErrorListWidget.this.getSelected() != this) {
                     if (expands)
-                        context.drawTextWithShadow(textRenderer, "▶", ceX, y + y_offset, 0xFFFFFFFF);
-                    context.drawTextWithShadow(textRenderer, collapsedSource, 36, y + y_offset, 0xFFFFFFFF);
-                    context.drawTextWithShadow(textRenderer, collapsedMsg, msgX, y + y_offset, 0xFFFFFFFF);
+                        context.text(font, "▶", ceX, y + y_offset, 0xFFFFFFFF);
+                    context.text(font, collapsedSource, 36, y + y_offset, 0xFFFFFFFF);
+                    context.text(font, collapsedMsg, msgX, y + y_offset, 0xFFFFFFFF);
                 }
                 else {
                     if (expands)
-                        context.drawTextWithShadow(textRenderer, "▼", ceX, y + y_offset, 0xFFFFFFFF);
-                    context.drawTextWithShadow(textRenderer, expandedSource, 36, y + y_offset, 0xFFFFFFFF);
-                    for (OrderedText msgLine : expandedMsg) {
+                        context.text(font, "▼", ceX, y + y_offset, 0xFFFFFFFF);
+                    context.text(font, expandedSource, 36, y + y_offset, 0xFFFFFFFF);
+                    for (FormattedCharSequence msgLine : expandedMsg) {
                         y_offset += 18;
-                        context.drawCenteredTextWithShadow(textRenderer, "→", lineColumnX, y + y_offset, 0xFFFFFFFF);
-                        context.drawTextWithShadow(textRenderer, msgLine, 36, y + y_offset, 0xFFFFFFFF);
+                        context.centeredText(font, "→", lineColumnX, y + y_offset, 0xFFFFFFFF);
+                        context.text(font, msgLine, 36, y + y_offset, 0xFFFFFFFF);
                     }
                     y_offset += 18;
 
@@ -252,10 +250,10 @@ public class ErrorsScreen extends Screen {
             }
 
             @Override
-            public boolean mouseClicked(Click click, boolean doubled) {
+            public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
                 if (click.x() >= refX && click.x() <= refX + refLength)
-                    Util.getOperatingSystem().open(error.type().link);
-                else if (expands && ErrorListWidget.this.getSelectedOrNull() != this)
+                    Util.getPlatform().openUri(error.type().link);
+                else if (expands && ErrorListWidget.this.getSelected() != this)
                     ErrorListWidget.this.setSelected(this);
                 else
                     ErrorListWidget.this.setSelected(null);

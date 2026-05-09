@@ -1,22 +1,22 @@
 package com.minenash.customhud.mixin.accessors;
 
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.sound.SoundCategory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.Map;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.Options;
+import net.minecraft.sounds.SoundSource;
 
-@Mixin(GameOptions.class)
+@Mixin(Options.class)
 public interface GameOptionsAccessor {
 
-    @Invoker("accept") void invokeAccept(GameOptions.Visitor visitor);
+    @Invoker("processOptions") void invokeAccept(Options.FieldAccess visitor);
 
-    @Accessor Map<SoundCategory, SimpleOption<Double>> getSoundVolumeLevels();
+    @Accessor Map<SoundSource, OptionInstance<Double>> getSoundSourceVolumes();
 
-    @Accessor("cloudRenderMode")
-    SimpleOption<?> getCloudRenderMode();
+    @Accessor("cloudStatus")
+    OptionInstance<?> getCloudRenderMode();
 
 }

@@ -9,13 +9,6 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.DynamicUniforms;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.Camera;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
@@ -23,6 +16,9 @@ import org.joml.Vector4f;
 
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import net.minecraft.client.Camera;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.util.Mth;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -37,15 +33,15 @@ public class DebugGizmoElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, RenderPiece piece) {
+    public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         float scale = -1 * this.scale * 10/18f;
-        Camera camera = CLIENT.gameRenderer.getCamera();
+        Camera camera = CLIENT.gameRenderer.getMainCamera();
         Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
         matrix4fStack.pushMatrix();
 //        matrix4fStack.scale(profileScale,profileScale,1);
 
-        float yaw = MathHelper.wrapDegrees(camera.getYaw());
-        float pitch = MathHelper.wrapDegrees(camera.getPitch());
+        float yaw = Mth.wrapDegrees(camera.yRot());
+        float pitch = Mth.wrapDegrees(camera.xRot());
 
         float x_offset = size / 2;
         float y_offset = (pitch + 90) / 180 * size * 2 - 2;
@@ -70,10 +66,10 @@ public class DebugGizmoElement extends IconElement {
 
         matrix4fStack.translate(piece.x + shiftX + x_offset, piece.y + shiftY + y_offset + (size/2), 100);
 //        matrix4fStack.mul(context.getMatrices().peek().getPositionMatrix());
-        matrix4fStack.rotateX(-camera.getPitch() * (float) (Math.PI / 180.0));
-        matrix4fStack.rotateY(camera.getYaw() * (float) (Math.PI / 180.0));
+        matrix4fStack.rotateX(-camera.xRot() * (float) (Math.PI / 180.0));
+        matrix4fStack.rotateY(camera.yRot() * (float) (Math.PI / 180.0));
         matrix4fStack.scale(scale, scale, scale);
-        CLIENT.getDebugHud().renderDebugCrosshair(camera);
+        // Minecraft 26.1 moved the debug gizmo renderer to the extracted render state path.
         matrix4fStack.popMatrix();
     }
 

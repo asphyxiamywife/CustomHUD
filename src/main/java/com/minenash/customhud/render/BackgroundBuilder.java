@@ -2,11 +2,9 @@ package com.minenash.customhud.render;
 
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.data.Section;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.BufferBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class BackgroundBuilder {
 
@@ -47,7 +45,7 @@ public class BackgroundBuilder {
 
     }
 
-    public void finalizeBg(DrawContext context, int x, int y) {
+    public void finalizeBg(GuiGraphicsExtractor context, int x, int y) {
         if (isDynamic) {
             if (textAlign == Section.Align.RIGHT)
                 for (var piece : bgPieces)

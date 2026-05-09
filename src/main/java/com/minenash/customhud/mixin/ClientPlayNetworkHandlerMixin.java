@@ -2,12 +2,12 @@ package com.minenash.customhud.mixin;
 
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
-import net.minecraft.client.gui.hud.DebugHud;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
-import net.minecraft.network.packet.s2c.play.SetTradeOffersS2CPacket;
-import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.protocol.game.ClientboundMerchantOffersPacket;
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
+import net.minecraft.world.inventory.MenuType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,27 +16,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(ClientPacketListener.class)
 public class ClientPlayNetworkHandlerMixin {
 
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowPacketSizeAndPingCharts()Z"))
-    private boolean pingForMetricVariables(DebugHud hud) {
-        return hud.shouldShowPacketSizeAndPingCharts() || (ProfileManager.getActive() != null && ProfileManager.getActive().enabled.pingMetrics);
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;showNetworkCharts()Z"))
+    private boolean pingForMetricVariables(DebugScreenOverlay hud) {
+        return hud.showNetworkCharts() || (ProfileManager.getActive() != null && ProfileManager.getActive().enabled.pingMetrics);
     }
 
-    @Inject(method = "onSetTradeOffers", at = @At("HEAD"))
-    public void getTradeOffer(SetTradeOffersS2CPacket packet, CallbackInfo ci) {
+    @Inject(method = "handleMerchantOffers", at = @At("HEAD"))
+    public void getTradeOffer(ClientboundMerchantOffersPacket packet, CallbackInfo ci) {
         if (ComplexData.fakeVillagerInteract > 0) {
             ComplexData.fakeVillagerInteract--;
             ComplexData.villagerOffers = packet.getOffers();
-            ComplexData.villagerXP = packet.getExperience();
+            ComplexData.villagerXP = packet.getVillagerXp();
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "onOpenScreen", cancellable = true)
-    public void onOpenScreen(OpenScreenS2CPacket packet, CallbackInfo ci) {
-        if (packet.getScreenHandlerType() == ScreenHandlerType.MERCHANT && ComplexData.fakeVillagerInteract > 0) {
-            CLIENT.getNetworkHandler().sendPacket(new CloseHandledScreenC2SPacket(packet.getSyncId()));
+    @Inject(at = @At("HEAD"), method = "handleOpenScreen", cancellable = true)
+    public void onOpenScreen(ClientboundOpenScreenPacket packet, CallbackInfo ci) {
+        if (packet.getType() == MenuType.MERCHANT && ComplexData.fakeVillagerInteract > 0) {
+            CLIENT.getConnection().send(new ServerboundContainerClosePacket(packet.getContainerId()));
             ComplexData.fakeVillagerInteract--;
             ci.cancel();
         }

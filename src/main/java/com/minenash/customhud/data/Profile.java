@@ -9,8 +9,7 @@ import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class Profile {
 
     public String name;
     public LocalDateTime updatedDateTime;
-    public KeyBinding keyBinding;
+    public KeyMapping keyBinding;
     public boolean cycle = true;
 
     public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([^,]*)?)? ?(?:, ?([^,]*)?)? ?(?:, ?(true|false)?)? ?(?:, ?(-?\\d+|fit|max)?)? ?(?:, ?(left|right|center)?)? ?==");
@@ -71,7 +70,7 @@ public class Profile {
         Profile p = new Profile();
         p.name = name;
         p.updatedDateTime = LocalDateTime.now();
-        p.keyBinding = new KeyBinding("custom_hud." + name, GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+        p.keyBinding = new KeyMapping("custom_hud." + name, GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
         return p;
     }
 
@@ -95,7 +94,7 @@ public class Profile {
         }
 
         if (profile != null)
-            profile.keyBinding = new KeyBinding("custom_hud." + profileName, GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+            profile.keyBinding = new KeyMapping("custom_hud." + profileName, GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
         return profile;
     }
 
