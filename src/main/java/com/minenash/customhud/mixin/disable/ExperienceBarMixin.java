@@ -13,7 +13,7 @@ import static com.minenash.customhud.data.DisableElement.XP;
 
 @Mixin(ExperienceBarRenderer.class)
 public class ExperienceBarMixin {
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true, require = 0)
     public void customhud$disableXPBar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(XP))
             ci.cancel();
