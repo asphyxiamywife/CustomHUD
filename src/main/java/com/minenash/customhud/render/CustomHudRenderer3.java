@@ -40,9 +40,6 @@ public class CustomHudRenderer3 {
                 || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.options.hideGui && client.screen == null))
             return;
 
-        if (profile.baseTheme.getTargetGuiScale() != client.getWindow().getGuiScale())
-            client.resizeGui();
-
         boolean isChatOpen = client.screen instanceof ChatScreen;
 
         List<RenderPiece> pieces = new ArrayList<>();

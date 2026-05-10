@@ -9,26 +9,31 @@ import net.minecraft.world.item.ItemStack;
 
 public class ItemIconElement extends IconElement {
 
-    private final ItemStack stack;
+    private final Item item;
 
-    public ItemIconElement(ItemStack stack, Flags flags) {
+    public ItemIconElement(Item item, Flags flags) {
         super(flags, 11);
-        this.stack = stack;
+        this.item = item;
     }
 
     @Override
     public Number getNumber() {
-        return Item.getId(stack.getItem());
+        return Item.getId(item);
     }
 
     @Override
     public boolean getBoolean() {
-        return stack.isEmpty();
+        return item == null;
     }
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
-        renderItemStack(context, piece.x, piece.y, stack, piece.shiftTextUpOrFitItemIcon);
+        try {
+            renderItemStack(context, piece.x, piece.y, item.getDefaultInstance(), piece.shiftTextUpOrFitItemIcon);
+        }
+        catch (NullPointerException ignored) {
+            // Some modpacks trigger profile parsing/render setup before item components are bound.
+        }
     }
 
     @Override

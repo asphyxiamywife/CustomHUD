@@ -449,7 +449,7 @@ public class VariableParser {
                 Item item = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(main));
                 if (item != Items.AIR) {
                     Flags flags = Flags.parse(profile.name, debugLine, flagParts);
-                    return Flags.wrap(new ItemIconElement(new ItemStack(item), flags), flags);
+                    return Flags.wrap(new ItemIconElement(item, flags), flags);
                 }
             }
 
