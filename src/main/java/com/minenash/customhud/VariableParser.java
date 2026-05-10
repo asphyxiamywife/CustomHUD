@@ -78,6 +78,27 @@ public class VariableParser {
 
     private static final Pattern HEX_COLOR_VARIABLE_PATTERN = Pattern.compile("&\\{(?:0x|#)?([0-9a-fA-F]{3,8})}");
     private static final Pattern EXPRESSION_WITH_PRECISION = Pattern.compile("\\$(?:(\\d+) *,)?(.*)");
+
+    private static Identifier resolveLegacyTextureIcon(Identifier id) {
+        if (!id.getNamespace().equals("minecraft"))
+            return id;
+
+        String slot = switch (id.getPath()) {
+            case "textures/item/empty_armor_slot_helmet.png" -> "helmet";
+            case "textures/item/empty_armor_slot_chestplate.png" -> "chestplate";
+            case "textures/item/empty_armor_slot_leggings.png" -> "leggings";
+            case "textures/item/empty_armor_slot_boots.png" -> "boots";
+            case "textures/item/empty_armor_slot_shield.png" -> "shield";
+            case "textures/item/empty_slot_sword.png" -> "sword";
+            case "textures/item/empty_slot_pickaxe.png" -> "pickaxe";
+            case "textures/item/empty_slot_axe.png" -> "axe";
+            case "textures/item/empty_slot_shovel.png" -> "shovel";
+            case "textures/item/empty_slot_hoe.png" -> "hoe";
+            default -> null;
+        };
+
+        return slot == null ? id : Identifier.fromNamespaceAndPath("minecraft", "textures/gui/sprites/container/slot/" + slot + ".png");
+    }
     private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::?([\\w.: /|-]*))?.*");
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
     private static final Pattern IS_LIST_PATTERN = Pattern.compile("([\\w\\s:-]+),\\s*\".*");
@@ -460,6 +481,7 @@ public class VariableParser {
                     Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, path);
                     return null;
                 }
+                id = resolveLegacyTextureIcon(id);
                 Flags flags = Flags.parse(profile.name, debugLine, flagParts);
                 SimpleTextureIconElement element = new SimpleTextureIconElement(id, crosshair, flags);
                 if (element.isIconAvailable())
@@ -481,6 +503,7 @@ public class VariableParser {
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, path);
                 return null;
             }
+            id = resolveLegacyTextureIcon(id);
             Operation u = matcher.group(3) == null || matcher.group(3).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(3), original, profile, debugLine, enabled, listProviders, false);
             Operation v = matcher.group(4) == null || matcher.group(4).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(4), original, profile, debugLine, enabled, listProviders, false);
             Operation w = matcher.group(5) == null || matcher.group(5).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(5), original, profile, debugLine, enabled, listProviders, false);
