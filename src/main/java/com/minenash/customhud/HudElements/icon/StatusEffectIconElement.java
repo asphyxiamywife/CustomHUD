@@ -4,7 +4,7 @@ import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import java.util.UUID;
 import java.util.function.Supplier;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
@@ -42,7 +42,7 @@ public class StatusEffectIconElement extends IconElement {
             if (!referenceCorner && scale != 1)
                y-= (renderWidth-12)/2;
 
-            Identifier texture = Gui.getMobEffectSprite(effect.getEffect());
+            Identifier texture = Hud.getMobEffectSprite(effect.getEffect());
             int m = effect.getDuration();
             float f = !effect.endsWithin(200) ? 1.0f :
                 Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((float)(10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);

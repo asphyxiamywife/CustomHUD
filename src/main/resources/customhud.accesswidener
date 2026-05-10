@@ -29,19 +29,8 @@ accessible	field	net/minecraft/world/level/entity/PersistentEntitySectionManager
 accessible	field	net/minecraft/client/KeyMapping	clickCount	I
 accessible	method	net/minecraft/world/scores/Scoreboard	getOrCreatePlayerInfo	(Ljava/lang/String;)Lnet/minecraft/world/scores/PlayerScores;
 accessible	field	net/minecraft/world/scores/PlayerScores	scores	Lit/unimi/dsi/fastutil/objects/Reference2ObjectOpenHashMap;
-accessible	field	net/minecraft/client/gui/Gui	SCORE_DISPLAY_ORDER	Ljava/util/Comparator;
 accessible	field	net/minecraft/client/gui/screens/Screen	renderables	Ljava/util/List;
 accessible	field	net/minecraft/client/KeyMapping	key	Lcom/mojang/blaze3d/platform/InputConstants$Key;
-accessible	class	net/minecraft/client/Minecraft$GameLoadCookie
-accessible	field	net/minecraft/client/gui/Gui	overlayMessageString	Lnet/minecraft/network/chat/Component;
-accessible	field	net/minecraft/client/gui/Gui	overlayMessageTime	I
-accessible	field	net/minecraft/client/gui/Gui	animateOverlayMessageColor	Z
-accessible	field	net/minecraft/client/gui/Gui	title	Lnet/minecraft/network/chat/Component;
-accessible	field	net/minecraft/client/gui/Gui	subtitle	Lnet/minecraft/network/chat/Component;
-accessible	field	net/minecraft/client/gui/Gui	titleTime	I
-accessible	field	net/minecraft/client/gui/Gui	titleFadeOutTime	I
-accessible	field	net/minecraft/client/gui/Gui	titleStayTime	I
-accessible	field	net/minecraft/client/gui/Gui	titleFadeInTime	I
 accessible	field	net/minecraft/server/packs/repository/Pack	metadata	Lnet/minecraft/server/packs/repository/Pack$Metadata;
 accessible	class	net/minecraft/client/gui/components/debug/DebugEntryMemory$AllocationRateCalculator
 accessible	method	net/minecraft/client/gui/components/debug/DebugEntryMemory$AllocationRateCalculator	<init>	()V

@@ -6,6 +6,7 @@ import com.minenash.customhud.HudElements.list.ListProvider.EventListProvider;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.complex.SubtitleTracker;
+import com.minenash.customhud.mixin.accessors.ChatComponentAccessor;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import java.util.*;
@@ -13,7 +14,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import net.minecraft.Optionull;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.SubtitleOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.core.BlockPos;
@@ -26,7 +26,7 @@ import net.minecraft.server.bossevents.CustomBossEvent;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Tuple;
+import com.minenash.customhud.util.Tuple;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -38,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.PlayerScoreEntry;
 import net.minecraft.world.scores.PlayerTeam;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
@@ -57,6 +58,8 @@ public class ListSuppliers {
             Comparator.comparingInt((PlayerInfo entry) -> entry.getGameMode() == GameType.SPECTATOR ? 1 : 0)
                     .thenComparing((entry) -> Optionull.mapOrDefault(entry.getTeam(), PlayerTeam::getName, ""))
                     .thenComparing((entry) -> entry.getProfile().name(), String::compareToIgnoreCase);
+    public static final Comparator<PlayerScoreEntry> SCORE_DISPLAY_ORDER =
+            Comparator.comparing(PlayerScoreEntry::value).reversed().thenComparing(PlayerScoreEntry::owner, String.CASE_INSENSITIVE_ORDER);
 
 
     public static final List<String> IGNORE_MODS = List.of("minecraft", "fabricloader", "java");
@@ -175,7 +178,7 @@ public class ListSuppliers {
         return profiles;
     },
 
-    CHAT_MESSAGES = () -> CLIENT.gui.getChat().allMessages,
+    CHAT_MESSAGES = () -> ((ChatComponentAccessor) CLIENT.gui.hud.getChat()).getAllMessages(),
 
     PROFILER_TIMINGS = () -> ComplexData.rootEntries;
 
@@ -210,10 +213,10 @@ public class ListSuppliers {
     };
 
 
-    public static final Function<Objective, List<?>> SCOREBOARD_OBJECTIVE_SCORES = (obj) -> scoreboard().listPlayerScores(obj).stream().sorted(Gui.SCORE_DISPLAY_ORDER).toList();
+    public static final Function<Objective, List<?>> SCOREBOARD_OBJECTIVE_SCORES = (obj) -> scoreboard().listPlayerScores(obj).stream().sorted(SCORE_DISPLAY_ORDER).toList();
     public static final Function<Objective, List<?>> SCOREBOARD_OBJECTIVE_SCORES_ONLINE = (obj) -> scoreboard().listPlayerScores(obj).stream()
             .filter(score -> entryOnline(score.owner()))
-            .sorted(Gui.SCORE_DISPLAY_ORDER).toList();
+            .sorted(SCORE_DISPLAY_ORDER).toList();
 
 
     public static ListProvider SCORES(String name) {

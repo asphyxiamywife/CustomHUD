@@ -35,7 +35,7 @@ public class DebugGizmoElement extends IconElement {
     @Override
     public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         float scale = -1 * this.scale * 10/18f;
-        Camera camera = CLIENT.gameRenderer.getMainCamera();
+        Camera camera = CLIENT.gameRenderer.mainCamera();
         Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
         matrix4fStack.pushMatrix();
 //        matrix4fStack.scale(profileScale,profileScale,1);

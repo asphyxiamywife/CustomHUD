@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.text;
 
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.mixin.accessors.HudAccessor;
 import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
 
@@ -10,9 +11,9 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 public class TextSupplierElement extends TextElement {
 
     public static final Supplier<Component> DISPLAY_NAME = () -> CLIENT.player.getDisplayName();
-    public static final Supplier<Component> ACTIONBAR_MSG = () -> CLIENT.gui.overlayMessageTime == 0 ? null : CLIENT.gui.overlayMessageString;
-    public static final Supplier<Component> TITLE_MSG = () -> CLIENT.gui.title;
-    public static final Supplier<Component> SUBTITLE_MSG = () -> CLIENT.gui.titleTime == 0 ? null : CLIENT.gui.subtitle;
+    public static final Supplier<Component> ACTIONBAR_MSG = () -> ((HudAccessor) CLIENT.gui.hud).getOverlayMessageTime() == 0 ? null : ((HudAccessor) CLIENT.gui.hud).getOverlayMessageString();
+    public static final Supplier<Component> TITLE_MSG = () -> ((HudAccessor) CLIENT.gui.hud).getTitle();
+    public static final Supplier<Component> SUBTITLE_MSG = () -> ((HudAccessor) CLIENT.gui.hud).getTitleTime() == 0 ? null : ((HudAccessor) CLIENT.gui.hud).getSubtitle();
     public static final Supplier<Component> RECORD_NAME = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().name : null;
     public static final Supplier<Component> PLAYER_TEAM_NAME = () -> CLIENT.player.getTeam() == null ? null : CLIENT.player.getTeam().getDisplayName();
 

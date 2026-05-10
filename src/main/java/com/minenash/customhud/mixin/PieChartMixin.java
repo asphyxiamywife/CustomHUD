@@ -26,8 +26,8 @@ public class PieChartMixin {
     @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
     private void shouldRenderTheActualProfiler(GuiGraphicsExtractor context, CallbackInfo ci) {
         Profile p = ProfileManager.getActive();
-        if (CLIENT.gui.getDebugOverlay().showDebugScreen() ||
-                (!CLIENT.options.hideGui && !CLIENT.gui.getDebugOverlay().showDebugScreen() && CLIENT.level != null
+        if (CLIENT.getDebugOverlay().showDebugScreen() ||
+                (!CLIENT.gui.hud.isHidden() && !CLIENT.getDebugOverlay().showDebugScreen() && CLIENT.level != null
                         && p != null && (p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER)) )
             return;
         ci.cancel();

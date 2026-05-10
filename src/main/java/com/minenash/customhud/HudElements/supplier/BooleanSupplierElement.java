@@ -65,10 +65,10 @@ public class BooleanSupplierElement implements HudElement {
 
     // ADD: onFire et al
 
-    public static final Supplier<Boolean> HUD_HIDDEN = () -> client.options.hideGui;
-    public static final Supplier<Boolean> SCREEN_OPEN = () -> client.screen != null;
-    public static final Supplier<Boolean> CHAT_OPEN = () -> client.screen instanceof ChatScreen;
-    public static final Supplier<Boolean> PLAYER_LIST_OPEN = () -> ((PlayerListHudAccess)client.gui.getTabList()).getVisible();
+    public static final Supplier<Boolean> HUD_HIDDEN = () -> client.gui.hud.isHidden();
+    public static final Supplier<Boolean> SCREEN_OPEN = () -> client.gui.screen() != null;
+    public static final Supplier<Boolean> CHAT_OPEN = () -> client.gui.screen() instanceof ChatScreen;
+    public static final Supplier<Boolean> PLAYER_LIST_OPEN = () -> ((PlayerListHudAccess)client.gui.hud.getTabList()).getVisible();
 
     public static final Supplier<Boolean> WINDOW_FOCUSED = client::isWindowActive;
 

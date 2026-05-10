@@ -125,7 +125,7 @@ public class ProfileManager {
         } catch (IOException e) {
             CustomHud.LOGGER.error("Can't rename profile, IO Exception");
             CustomHud.LOGGER.catching(e);
-            CLIENT.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+            CLIENT.gui.toastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                     Component.literal("§cUnable to Rename Profile"),
                     Component.literal("§eIO Exception")
             ));

@@ -9,6 +9,7 @@ import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.ducks.ResourcePackProfileMetadataDuck;
 import com.minenash.customhud.ducks.SubtitleEntryDuck;
+import com.minenash.customhud.util.Tuple;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
@@ -57,6 +58,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -68,6 +70,32 @@ import static com.minenash.customhud.data.StatFormatters.*;
 public class AttributeFunctions {
 
     public static final Function<?,?> DIRECT = (str) -> str;
+
+    private static String formatName(ChatFormatting formatting) {
+        return formatting == null ? "reset" : formatting.name().toLowerCase(Locale.ROOT);
+    }
+
+    private static int formatColor(ChatFormatting formatting) {
+        return switch (formatting) {
+            case BLACK -> 0x000000;
+            case DARK_BLUE -> 0x0000AA;
+            case DARK_GREEN -> 0x00AA00;
+            case DARK_AQUA -> 0x00AAAA;
+            case DARK_RED -> 0xAA0000;
+            case DARK_PURPLE -> 0xAA00AA;
+            case GOLD -> 0xFFAA00;
+            case GRAY -> 0xAAAAAA;
+            case DARK_GRAY -> 0x555555;
+            case BLUE -> 0x5555FF;
+            case GREEN -> 0x55FF55;
+            case AQUA -> 0x55FFFF;
+            case RED -> 0xFF5555;
+            case LIGHT_PURPLE -> 0xFF55FF;
+            case YELLOW -> 0xFFFF55;
+            case WHITE -> 0xFFFFFF;
+            default -> 0xFFFFFF;
+        };
+    }
 
 
     // STATUS EFFECTS
@@ -238,7 +266,7 @@ public class AttributeFunctions {
     public static final Function<ItemStack, Number> ITEM_REPAIR_COST = (stack) -> stack.getOrDefault(DataComponents.REPAIR_COST, Double.NaN);
     public static final Entry<ItemStack> ITEM_RARITY = new Entry<>(
             (stack) -> stack.getOrDefault(DataComponents.RARITY, Rarity.COMMON).name(),
-            (stack) -> stack.getOrDefault(DataComponents.RARITY, Rarity.COMMON).color().getColor(),
+            (stack) -> formatColor(stack.getOrDefault(DataComponents.RARITY, Rarity.COMMON).color()),
             (stack) -> stack.getOrDefault(DataComponents.RARITY, Rarity.COMMON) != Rarity.COMMON
     );
     public static final Entry<ItemStack> ITEM_ARMOR_SLOT = new Entry<>(
@@ -327,9 +355,9 @@ public class AttributeFunctions {
             (team) -> team.getCollisionRule().id,
             (team) -> team.getCollisionRule() != Team.CollisionRule.NEVER);
     public static final Entry<PlayerTeam> TEAM_COLOR = new Entry<>(
-            (team) -> team.getColor().getName(),
-            (team) -> team.getColor().getColor(),
-            (team) -> team.getColor() != ChatFormatting.RESET
+            (team) -> team.getColor().map(TeamColor::getSerializedName).orElse("reset"),
+            (team) -> team.getColor().map(TeamColor::rgb).orElse(0xFFFFFF),
+            (team) -> team.getColor().isPresent()
     );
 
 
@@ -380,8 +408,8 @@ public class AttributeFunctions {
             (bar) -> bar.getColor() != BossEvent.BossBarColor.WHITE
     );
     public static final Entry<BossEvent> BOSSBAR_TEXT_COLOR = new Entry<>(
-            (bar) -> WordUtils.capitalize(bar.getColor().getFormatting().getName().toLowerCase()),
-            (bar) -> bar.getColor().getFormatting().getColor(),
+            (bar) -> WordUtils.capitalize(formatName(bar.getColor().getFormatting())),
+            (bar) -> formatColor(bar.getColor().getFormatting()),
             (bar) -> bar.getColor() != BossEvent.BossBarColor.WHITE
     );
     public static final Entry<BossEvent> BOSSBAR_STYLE = new Entry<>(
@@ -500,7 +528,7 @@ public class AttributeFunctions {
 
     //CHAT MESSAGES
     public static final Function<GuiMessage,Component> CHAT_MESSAGE_TEXT = (line) -> line.content();
-    public static final NumEntry<GuiMessage> CHAT_MESSAGE_TIME_AGO = Num.of(TICKS_HMS, (line) -> line == null ? null : CLIENT.gui.getGuiTicks() - line.addedTime());
+    public static final NumEntry<GuiMessage> CHAT_MESSAGE_TIME_AGO = Num.of(TICKS_HMS, (line) -> line == null ? null : CLIENT.gui.hud.getGuiTicks() - line.addedTime());
     public static final Function<GuiMessage,String> CHAT_MESSAGE_TYPE = (line) -> {
         if (line == null) return null;
         if (line.tag() == null) return "Normal";

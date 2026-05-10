@@ -4,6 +4,7 @@ import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.EstimatedTick;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.data.StatFormatters;
+import com.minenash.customhud.mixin.accessors.HudAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugEntryMemory;
 import net.minecraft.client.server.IntegratedServer;
@@ -41,8 +42,8 @@ public class EntryNumberSuppliers {
         return function.compute(new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
     }
 
-    public static final Entry ACTIONBAR_REMAINING = of( () -> client.gui.overlayMessageTime, 0, StatFormatters.MIL_HMS);
-    public static final Entry TITLE_REMAINING = of( () -> client.gui.titleTime, 0, StatFormatters.MIL_HMS);
+    public static final Entry ACTIONBAR_REMAINING = of( () -> ((HudAccessor) client.gui.hud).getOverlayMessageTime(), 0, StatFormatters.MIL_HMS);
+    public static final Entry TITLE_REMAINING = of( () -> ((HudAccessor) client.gui.hud).getTitleTime(), 0, StatFormatters.MIL_HMS);
 
     public static final Entry X = of( () -> cameraEntity().getX(), 3);
     public static final Entry Y = of( () -> cameraEntity().getY(), 3);

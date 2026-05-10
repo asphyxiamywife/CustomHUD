@@ -128,7 +128,7 @@ public class NewConfigScreen extends Screen {
             return true;
         }
         if (input.key() == CustomHud.kb_showErrors.key.getValue() && ProfileManager.getActive() != null) {
-            minecraft.setScreen( new ErrorsScreen(this) );
+            minecraft.gui.setScreen( new ErrorsScreen(this) );
             return true;
         }
 
@@ -212,7 +212,7 @@ public class NewConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        CLIENT.setScreen(parent);
+        CLIENT.gui.setScreen(parent);
         profiles.update();
         ConfigManager.save();
     }

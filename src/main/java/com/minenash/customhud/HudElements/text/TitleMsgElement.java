@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.text;
 
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.mixin.accessors.HudAccessor;
 import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -13,13 +14,14 @@ public class TitleMsgElement extends TextSupplierElement {
     @Override
     public int getColor(int current) {
         int l = 0;
-        if (CLIENT.gui.titleTime > CLIENT.gui.titleFadeOutTime + CLIENT.gui.titleStayTime) {
-            float o = (float)(CLIENT.gui.titleFadeInTime + CLIENT.gui.titleStayTime + CLIENT.gui.titleFadeOutTime) - CLIENT.gui.titleTime;
-            l = (int)(o * 255.0F / CLIENT.gui.titleFadeInTime);
+        HudAccessor hud = (HudAccessor) CLIENT.gui.hud;
+        if (hud.getTitleTime() > hud.getTitleFadeOutTime() + hud.getTitleStayTime()) {
+            float o = (float)(hud.getTitleFadeInTime() + hud.getTitleStayTime() + hud.getTitleFadeOutTime()) - hud.getTitleTime();
+            l = (int)(o * 255.0F / hud.getTitleFadeInTime());
         }
 
-        if (CLIENT.gui.titleTime <= CLIENT.gui.titleFadeOutTime)
-            l = (int)(CLIENT.gui.titleTime * 255.0F / CLIENT.gui.titleFadeOutTime);
+        if (hud.getTitleTime() <= hud.getTitleFadeOutTime())
+            l = (int)(hud.getTitleTime() * 255.0F / hud.getTitleFadeOutTime());
 
         return (current & 0xFFFFFF) | Mth.clamp(l, 0, 255) << 24 & 0xFF000000;
     }

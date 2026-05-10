@@ -55,7 +55,7 @@ public class TogglesScreen extends Screen {
                 .pos(this.width / 2 - 155, this.height - 26).size(150, 20)
                 .tooltip(ProfileManager.openTooltip).build() );
 
-        this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.setScreen(parent))
+        this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.gui.setScreen(parent))
                 .pos(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
 
         super.init();
@@ -63,7 +63,7 @@ public class TogglesScreen extends Screen {
 
     @Override
     public void onClose() {
-        CLIENT.setScreen(parent);
+        CLIENT.gui.setScreen(parent);
         ConfigManager.save();
     }
 

@@ -42,7 +42,7 @@ public class IntegerSuppliers {
         return client.levelRenderer;
     }
     private static SectionRenderDispatcher chunkBuilder() {
-        return worldRender().getSectionRenderDispatcher();
+        return worldRender().sectionRenderDispatcher();
     }
     private static BlockPos blockPos() { return client.getCameraEntity().blockPosition(); }
     private static LevelLightEngine serverLighting() { return ComplexData.world.getChunkSource().getLightEngine(); }
@@ -74,8 +74,8 @@ public class IntegerSuppliers {
 
     public static final Supplier<Number> PACKETS_SENT = () -> (int)client.getConnection().getConnection().getAverageSentPackets();
     public static final Supplier<Number> PACKETS_RECEIVED = () -> (int)client.getConnection().getConnection().getAverageReceivedPackets();
-    public static final Supplier<Number> CHUNKS_RENDERED = () -> worldRender().countRenderedSections();
-    public static final Supplier<Number> CHUNKS_LOADED = () -> worldRender().getTotalSections();
+    public static final Supplier<Number> CHUNKS_RENDERED = () -> worldRender().visibleSections().size();
+    public static final Supplier<Number> CHUNKS_LOADED = () -> worldRender().viewArea().sectionCount();
     @SuppressWarnings("Convert2MethodRef" )
     public static final Supplier<Number> RENDER_DISTANCE = () -> client.options.getEffectiveRenderDistance();
     public static final Supplier<Number> QUEUED_TASKS = () -> chunkBuilder().getCompileQueueSize();

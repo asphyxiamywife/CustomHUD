@@ -3,6 +3,7 @@ package com.minenash.customhud.HudElements.list;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.mixin.accessors.AttributeContainerAccessor;
 import com.minenash.customhud.mixin.accessors.BlockPredicatesComponentAccessor;
+import com.minenash.customhud.mixin.accessors.BossHealthOverlayAccessor;
 import com.minenash.customhud.mixin.accessors.DefaultAttributeContainerAccessor;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -230,7 +231,7 @@ public class AttributeHelpers {
 
     public static List<?> bossbars(boolean all) {
         if (CLIENT.getSingleplayerServer() == null)
-            return Arrays.asList(CLIENT.gui.getBossOverlay().events.entrySet().toArray());
+            return Arrays.asList(((BossHealthOverlayAccessor) CLIENT.gui.hud.getBossOverlay()).getEvents().entrySet().toArray());
 
         List<BossEvent> serverBossbars = new ArrayList<>();
         serverBossbars.addAll(CLIENT.getSingleplayerServer().getCustomBossEvents().events.values());
@@ -239,7 +240,7 @@ public class AttributeHelpers {
         if (all)
             return serverBossbars;
 
-        Set<UUID> client = CLIENT.gui.getBossOverlay().events.keySet();
+        Set<UUID> client = ((BossHealthOverlayAccessor) CLIENT.gui.hud.getBossOverlay()).getEvents().keySet();
         return Arrays.asList( serverBossbars.stream().filter(bar -> client.contains(bar.getId())).toArray() );
     }
 
@@ -248,7 +249,7 @@ public class AttributeHelpers {
         try {
             UUID uuid = UUID.fromString(input);
             if (client)
-                return CLIENT.gui.getBossOverlay().events.get(uuid);
+                return ((BossHealthOverlayAccessor) CLIENT.gui.hud.getBossOverlay()).getEvents().get(uuid);
             for (BossEvent bar : CLIENT.getSingleplayerServer().getCustomBossEvents().events.values())
                 if (bar.getId() == uuid)
                     return bar;
@@ -259,7 +260,7 @@ public class AttributeHelpers {
         catch (Exception ignored) {}
 
         if (client) {
-            for (BossEvent bar : CLIENT.gui.getBossOverlay().events.values())
+            for (BossEvent bar : ((BossHealthOverlayAccessor) CLIENT.gui.hud.getBossOverlay()).getEvents().values())
                 if (bar.getName().getString().equalsIgnoreCase(input))
                     return bar;
         }

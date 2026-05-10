@@ -8,6 +8,7 @@ import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.data.DebugCharts;
 import com.minenash.customhud.data.Profile;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.GameLoadCookie;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Gui;
@@ -33,6 +34,7 @@ public abstract class MinecraftClientMixin {
     @Shadow public abstract double getGpuUtilization();
 
     @Shadow @Final public Gui gui;
+    @Shadow public abstract DebugScreenOverlay getDebugOverlay();
 
     @Shadow @Nullable public ClientLevel level;
 
@@ -75,7 +77,7 @@ public abstract class MinecraftClientMixin {
 
     @Unique private static boolean isFirst = true;
     @Inject(method = "onResourceLoadFinished", at = @At("RETURN"))
-    public void reloadProfiles(Minecraft.GameLoadCookie loadingContext, CallbackInfo ci) {
+    public void reloadProfiles(GameLoadCookie loadingContext, CallbackInfo ci) {
         if (isFirst) {
             isFirst = false;
             return;
@@ -93,7 +95,7 @@ public abstract class MinecraftClientMixin {
 
         Profile p = ProfileManager.getActive();
         return original.call(instance) ||
-                (!options.hideGui && !gui.getDebugOverlay().showDebugScreen() && level != null
+                (!gui.hud.isHidden() && !getDebugOverlay().showDebugScreen() && level != null
                         && p != null && (p.enabled.profilerTimings || p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER) );
     }
 }

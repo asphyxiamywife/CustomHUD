@@ -55,8 +55,8 @@ public class ProfileLineEntry extends LineEntry {
         });
         int errors = Errors.getErrors(profile.name).size();
         int toggles = profile.toggles.size();
-        this.error = button("§c!", "§c" + (errors == 1 ? "1 Error Found" : errors + " Errors Found") , 16, (b) -> CLIENT.setScreen(new ErrorsScreen(widget.screen, profile)));
-        this.toggles = button("Toggles", toggles == 1 ? "1 Toggle in the profile" : toggles + " Toggles in the profile",48, (b) -> CLIENT.setScreen(new TogglesScreen(widget.screen, profile)));
+        this.error = button("§c!", "§c" + (errors == 1 ? "1 Error Found" : errors + " Errors Found") , 16, (b) -> CLIENT.gui.setScreen(new ErrorsScreen(widget.screen, profile)));
+        this.toggles = button("Toggles", toggles == 1 ? "1 Toggle in the profile" : toggles + " Toggles in the profile",48, (b) -> CLIENT.gui.setScreen(new TogglesScreen(widget.screen, profile)));
         this.delete = button("§cDelete", "§cThis Can't Be §nUndone!!!!", 48, (b) -> widget.deleteProfile(this));
         this.up = button("§a↑", 16, b -> widget.move(this, -1));
         this.down = button("§c↓", 16, b -> widget.move(this, 1));

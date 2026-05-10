@@ -36,11 +36,11 @@ public class CustomHudRenderer3 {
 
         Profile profile = ProfileManager.getActive();
         if (profile == null || client.getDebugOverlay().showDebugScreen() && client.debugEntries.isOverlayVisible()
-                || (profile.hudHiddenBehavior == HudHiddenBehavior.HIDE && client.options.hideGui)
-                || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.options.hideGui && client.screen == null))
+                || (profile.hudHiddenBehavior == HudHiddenBehavior.HIDE && client.gui.hud.isHidden())
+                || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.gui.hud.isHidden() && client.gui.screen() == null))
             return;
 
-        boolean isChatOpen = client.screen instanceof ChatScreen;
+        boolean isChatOpen = client.gui.screen() instanceof ChatScreen;
 
         List<RenderPiece> pieces = new ArrayList<>();
         List<RenderPiece> wipPieces = new ArrayList<>();

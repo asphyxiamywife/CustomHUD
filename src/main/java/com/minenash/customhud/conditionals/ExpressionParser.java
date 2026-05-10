@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import net.minecraft.util.Tuple;
+import com.minenash.customhud.util.Tuple;
 
 @SuppressWarnings("DuplicatedCode")
 public class ExpressionParser {

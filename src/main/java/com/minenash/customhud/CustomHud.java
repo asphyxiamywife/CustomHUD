@@ -70,7 +70,7 @@ public class CustomHud implements ModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(CustomHud::onTick);
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			if (UpdateChecker.updateMessage != null)
-				client.getChatListener().handleSystemMessage(UpdateChecker.updateMessage, false);
+				client.gui.chatListener().handleSystemMessage(UpdateChecker.updateMessage, false);
 			EstimatedTick.reset();
 
 			var profile = ProfileManager.getActive();
@@ -165,11 +165,11 @@ public class CustomHud implements ModInitializer {
 		}
 
 		while (kb_showErrors.consumeClick()) {
-			if (client.screen == null)
+			if (client.gui.screen() == null)
 				if (ProfileManager.getActive() != null && Errors.hasErrors(ProfileManager.getActive().name))
-					CLIENT.setScreen(new ErrorsScreen(null));
+					CLIENT.gui.setScreen(new ErrorsScreen(null));
 				else
-					CLIENT.setScreen(new NewConfigScreen(null));
+					CLIENT.gui.setScreen(new NewConfigScreen(null));
 		}
 	}
 
@@ -224,11 +224,11 @@ public class CustomHud implements ModInitializer {
 				else {
 					profile = Profile.parseProfile(path, fileName);
 					ProfileManager.replace(profile);
-					if (CLIENT.screen instanceof ErrorsScreen screen)
+					if (CLIENT.gui.screen() instanceof ErrorsScreen screen)
 						screen.changeProfile(profile);
-					if (CLIENT.screen instanceof TogglesScreen screen)
+					if (CLIENT.gui.screen() instanceof TogglesScreen screen)
 						screen.changeProfile(profile);
-					if (CLIENT.screen instanceof NewConfigScreen screen)
+					if (CLIENT.gui.screen() instanceof NewConfigScreen screen)
 						screen.init();
 				}
 			}
@@ -272,11 +272,11 @@ public class CustomHud implements ModInitializer {
 	}
 
 	public static void showToast(String profileName) {
-		CLIENT.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+		CLIENT.gui.toastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
 				Component.translatable("gui.custom_hud.profile_updated", profileName).withStyle(ChatFormatting.WHITE),
 				Errors.hasErrors(profileName) ?
 						Component.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")
-							.append(CLIENT.screen instanceof TitleScreen ?
+							.append(CLIENT.gui.screen() instanceof TitleScreen ?
 								Component.literal("§7, view in config screen via modmenu ")
 								: Component.literal("§7, press ")
 									.append(((MutableComponent)kb_showErrors.getTranslatedKeyMessage()).withStyle(ChatFormatting.AQUA))
@@ -285,7 +285,7 @@ public class CustomHud implements ModInitializer {
 		));
 	}
 	public static void showAllUpdatedToast() {
-		CLIENT.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+		CLIENT.gui.toastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
 				Component.literal("§fAll Profiles Updated"),
 				Component.literal("§aNo errors found")
 		));

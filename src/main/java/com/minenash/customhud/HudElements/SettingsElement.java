@@ -15,7 +15,7 @@ import net.minecraft.client.Options;
 import net.minecraft.client.*;
 import net.minecraft.server.level.ParticleStatus;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Tuple;
+import com.minenash.customhud.util.Tuple;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.ChatVisiblity;
 import java.util.HashMap;

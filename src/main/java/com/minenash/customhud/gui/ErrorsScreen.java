@@ -69,10 +69,10 @@ public class ErrorsScreen extends Screen {
                     .pos(this.width / 2 - 155, this.height - 26).size(100, 20)
                     .tooltip(ProfileManager.openTooltip).build() );
 
-            this.addRenderableWidget( Button.builder(Component.literal("Profiles"), button -> CLIENT.setScreen( new NewConfigScreen(null) ))
+            this.addRenderableWidget( Button.builder(Component.literal("Profiles"), button -> CLIENT.gui.setScreen( new NewConfigScreen(null) ))
                     .pos(this.width / 2 - 155 + 100 + 5, this.height - 26).size(100, 20).build() );
 
-            this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.setScreen(parent))
+            this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.gui.setScreen(parent))
                     .pos(this.width / 2 - 155 + 160 + 50, this.height - 26).size(100, 20).build() );
         }
         else {
@@ -81,7 +81,7 @@ public class ErrorsScreen extends Screen {
                     .tooltip(ProfileManager.openTooltip).build() );
 
 
-            this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.setScreen(parent))
+            this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> CLIENT.gui.setScreen(parent))
                     .pos(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
         }
 
@@ -91,7 +91,7 @@ public class ErrorsScreen extends Screen {
 
     @Override
     public void onClose() {
-        CLIENT.setScreen(parent);
+        CLIENT.gui.setScreen(parent);
     }
 
     public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {

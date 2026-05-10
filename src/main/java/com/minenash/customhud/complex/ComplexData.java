@@ -299,27 +299,27 @@ public class ComplexData {
 
         if (profile.enabled.frameMetrics) {
             Profiler.get().push("frameMetrics");
-            processLog(((DebugHudAccessor)client.gui.getDebugOverlay()).getFrameTimeLogger(), 0.000001, 240, frameTimeMetrics);
+            processLog(((DebugHudAccessor)client.getDebugOverlay()).getFrameTimeLogger(), 0.000001, 240, frameTimeMetrics);
             Profiler.get().pop();
         }
         if (profile.enabled.tickMetrics) {
             Profiler.get().push("tickMetrics");
-            processLog(((DebugHudAccessor)client.gui.getDebugOverlay()).getTickTimeLogger(), 0.000001, 120, tickTimeMetrics);
+            processLog(((DebugHudAccessor)client.getDebugOverlay()).getTickTimeLogger(), 0.000001, 120, tickTimeMetrics);
             Profiler.get().pop();
         }
         if (profile.enabled.pingMetrics) {
             Profiler.get().push("pingMetrics");
-            processLog(client.gui.getDebugOverlay().getPingLogger(), 1, 120, pingMetrics);
+            processLog(client.getDebugOverlay().getPingLogger(), 1, 120, pingMetrics);
             Profiler.get().pop();
         }
         if (profile.enabled.packetMetrics) {
             Profiler.get().push("packetMetrics");
-            processLog(client.gui.getDebugOverlay().getBandwidthLogger(), 20/1024D, 120, packetSizeMetrics);
+            processLog(client.getDebugOverlay().getBandwidthLogger(), 20/1024D, 120, packetSizeMetrics);
             Profiler.get().pop();
         }
         if (profile.enabled.tpsMetrics) {
             Profiler.get().push("tpsMetrics");
-            processTPSLog(((DebugHudAccessor)client.gui.getDebugOverlay()).getTickTimeLogger(), tpsMetrics);
+            processTPSLog(((DebugHudAccessor)client.getDebugOverlay()).getTickTimeLogger(), tpsMetrics);
             Profiler.get().pop();
         }
 
