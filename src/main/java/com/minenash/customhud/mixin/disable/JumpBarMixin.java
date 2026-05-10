@@ -13,7 +13,7 @@ import static com.minenash.customhud.data.DisableElement.*;
 
 @Mixin(JumpableVehicleBarRenderer.class)
 public class JumpBarMixin {
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
     public void customhud$disableHorseJump(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(HORSE) || CustomHud.isDisabled(HORSE_JUMP))
             ci.cancel();

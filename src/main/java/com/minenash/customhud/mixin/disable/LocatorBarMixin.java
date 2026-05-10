@@ -13,7 +13,7 @@ import static com.minenash.customhud.data.DisableElement.LOCATOR;
 
 @Mixin(LocatorBarRenderer.class)
 public class LocatorBarMixin {
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
     public void customhud$disableXPBar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(LOCATOR))
             ci.cancel();
