@@ -18,7 +18,7 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"), require = 0)
+    @WrapOperation(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
     public void changeHudGuiScale(Gui instance, GuiGraphicsExtractor context, DeltaTracker tickCounter, Operation<Void> original) {
         Profile p = ProfileManager.getActive();
         if (p == null || p.baseTheme.hudScale == null) {
@@ -28,7 +28,7 @@ public class GameRendererMixin {
 
         int originalScale = CLIENT.getWindow().getGuiScale();
         int target = p.baseTheme.getTargetGuiScale();
-        float scale = (float) (target/originalScale);
+        float scale = (float) target / originalScale;
         CLIENT.getWindow().setGuiScale(target);
 
         context.pose().pushMatrix();

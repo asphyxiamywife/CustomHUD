@@ -17,13 +17,13 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 @Mixin(ProfilerPieChart.class)
 public class PieChartMixin {
 
-    @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;guiWidth()I"), require = 0)
+    @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;guiWidth()I"))
     public int moveProfilerToLeft(GuiGraphicsExtractor instance, Operation<Integer> original) {
         Profile p = ProfileManager.getActive();
         return p != null && p.leftChart == DebugCharts.PROFILER ? 360 : original.call(instance);
     }
 
-    @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true, require = 0)
+    @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
     private void shouldRenderTheActualProfiler(GuiGraphicsExtractor context, CallbackInfo ci) {
         Profile p = ProfileManager.getActive();
         if (CLIENT.gui.getDebugOverlay().showDebugScreen() ||

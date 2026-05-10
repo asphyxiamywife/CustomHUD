@@ -64,7 +64,7 @@ public abstract class MinecraftClientMixin {
         ComplexData.updateGpuUsage(getGpuUtilization());
     }
 
-    @WrapOperation(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/debug/DebugScreenEntryList;isCurrentlyEnabled(Lnet/minecraft/resources/Identifier;)Z"), require = 0)
+    @WrapOperation(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/debug/DebugScreenEntryList;isCurrentlyEnabled(Lnet/minecraft/resources/Identifier;)Z"))
     public boolean getGpuUsageAndOtherPerformanceMetrics(DebugScreenEntryList instance, Identifier entryId, Operation<Boolean> original) {
         return original.call(instance, entryId)
                 || (DebugScreenEntries.GPU_UTILIZATION.equals(entryId)
