@@ -4,6 +4,7 @@ import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -124,10 +125,10 @@ public class ProgressBarIcon extends IconElement {
         public void extractRenderState(GuiGraphicsExtractor context, float progress, boolean background) {
             bossBar.setProgress(progress);
             if (background)
-                context.fill(0, 0, 182, 5, 0xFF555555);
+                BossbarIcon.extractBar(context, bossBar, 182, BossHealthOverlay.BAR_BACKGROUND_SPRITES, BossHealthOverlay.OVERLAY_BACKGROUND_SPRITES);
             int i = Mth.lerpDiscrete(bossBar.getProgress(), 0, 182);
             if (i > 0)
-                context.fill(0, 0, i, 5, 0xFFFFFFFF);
+                BossbarIcon.extractBar(context, bossBar, i, BossHealthOverlay.BAR_PROGRESS_SPRITES, BossHealthOverlay.OVERLAY_PROGRESS_SPRITES);
         }
     }
 

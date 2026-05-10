@@ -7,6 +7,9 @@ import org.joml.Matrix3x2fStack;
 import java.util.UUID;
 import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.BossHealthOverlay;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.BossEvent;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
@@ -41,10 +44,18 @@ public class BossbarIcon extends IconElement {
         matrices.scale(scale, scale);
         rotate(matrices, 182, 5);
 
-        context.fill(0, 0, 182, 5, 0xFF555555);
-        context.fill(1, 1, 1 + (int)(180 * bossBar.getProgress()), 4, 0xFFFFFFFF);
+        extractBar(context, bossBar, 182, BossHealthOverlay.BAR_BACKGROUND_SPRITES, BossHealthOverlay.OVERLAY_BACKGROUND_SPRITES);
+        int width = (int)(bossBar.getProgress() * 182);
+        if (width > 0)
+            extractBar(context, bossBar, width, BossHealthOverlay.BAR_PROGRESS_SPRITES, BossHealthOverlay.OVERLAY_PROGRESS_SPRITES);
 
         matrices.popMatrix();
+    }
+
+    public static void extractBar(GuiGraphicsExtractor context, BossEvent bossBar, int width, Identifier[] barSprites, Identifier[] overlaySprites) {
+        context.blitSprite(RenderPipelines.GUI_TEXTURED, barSprites[bossBar.getColor().ordinal()], 182, 5, 0, 0, 0, 0, width, 5);
+        if (bossBar.getOverlay() != BossEvent.BossBarOverlay.PROGRESS)
+            context.blitSprite(RenderPipelines.GUI_TEXTURED, overlaySprites[bossBar.getOverlay().ordinal() - 1], 182, 5, 0, 0, 0, 0, width, 5);
     }
 
 }
