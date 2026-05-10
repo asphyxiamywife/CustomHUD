@@ -48,16 +48,20 @@ public abstract class IconElement extends FunctionalElement {
     public void renderItemStack(GuiGraphicsExtractor context, int x, int y, ItemStack stack, boolean fitInLine) {
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
-        matrices.translate(x + shiftX, y + shiftY - 2);
-        int size = fitInLine ? 11 : 16;
-        if (!referenceCorner)
-            matrices.translate(0, -(size*scale-11)/2);
-        matrices.scale(size/16F * scale, size/16F * scale);
-        rotate(matrices, 16, 16);
-        rotate(matrices, 16, 16);
+        try {
+            matrices.translate(x + shiftX, y + shiftY - 2);
+            int size = fitInLine ? 11 : 16;
+            if (!referenceCorner)
+                matrices.translate(0, -(size*scale-11)/2);
+            matrices.scale(size/16F * scale, size/16F * scale);
+            rotate(matrices, 16, 16);
+            rotate(matrices, 16, 16);
 
-        context.item(stack, 0, 0);
-        matrices.popMatrix();
+            context.item(stack, 0, 0);
+        }
+        finally {
+            matrices.popMatrix();
+        }
 
     }
 

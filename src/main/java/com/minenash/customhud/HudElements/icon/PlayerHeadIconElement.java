@@ -17,17 +17,21 @@ public class PlayerHeadIconElement extends IconElement {
     @Override
     public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         context.pose().pushMatrix();
-        float y = piece.y;
-        if (!referenceCorner)
-            y -= (10*scale-10)/2;
+        try {
+            float y = piece.y;
+            if (!referenceCorner)
+                y -= (10*scale-10)/2;
 
-        boolean flip = CLIENT.player != null && AvatarRenderer.isPlayerUpsideDown(CLIENT.player);
-        boolean hat = CLIENT.player != null && CLIENT.getConnection().getPlayerInfo(CLIENT.player.getUUID()).showHat();
-        context.pose().translate(piece.x + scale + shiftX, y + shiftY);
-        int size = (int)(8*scale);
-        rotate(context.pose(), size, size);
-        PlayerFaceExtractor.extractRenderState(context, CLIENT.player.getSkin().body().texturePath(), 0, 0, size, hat, flip, -1);
-        context.pose().popMatrix();
+            boolean flip = CLIENT.player != null && AvatarRenderer.isPlayerUpsideDown(CLIENT.player);
+            boolean hat = CLIENT.player != null && CLIENT.getConnection() != null && CLIENT.getConnection().getPlayerInfo(CLIENT.player.getUUID()) != null && CLIENT.getConnection().getPlayerInfo(CLIENT.player.getUUID()).showHat();
+            context.pose().translate(piece.x + scale + shiftX, y + shiftY);
+            int size = (int)(8*scale);
+            rotate(context.pose(), size, size);
+            PlayerFaceExtractor.extractRenderState(context, CLIENT.player.getSkin().body().texturePath(), 0, 0, size, hat, flip, -1);
+        }
+        finally {
+            context.pose().popMatrix();
+        }
     }
 
 }

@@ -24,20 +24,24 @@ public class ModBadgeIconElement extends IconElement{
     public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
+        try {
 
-        Mod.Badge badge = (Mod.Badge) piece.value;
-        int width = CLIENT.font.width(badge.getText()) + 6;
+            Mod.Badge badge = (Mod.Badge) piece.value;
+            int width = CLIENT.font.width(badge.getText()) + 6;
 
-        matrices.translate(piece.x + shiftX, piece.y + shiftY - 1);
-        if (!referenceCorner)
-            matrices.translate(0, -(9*scale-9)/2);
-        matrices.scale(scale, scale);
-        rotate(matrices, width+1, 9);
+            matrices.translate(piece.x + shiftX, piece.y + shiftY - 1);
+            if (!referenceCorner)
+                matrices.translate(0, -(9*scale-9)/2);
+            matrices.scale(scale, scale);
+            rotate(matrices, width+1, 9);
 
 
-        DrawingUtil.drawBadge(context, 0, 0, width, badge.getText().getVisualOrderText(),badge.getOutlineColor(), badge.getFillColor(), piece.color);
+            DrawingUtil.drawBadge(context, 0, 0, width, badge.getText().getVisualOrderText(),badge.getOutlineColor(), badge.getFillColor(), piece.color);
 
-        matrices.popMatrix();
+        }
+        finally {
+            matrices.popMatrix();
+        }
     }
 
     @Override

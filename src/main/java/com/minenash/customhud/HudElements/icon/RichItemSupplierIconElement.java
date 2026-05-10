@@ -78,40 +78,44 @@ public class RichItemSupplierIconElement extends IconElement {
         Matrix3x2fStack matrices = context.pose();
 
         matrices.pushMatrix();
-        matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
-        int size = piece.shiftTextUpOrFitItemIcon ? 11 : 16;
-        if (!referenceCorner)
-            matrices.translate(0, -(size*scale-11)/2);
-        matrices.scale(size/16F * scale, size/16F * scale);
-        rotate(matrices, 16, 16);
+        try {
+            matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
+            int size = piece.shiftTextUpOrFitItemIcon ? 11 : 16;
+            if (!referenceCorner)
+                matrices.translate(0, -(size*scale-11)/2);
+            matrices.scale(size/16F * scale, size/16F * scale);
+            rotate(matrices, 16, 16);
 
-        context.item(stack, 0, 0);
+            context.item(stack, 0, 0);
 
-        int count = !invCount ? stack.getCount() : client.player.getInventory().countItem(stack.getItem());
+            int count = !invCount ? stack.getCount() : client.player.getInventory().countItem(stack.getItem());
 
-        if (showCount && count != 1) {
-            String string = String.valueOf(count);
-            string = numSize == 0 ? string : numSize == 1 ? Flags.subNums(string) : Flags.supNums(string);
-            context.text(client.font, string, 19 - 2 - client.font.width(string), numSize == 2 ? 0 : 9, 16777215, true);
-        }
-
-        if (showDur && stack.isBarVisible()) {
-            int i = stack.getBarWidth();
-            int j = stack.getBarColor();
-            context.fill(RenderPipelines.GUI, 2, 13, 2 + 13, 13 + 2, -16777216);
-            context.fill(RenderPipelines.GUI, 2, 13, 2 + i, 13 + 1, j | -16777216);
-        }
-
-        if (showCooldown) {
-            float f = client.player.getCooldowns().getCooldownPercent(stack, client.getDeltaTracker().getGameTimeDeltaPartialTick(true));
-            if (f > 0.0F) {
-                int k = Mth.floor(16.0F * (1.0F - f));
-                int l = k + Mth.ceil(16.0F * f);
-                context.fill(RenderPipelines.GUI, 0, k, 16, l, Integer.MAX_VALUE);
+            if (showCount && count != 1) {
+                String string = String.valueOf(count);
+                string = numSize == 0 ? string : numSize == 1 ? Flags.subNums(string) : Flags.supNums(string);
+                context.text(client.font, string, 19 - 2 - client.font.width(string), numSize == 2 ? 0 : 9, 16777215, true);
             }
-        }
 
-        matrices.popMatrix();
+            if (showDur && stack.isBarVisible()) {
+                int i = stack.getBarWidth();
+                int j = stack.getBarColor();
+                context.fill(RenderPipelines.GUI, 2, 13, 2 + 13, 13 + 2, -16777216);
+                context.fill(RenderPipelines.GUI, 2, 13, 2 + i, 13 + 1, j | -16777216);
+            }
+
+            if (showCooldown) {
+                float f = client.player.getCooldowns().getCooldownPercent(stack, client.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+                if (f > 0.0F) {
+                    int k = Mth.floor(16.0F * (1.0F - f));
+                    int l = k + Mth.ceil(16.0F * f);
+                    context.fill(RenderPipelines.GUI, 0, k, 16, l, Integer.MAX_VALUE);
+                }
+            }
+
+        }
+        finally {
+            matrices.popMatrix();
+        }
     }
 
 }

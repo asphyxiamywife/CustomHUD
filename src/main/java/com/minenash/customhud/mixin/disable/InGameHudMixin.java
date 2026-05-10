@@ -1,6 +1,7 @@
 package com.minenash.customhud.mixin.disable;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.customhud.CustomHud;
@@ -31,33 +32,27 @@ public abstract class InGameHudMixin {
             ci.cancel();
     }
 
-    @Inject(method = "extractPlayerHealth", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableStatusBars(GuiGraphicsExtractor context, CallbackInfo ci) {
-        if (CustomHud.isDisabled(STATUS_BARS))
-            ci.cancel();
-    }
-
     @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractArmor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;IIII)V"))
     public void customhud$disableArmor(GuiGraphicsExtractor context, Player player, int i, int j, int k, int x, Operation<Void> original) {
-        if (CustomHud.isNotDisabled(ARMOR))
+        if (CustomHud.isNotDisabled(ARMOR) && CustomHud.isNotDisabled(STATUS_BARS))
             original.call(context, player, i, j, k, x);
     }
 
     @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractHearts(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;IIIIFIIIZ)V"))
     public void customhud$disableHealthBar(Gui instance, GuiGraphicsExtractor context, Player player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking, Operation<Void> original) {
-        if (CustomHud.isNotDisabled(HEALTH))
+        if (CustomHud.isNotDisabled(HEALTH) && CustomHud.isNotDisabled(STATUS_BARS))
             original.call(instance, context, player, x, y, lines, regeneratingHeartIndex, maxHealth, lastHealth, health, absorption, blinking);
     }
 
     @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractFood(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;II)V"))
     public void customhud$disableHunger(Gui instance, GuiGraphicsExtractor context, Player player, int top, int right, Operation<Void> original) {
-        if (CustomHud.isNotDisabled(HUNGER))
+        if (CustomHud.isNotDisabled(HUNGER) && CustomHud.isNotDisabled(STATUS_BARS))
             original.call(instance, context, player, top, right);
     }
 
     @WrapOperation(method = "extractPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractAirBubbles(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/entity/player/Player;III)V"))
     public void customhud$disableAir(Gui instance, GuiGraphicsExtractor context, Player player, int heartCount, int top, int left, Operation<Void> original) {
-        if (CustomHud.isNotDisabled(AIR))
+        if (CustomHud.isNotDisabled(AIR) && CustomHud.isNotDisabled(STATUS_BARS))
             original.call(instance, context, player, heartCount, top, left);
     }
 
@@ -78,10 +73,9 @@ public abstract class InGameHudMixin {
             ci.cancel();
     }
 
-    @Inject(method = "extractEffects", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableStatusEffects(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (CustomHud.isDisabled(STATUS_EFFECTS))
-            ci.cancel();
+    @ModifyExpressionValue(method = "extractEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectInstance;showIcon()Z"))
+    public boolean customhud$disableStatusEffects(boolean original) {
+        return original && CustomHud.isNotDisabled(STATUS_EFFECTS);
     }
 
     @Inject(method = "extractSubtitleOverlay", at = @At(value = "HEAD"), cancellable = true)

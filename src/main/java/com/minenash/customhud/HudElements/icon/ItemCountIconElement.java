@@ -48,20 +48,24 @@ public class ItemCountIconElement extends IconElement {
         Matrix3x2fStack matrices = context.pose();
 
         matrices.pushMatrix();
-        matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
-        if (!referenceCorner)
-            matrices.translate(0, -(11*scale-11)/2);
-        matrices.scale(11/16F * scale, 11/16F * scale);
-        rotate(matrices, 16, 16);
+        try {
+            matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
+            if (!referenceCorner)
+                matrices.translate(0, -(11*scale-11)/2);
+            matrices.scale(11/16F * scale, 11/16F * scale);
+            rotate(matrices, 16, 16);
 
-        context.item(stack, 0, 0);
+            context.item(stack, 0, 0);
 
-        String string = String.valueOf(stack.getCount());
-        string = numSize == 0 ? string : numSize == 1 ? Flags.subNums(string) : Flags.supNums(string);
-        matrices.translate(0.0F, 0.0F);
-        context.text(client.font, string, 19 - 2 - client.font.width(string), numSize == 2 ? 0 : 9, 16777215, true);
+            String string = String.valueOf(stack.getCount());
+            string = numSize == 0 ? string : numSize == 1 ? Flags.subNums(string) : Flags.supNums(string);
+            matrices.translate(0.0F, 0.0F);
+            context.text(client.font, string, 19 - 2 - client.font.width(string), numSize == 2 ? 0 : 9, 16777215, true);
 
-        matrices.popMatrix();
+        }
+        finally {
+            matrices.popMatrix();
+        }
     }
 
 }

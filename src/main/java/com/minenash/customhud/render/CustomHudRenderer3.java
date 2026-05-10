@@ -48,6 +48,7 @@ public class CustomHudRenderer3 {
         Profiler.get().push("custom_hud");
         Profiler.get().push("processing");
         context.pose().pushMatrix();
+        try {
 
         context.pose().scale(profile.baseTheme.getScale(), profile.baseTheme.getScale());
 
@@ -239,13 +240,17 @@ public class CustomHudRenderer3 {
         }
 
         Profiler.get().pop();
+        }
+        finally {
         context.pose().popMatrix();
         font = null;
+        theme = null;
         for (var e : profile.listEvents.values())
             e.reset();
         profile.boolEvents.clear();
 
         Profiler.get().pop();
+        }
 
     }
 

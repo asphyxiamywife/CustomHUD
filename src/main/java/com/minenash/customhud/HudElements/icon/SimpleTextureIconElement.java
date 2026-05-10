@@ -79,10 +79,14 @@ public class SimpleTextureIconElement extends IconElement {
         if (width == 0)
             return;
         context.pose().pushMatrix();
-        context.pose().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2);
-        rotate(context.pose(), width, height);
-        context.blit(pipeline, texture, 0, 0, 0, 0, width, height, textureWidth, textureHeight, textureWidth, textureHeight);
-        context.pose().popMatrix();
+        try {
+            context.pose().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2);
+            rotate(context.pose(), width, height);
+            context.blit(pipeline, texture, 0, 0, 0, 0, width, height, textureWidth, textureHeight, textureWidth, textureHeight);
+        }
+        finally {
+            context.pose().popMatrix();
+        }
     }
 
 

@@ -36,15 +36,19 @@ public class PackIconElement extends IconElement {
         Pack pack = (Pack) piece.value;
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
-        matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
-        if (!referenceCorner)
-            matrices.translate(0, -(11*scale-11)/2F);
+        try {
+            matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
+            if (!referenceCorner)
+                matrices.translate(0, -(11*scale-11)/2F);
 //        matrices.scale(scale, scale, 0);
-        int width = (int) (11*scale);
-        rotate(matrices, width, width);
+            int width = (int) (11*scale);
+            rotate(matrices, width, width);
 
-        context.blit(RenderPipelines.GUI_TEXTURED, getPackIconTexture(pack), 0, 0, 0, 0, width, width, width, width);
-        matrices.popMatrix();
+            context.blit(RenderPipelines.GUI_TEXTURED, getPackIconTexture(pack), 0, 0, 0, 0, width, width, width, width);
+        }
+        finally {
+            matrices.popMatrix();
+        }
     }
 
     private Identifier getPackIconTexture(Pack resourcePackProfile) {

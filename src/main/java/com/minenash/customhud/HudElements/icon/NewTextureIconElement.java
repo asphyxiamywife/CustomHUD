@@ -93,10 +93,14 @@ public class NewTextureIconElement extends IconElement {
         if (calcWidth == 0 || calcHeight == 0)
             return;
         context.pose().pushMatrix();
-        context.pose().translate(piece.x+shiftX, piece.y+shiftY-2 - (referenceCorner? 0 : (calcHeight*scale-calcHeight)/(scale*2)));
-        rotate(context.pose(), calcWidth, calcHeight);
-        context.blit(pipeline, texture, 0, 0,  calcU, calcV, calcWidth, calcHeight, (int) calcRegionWidth, (int) calcRegionHeight, textureWidth, textureHeight);
-        context.pose().popMatrix();
+        try {
+            context.pose().translate(piece.x+shiftX, piece.y+shiftY-2 - (referenceCorner? 0 : (calcHeight*scale-calcHeight)/(scale*2)));
+            rotate(context.pose(), calcWidth, calcHeight);
+            context.blit(pipeline, texture, 0, 0,  calcU, calcV, calcWidth, calcHeight, (int) calcRegionWidth, (int) calcRegionHeight, textureWidth, textureHeight);
+        }
+        finally {
+            context.pose().popMatrix();
+        }
     }
 
     int calcU = 0;

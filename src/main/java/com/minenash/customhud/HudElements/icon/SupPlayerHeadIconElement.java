@@ -29,17 +29,21 @@ public class SupPlayerHeadIconElement extends IconElement {
             return;
 
         context.pose().pushMatrix();
-        if (!referenceCorner)
-            y -= (10*scale-10)/2;
+        try {
+            if (!referenceCorner)
+                y -= (10*scale-10)/2;
 
-        Player playerEntity = CLIENT.level.getPlayerByUUID(playerEntry.getProfile().id());
-        boolean flip = playerEntity != null && AvatarRenderer.isPlayerUpsideDown(playerEntity);
-        boolean hat = playerEntity != null && CLIENT.getConnection().getPlayerInfo(CLIENT.player.getUUID()).showHat();
-        context.pose().translate(piece.x+((int)scale) + shiftX, y + shiftY);
-        int size = (int)(8*scale);
-        rotate(context.pose(), size, size);
-        PlayerFaceExtractor.extractRenderState(context, playerEntry.getSkin().body().texturePath(), 0, 0, size, hat, flip, -1);
-        context.pose().popMatrix();
+            Player playerEntity = CLIENT.level.getPlayerByUUID(playerEntry.getProfile().id());
+            boolean flip = playerEntity != null && AvatarRenderer.isPlayerUpsideDown(playerEntity);
+            boolean hat = playerEntity != null && CLIENT.getConnection() != null && CLIENT.getConnection().getPlayerInfo(playerEntry.getProfile().id()) != null && CLIENT.getConnection().getPlayerInfo(playerEntry.getProfile().id()).showHat();
+            context.pose().translate(piece.x+((int)scale) + shiftX, y + shiftY);
+            int size = (int)(8*scale);
+            rotate(context.pose(), size, size);
+            PlayerFaceExtractor.extractRenderState(context, playerEntry.getSkin().body().texturePath(), 0, 0, size, hat, flip, -1);
+        }
+        finally {
+            context.pose().popMatrix();
+        }
     }
 
 }

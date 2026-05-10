@@ -33,26 +33,30 @@ public class StatusEffectIconElement extends IconElement {
     @Override
     public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         context.pose().pushMatrix();
-        MobEffectInstance effect = piece.value != null ? (MobEffectInstance) piece.value : supplier.get();
-        if (effect == null)
-            return;
+        try {
+            MobEffectInstance effect = piece.value != null ? (MobEffectInstance) piece.value : supplier.get();
+            if (effect == null)
+                return;
 
-        int y= piece.y - 2;
-        if (!referenceCorner && scale != 1)
-           y-= (renderWidth-12)/2;
+            int y= piece.y - 2;
+            if (!referenceCorner && scale != 1)
+               y-= (renderWidth-12)/2;
 
-        Identifier texture = Gui.getMobEffectSprite(effect.getEffect());
-        int m = effect.getDuration();
-        float f = !effect.endsWithin(200) ? 1.0f :
-            Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((float)(10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
+            Identifier texture = Gui.getMobEffectSprite(effect.getEffect());
+            int m = effect.getDuration();
+            float f = !effect.endsWithin(200) ? 1.0f :
+                Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((float)(10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
 
-        context.pose().translate(piece.x + shiftX, y + shiftY);
-        rotate(context.pose(), renderWidth, renderWidth);
+            context.pose().translate(piece.x + shiftX, y + shiftY);
+            rotate(context.pose(), renderWidth, renderWidth);
 
-        if (background)
-            context.blitSprite(RenderPipelines.GUI_TEXTURED, effect.isAmbient() ? EFFECT_BACKGROUND_AMBIENT_TEXTURE : EFFECT_BACKGROUND_TEXTURE, 0, 0, renderWidth, renderWidth);
-        context.blitSprite(RenderPipelines.GUI_TEXTURED, texture, effectOffset, effectOffset, (int)(9*scale), (int)(9*scale), ARGB.white(f));
-        context.pose().popMatrix();
+            if (background)
+                context.blitSprite(RenderPipelines.GUI_TEXTURED, effect.isAmbient() ? EFFECT_BACKGROUND_AMBIENT_TEXTURE : EFFECT_BACKGROUND_TEXTURE, 0, 0, renderWidth, renderWidth);
+            context.blitSprite(RenderPipelines.GUI_TEXTURED, texture, effectOffset, effectOffset, (int)(9*scale), (int)(9*scale), ARGB.white(f));
+        }
+        finally {
+            context.pose().popMatrix();
+        }
 
     }
 

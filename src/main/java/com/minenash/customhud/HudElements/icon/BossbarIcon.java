@@ -38,18 +38,21 @@ public class BossbarIcon extends IconElement {
 
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
-        matrices.translate(piece.x + shiftX, piece.y + shiftY + 1);
-        if (!referenceCorner)
-            matrices.translate(0, -(5*scale-5)/2);
-        matrices.scale(scale, scale);
-        rotate(matrices, 182, 5);
+        try {
+            matrices.translate(piece.x + shiftX, piece.y + shiftY + 1);
+            if (!referenceCorner)
+                matrices.translate(0, -(5*scale-5)/2);
+            matrices.scale(scale, scale);
+            rotate(matrices, 182, 5);
 
-        extractBar(context, bossBar, 182, BossHealthOverlay.BAR_BACKGROUND_SPRITES, BossHealthOverlay.OVERLAY_BACKGROUND_SPRITES);
-        int width = (int)(bossBar.getProgress() * 182);
-        if (width > 0)
-            extractBar(context, bossBar, width, BossHealthOverlay.BAR_PROGRESS_SPRITES, BossHealthOverlay.OVERLAY_PROGRESS_SPRITES);
-
-        matrices.popMatrix();
+            extractBar(context, bossBar, 182, BossHealthOverlay.BAR_BACKGROUND_SPRITES, BossHealthOverlay.OVERLAY_BACKGROUND_SPRITES);
+            int width = (int)(bossBar.getProgress() * 182);
+            if (width > 0)
+                extractBar(context, bossBar, width, BossHealthOverlay.BAR_PROGRESS_SPRITES, BossHealthOverlay.OVERLAY_PROGRESS_SPRITES);
+        }
+        finally {
+            matrices.popMatrix();
+        }
     }
 
     public static void extractBar(GuiGraphicsExtractor context, BossEvent bossBar, int width, Identifier[] barSprites, Identifier[] overlaySprites) {

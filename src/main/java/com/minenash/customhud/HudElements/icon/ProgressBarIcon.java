@@ -35,15 +35,18 @@ public class ProgressBarIcon extends IconElement {
     public void extractRenderState(GuiGraphicsExtractor context, RenderPiece piece) {
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
-        matrices.translate(piece.x + shiftX, piece.y + shiftY + 1);
-        if (!referenceCorner)
-            matrices.translate(0, -(5*scale-5)/2);
-        matrices.scale(scale, scale);
-        rotate(matrices, 182, 5);
+        try {
+            matrices.translate(piece.x + shiftX, piece.y + shiftY + 1);
+            if (!referenceCorner)
+                matrices.translate(0, -(5*scale-5)/2);
+            matrices.scale(scale, scale);
+            rotate(matrices, 182, 5);
 
-        style.extractRenderState(context, (float) Mth.clamp(numerator.getValue() / denominator.getValue(), 0, 1), background);
-
-        matrices.popMatrix();
+            style.extractRenderState(context, (float) Mth.clamp(numerator.getValue() / denominator.getValue(), 0, 1), background);
+        }
+        finally {
+            matrices.popMatrix();
+        }
     }
 
     public static BarStyle getStyle(String settings) {

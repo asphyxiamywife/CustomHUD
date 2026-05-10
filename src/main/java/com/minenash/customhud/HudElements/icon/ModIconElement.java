@@ -49,15 +49,19 @@ public class ModIconElement extends IconElement {
 
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
-        matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
-        if (!referenceCorner)
-            matrices.translate(0, -(11*scale-11)/2F);
+        try {
+            matrices.translate(piece.x + shiftX, piece.y + shiftY - 2);
+            if (!referenceCorner)
+                matrices.translate(0, -(11*scale-11)/2F);
 //        matrices.scale(scale, scale, 0);
-        int w = (int) (11 * scale);
-        rotate(matrices, w, w);
+            int w = (int) (11 * scale);
+            rotate(matrices, w, w);
 
-        context.blit(RenderPipelines.GUI_TEXTURED, id, 0, 0, 0, 0, w, w, w, w);
-        matrices.popMatrix();
+            context.blit(RenderPipelines.GUI_TEXTURED, id, 0, 0, 0, 0, w, w, w, w);
+        }
+        finally {
+            matrices.popMatrix();
+        }
     }
 
 }
