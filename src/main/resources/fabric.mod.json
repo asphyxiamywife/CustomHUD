@@ -9,9 +9,7 @@
     "Minenash"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/customhud",
-    "sources": "https://github.com/Minenash/CustomHUD",
-    "issues": "https://github.com/Minenash/CustomHUD/issues"
+    "sources": "https://github.com/asphyxiamywife/CustomHUD"
   },
 
   "license": "MIT",
