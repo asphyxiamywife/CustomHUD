@@ -1,5 +1,5 @@
 {
-  "category.custom_hud": "Custom Hud",
+  "key.category.customhud.customhud": "Custom Hud",
   "key.custom_hud.enable": "Enable/Disable",
   "key.custom_hud.cycle_profiles": "Cycle Profiles",
   "key.custom_hud.swap_to_profile1": "Swap to Profile 1",

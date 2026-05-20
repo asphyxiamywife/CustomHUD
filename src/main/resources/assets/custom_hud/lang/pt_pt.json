@@ -1,5 +1,5 @@
 {
-  "category.custom_hud": "Custom HUD",
+  "key.category.customhud.customhud": "Custom HUD",
   "key.custom_hud.enable": "Ativar/desativar",
   "key.custom_hud.cycle_profiles": "Trocar perfil",
   "key.custom_hud.swap_to_profile1": "Mudar para perfil 1",

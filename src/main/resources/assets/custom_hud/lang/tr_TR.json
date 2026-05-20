@@ -1,5 +1,5 @@
 {
-  "category.custom_hud": "Custom Hud",
+  "key.category.customhud.customhud": "Custom Hud",
   "key.custom_hud.enable": "Etkinleştir/Devre Dışı Bırak",
   "key.custom_hud.cycle_profiles": "Profil Değiştir",
   "key.custom_hud.swap_to_profile1": "Profil 1'e geç",

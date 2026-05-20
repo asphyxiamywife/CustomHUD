@@ -1,5 +1,5 @@
 {
-  "category.custom_hud": "Custom Hud",
+  "key.category.customhud.customhud": "Custom Hud",
   "key.custom_hud.enable": "启用/禁用",
   "key.custom_hud.cycle_profiles": "切换配置文件",
   "key.custom_hud.swap_to_profile1": "切换至配置文件 1",
