@@ -21,6 +21,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.scores.*;
@@ -324,7 +325,7 @@ public class AttributeFunctions {
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE = (attr) -> CLIENT.player.getAttributeValue(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attr.attribute()));
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_NAME = (attr) -> {
         String key = attr.attribute().getDescriptionId();
-        return I18n.exists(key) ? I18n.get(key) : attr.modifier().id().toString(); };
+        return Language.getInstance().has(key) ? I18n.get(key) : attr.modifier().id().toString(); };
     public static final Function<ItemAttribute,Identifier> ITEM_ATTR_MODIFIER_ID = (attr) -> attr.modifier().id();
     public static final Function<ItemAttribute,Number> ITEM_ATTR_MODIFIER_VALUE = (attr) -> attr.modifier().amount();
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_OPERATION_NAME = (attr) -> switch (attr.modifier().operation()) {

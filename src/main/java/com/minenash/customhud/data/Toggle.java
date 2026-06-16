@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 
 public class Toggle {
 
@@ -39,7 +40,7 @@ public class Toggle {
     public String getDisplayName() {
         if (!direct)
             return name;
-        if (I18n.exists(name))
+        if (Language.getInstance().has(name))
             return "Key: " + I18n.get(name);
         if (name.startsWith("key.mouse."))
             return "Key: " + name.substring(10);
