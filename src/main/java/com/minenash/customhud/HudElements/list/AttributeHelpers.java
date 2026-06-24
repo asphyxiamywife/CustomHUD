@@ -161,7 +161,7 @@ public class AttributeHelpers {
         {
             var bundle = stack.get(DataComponents.BUNDLE_CONTENTS);
             if (bundle != null) {
-                iter = bundle.itemCopyStream().iterator();
+                iter = bundle.itemCopies().iterator();
                 break get_iter;
             }
             var container = stack.get(DataComponents.CONTAINER);

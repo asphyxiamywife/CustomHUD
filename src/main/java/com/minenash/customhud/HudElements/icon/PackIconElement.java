@@ -20,6 +20,7 @@ import org.joml.Matrix3x2fStack;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -57,20 +58,23 @@ public class PackIconElement extends IconElement {
 
     private static final Identifier UNKNOWN_PACK = Identifier.parse("textures/misc/unknown_pack.png");
     public static Identifier loadPackIcon(TextureManager textureManager, Pack resourcePackProfile) {
-        try (PackResources resourcePack = resourcePackProfile.open()) {
-            IoSupplier<InputStream> inputSupplier = resourcePack.getRootResource("pack.png");
-            if (inputSupplier == null)
-                return UNKNOWN_PACK;
+        try (Stream<PackResources> resourcePacks = resourcePackProfile.open()) {
+            for (PackResources resourcePack : resourcePacks.toList()) {
+                IoSupplier<InputStream> inputSupplier = resourcePack.getRootResource("pack.png");
+                if (inputSupplier == null)
+                    continue;
 
-            String name = resourcePackProfile.getId();
-            String safeName = Util.sanitizeName(name, Identifier::validPathChar);
-            Identifier identifier = Identifier.fromNamespaceAndPath("minecraft", "pack/" + safeName + "/" + Hashing.sha1().hashUnencodedChars(name) + "/icon");
+                String name = resourcePackProfile.getId();
+                String safeName = Util.sanitizeName(name, Identifier::validPathChar);
+                Identifier identifier = Identifier.fromNamespaceAndPath("minecraft", "pack/" + safeName + "/" + Hashing.sha1().hashUnencodedChars(name) + "/icon");
 
-            try (InputStream inputStream = inputSupplier.get()) {
-                NativeImage nativeImage = NativeImage.read(inputStream);
-                textureManager.register(identifier, new DynamicTexture(identifier::toString, nativeImage));
-                return identifier;
+                try (InputStream inputStream = inputSupplier.get()) {
+                    NativeImage nativeImage = NativeImage.read(inputStream);
+                    textureManager.register(identifier, new DynamicTexture(identifier::toString, nativeImage));
+                    return identifier;
+                }
             }
+            return UNKNOWN_PACK;
         } catch (Exception var14) {
             CustomHud.LOGGER.warn("[CustomHud] Failed to load icon from pack {}", resourcePackProfile.getId(), var14);
             return UNKNOWN_PACK;
