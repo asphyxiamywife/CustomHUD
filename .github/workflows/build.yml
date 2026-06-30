@@ -19,10 +19,14 @@ jobs:
         with:
           java-version: '25'
           distribution: 'microsoft'
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: build
-        run: ./gradlew build -PsnapshotBuild=true
+        run: ./gradlew --non-interactive build -PsnapshotBuild=true
       - name: upload mod jar
         uses: actions/upload-artifact@v7
         with:

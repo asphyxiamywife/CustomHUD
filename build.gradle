@@ -12,7 +12,16 @@ java {
 base {
 	archivesName = project.archives_base_name
 }
-version = project.mod_version
+def snapshotBuild = providers.gradleProperty("snapshotBuild")
+		.map { it.equalsIgnoreCase("true") }
+		.orElse(false)
+def actionsCommit = providers.environmentVariable("GITHUB_SHA")
+		.map { it.take(7) }
+		.orElse("")
+
+version = snapshotBuild.get() && !actionsCommit.get().isBlank()
+		? "${project.mod_version}.actions.${actionsCommit.get()}"
+		: project.mod_version
 group = project.maven_group
 
 repositories {
