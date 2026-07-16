@@ -8,9 +8,9 @@ import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,7 +70,7 @@ public class Profile {
         Profile p = new Profile();
         p.name = name;
         p.updatedDateTime = LocalDateTime.now();
-        p.keyBinding = new KeyMapping("custom_hud." + name, GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+        p.keyBinding = new KeyMapping("custom_hud." + name, InputConstants.UNKNOWN.getValue(), CustomHud.TOGGLES_KB_CAT);
         return p;
     }
 
@@ -94,7 +94,7 @@ public class Profile {
         }
 
         if (profile != null)
-            profile.keyBinding = new KeyMapping("custom_hud." + profileName, GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+            profile.keyBinding = new KeyMapping("custom_hud." + profileName, InputConstants.UNKNOWN.getValue(), CustomHud.TOGGLES_KB_CAT);
         return profile;
     }
 

@@ -4,7 +4,6 @@ import com.google.gson.*;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
 import com.mojang.blaze3d.platform.InputConstants;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -194,9 +193,9 @@ public class ConfigManager {
                 if (p.toggles.containsKey(name))
                     p.toggles.get(name).key.setKey(InputConstants.getKey(keyTranslation));
                 else {
-                    KeyMapping key = new KeyMapping("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+                    KeyMapping key = new KeyMapping("customhud_toggle_" + UUID.randomUUID(), InputConstants.UNKNOWN.getValue(), CustomHud.TOGGLES_KB_CAT);
                     key.setKey(InputConstants.getKey(keyTranslation));
-                    KeyMapping modifier = new KeyMapping("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT);
+                    KeyMapping modifier = new KeyMapping("customhud_toggle_" + UUID.randomUUID(), InputConstants.UNKNOWN.getValue(), CustomHud.TOGGLES_KB_CAT);
                     if (modifierTranslation != null)
                         modifier.setKey(InputConstants.getKey(modifierTranslation));
                     p.toggles.put(name, new Toggle(name, false, -1, false, modifier, key));

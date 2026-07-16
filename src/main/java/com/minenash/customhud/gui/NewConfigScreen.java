@@ -24,7 +24,6 @@ import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -122,7 +121,7 @@ public class NewConfigScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent input) {
         if (selectedKeybind != null) {
-            selectedKeybind.setKey(input.key() == GLFW.GLFW_KEY_ESCAPE ? InputConstants.UNKNOWN : InputConstants.getKey(input));
+            selectedKeybind.setKey(input.key() == InputConstants.KEY_ESCAPE ? InputConstants.UNKNOWN : InputConstants.getKey(input));
             selectedKeybind = null;
             profiles.update();
             return true;
@@ -133,7 +132,7 @@ public class NewConfigScreen extends Screen {
         }
 
         switch (input.key()) {
-            case GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER -> {
+            case InputConstants.KEY_ESCAPE, InputConstants.KEY_RETURN, InputConstants.KEY_NUMPADENTER -> {
                 boolean wasFocused = false;
                 for (var c : profiles.children()) {
                     if (c instanceof ProfileLineEntry e) {
@@ -142,10 +141,10 @@ public class NewConfigScreen extends Screen {
                         e.editName.setFocused(false);
                     }
                 }
-                if (input.key() != GLFW.GLFW_KEY_ESCAPE || wasFocused)
+                if (input.key() != InputConstants.KEY_ESCAPE || wasFocused)
                     return true;
             }
-            case GLFW.GLFW_KEY_LEFT -> {
+            case InputConstants.KEY_LEFT -> {
                 for (var c : profiles.children())
                     if (c instanceof ProfileLineEntry e)
                         if (e.editName.isFocused())
@@ -157,7 +156,7 @@ public class NewConfigScreen extends Screen {
                             return move(LEFT);
                         }
             }
-            case GLFW.GLFW_KEY_RIGHT -> {
+            case InputConstants.KEY_RIGHT -> {
                 for (var c : profiles.children())
                     if (c instanceof ProfileLineEntry e)
                         if (e.editName.isFocused())
@@ -169,7 +168,7 @@ public class NewConfigScreen extends Screen {
                             return move(RIGHT);
                         }
             }
-            case GLFW.GLFW_KEY_UP -> {
+            case InputConstants.KEY_UP -> {
                 int max = profiles.children().size()-1;
                 for (int i = 0; i < max; i++)
                     if (profiles.children().get(i) instanceof ProfileLineEntry e && e.toggles.isFocused())
@@ -179,7 +178,7 @@ public class NewConfigScreen extends Screen {
                 if (((LineEntry.NewProfile)profiles.children().get(max)).deleteProfiles.isFocused())
                     return move(LEFT, UP);
             }
-            case GLFW.GLFW_KEY_DOWN -> {
+            case InputConstants.KEY_DOWN -> {
                 for (int i = 0; i < profiles.children().size()-1; i++)
                     if (profiles.children().get(i) instanceof ProfileLineEntry e && e.toggles.isFocused())
                         return move(LEFT, DOWN);

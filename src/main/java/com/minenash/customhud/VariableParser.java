@@ -45,7 +45,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.ScoreHolder;
-import org.lwjgl.glfw.GLFW;
 
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -736,8 +735,8 @@ public class VariableParser {
             Toggle toggle = profile.toggles.get(name);
             if (toggle == null) //Replace with saved key
                 toggle = new Toggle(name.replace('_', ' '), false, debugLine, true,
-                        new KeyMapping("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT),
-                        new KeyMapping("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT));
+                        new KeyMapping("customhud_toggle_" + randomUUID(), InputConstants.UNKNOWN.getValue(), CustomHud.TOGGLES_KB_CAT),
+                        new KeyMapping("customhud_toggle_" + randomUUID(), InputConstants.UNKNOWN.getValue(), CustomHud.TOGGLES_KB_CAT));
             else
                 toggle.lines.add(debugLine);
 
@@ -792,7 +791,7 @@ public class VariableParser {
             Toggle toggle = profile.toggles.get(" " + name); //Space indicates key variant
             if (toggle == null)
                 toggle = new Toggle(name, true, debugLine, true,
-                        new KeyMapping("customhud_key_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, CustomHud.TOGGLES_KB_CAT),
+                        new KeyMapping("customhud_key_toggle_" + randomUUID(), InputConstants.UNKNOWN.getValue(), CustomHud.TOGGLES_KB_CAT),
                         new KeyMapping("customhud_key_toggle_" + randomUUID(), key.getValue(), CustomHud.TOGGLES_KB_CAT));
             else
                 toggle.lines.add(debugLine);

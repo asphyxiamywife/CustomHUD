@@ -5,7 +5,6 @@ import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.mixin.accessors.EntryListWidgetAccessor;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;

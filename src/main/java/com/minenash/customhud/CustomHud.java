@@ -27,7 +27,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -51,13 +50,13 @@ public class CustomHud implements ModInitializer {
 	public static final KeyMapping.Category MAIN_KB_CAT = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("customhud", "customhud"));
 	public static final KeyMapping.Category TOGGLES_KB_CAT = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("customhud", "toggles"));
 
-	public static final KeyMapping kb_enable = registerKeyMapping("enable", GLFW.GLFW_KEY_UNKNOWN);
-	public static final KeyMapping kb_cycleProfiles = registerKeyMapping("cycle_profiles", GLFW.GLFW_KEY_GRAVE_ACCENT);
-	public static final KeyMapping kb_showErrors = registerKeyMapping("show_errors", GLFW.GLFW_KEY_B);
-	public static final KeyMapping kb_refreshProfilerTimings = registerKeyMapping("refresh_profiler_timings", GLFW.GLFW_KEY_UNKNOWN);
+	public static final KeyMapping kb_enable = registerKeyMapping("enable", InputConstants.UNKNOWN.getValue());
+	public static final KeyMapping kb_cycleProfiles = registerKeyMapping("cycle_profiles", InputConstants.KEY_GRAVE);
+	public static final KeyMapping kb_showErrors = registerKeyMapping("show_errors", InputConstants.KEY_B);
+	public static final KeyMapping kb_refreshProfilerTimings = registerKeyMapping("refresh_profiler_timings", InputConstants.UNKNOWN.getValue());
 
 	private static KeyMapping registerKeyMapping(String binding, int defaultKey) {
-		return KeyMappingHelper.registerKeyMapping(new KeyMapping("key.custom_hud." + binding, InputConstants.Type.KEYSYM, defaultKey, MAIN_KB_CAT));
+		return KeyMappingHelper.registerKeyMapping(new KeyMapping("key.custom_hud." + binding, InputConstants.Type.KEYBOARD, defaultKey, MAIN_KB_CAT));
 	}
 
 	@Override
@@ -179,7 +178,7 @@ public class CustomHud implements ModInitializer {
 			return true;
 		if (key.key.type == InputConstants.Type.MOUSE)
 			return IS_MOUSE_DOWN.getOrDefault(KeyMappingHelper.getBoundKeyOf(key).getValue(), false);
-		return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), KeyMappingHelper.getBoundKeyOf(key).getValue());
+		return InputConstants.isKeyDown(KeyMappingHelper.getBoundKeyOf(key).getValue());
 	}
 
 	public static boolean isNotDisabled(DisableElement element) {
