@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.CustomHud;
+import com.minenash.customhud.complex.OpenGlGpuTimer;
 import com.minenash.customhud.data.DebugCharts;
 import com.minenash.customhud.data.Profile;
 import net.minecraft.client.KeyMapping;
@@ -29,6 +30,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftClientMixin {
+
+    @Unique private OpenGlGpuTimer customhud$openGlGpuTimer;
 
     @Shadow @Final public Options options;
     @Shadow public abstract double getGpuUtilization();
@@ -55,23 +58,51 @@ public abstract class MinecraftClientMixin {
         CustomHud.delayedInitialize();
     }
 
+    @Inject(method = "renderFrame", at = @At("HEAD"))
+    public void beginGpuUsageQuery(boolean tick, CallbackInfo ci) {
+        Profile profile = ProfileManager.getActive();
+        if (profile == null || !profile.enabled.gpuMetrics || !OpenGlGpuTimer.isSupported())
+            return;
+
+        if (customhud$openGlGpuTimer == null)
+            customhud$openGlGpuTimer = new OpenGlGpuTimer();
+
+        double usage = customhud$openGlGpuTimer.beginFrame();
+        if (Double.isFinite(usage))
+            ComplexData.updateGpuUsage(usage);
+    }
+
     @Inject(method = "renderFrame", at = @At("RETURN"))
     public void getGpuUsage(boolean tick, CallbackInfo ci) {
+        if (customhud$openGlGpuTimer != null)
+            customhud$openGlGpuTimer.endFrame();
+
         Profile profile = ProfileManager.getActive();
         if (profile == null || !profile.enabled.gpuMetrics) {
             ComplexData.resetGpuUsage();
             return;
         }
 
-        ComplexData.updateGpuUsage(getGpuUtilization());
+        if (!OpenGlGpuTimer.isSupported())
+            ComplexData.updateGpuUsage(getGpuUtilization());
     }
 
     @WrapOperation(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/debug/DebugScreenEntryList;isCurrentlyEnabled(Lnet/minecraft/resources/Identifier;)Z"))
     public boolean getGpuUsageAndOtherPerformanceMetrics(DebugScreenEntryList instance, Identifier entryId, Operation<Boolean> original) {
+        Profile profile = ProfileManager.getActive();
         return original.call(instance, entryId)
                 || (DebugScreenEntries.GPU_UTILIZATION.equals(entryId)
-                    && ProfileManager.getActive() != null
-                    && ProfileManager.getActive().enabled.gpuMetrics);
+                    && profile != null
+                    && profile.enabled.gpuMetrics
+                    && !OpenGlGpuTimer.isSupported());
+    }
+
+    @Inject(method = "close", at = @At("HEAD"))
+    public void closeGpuUsageQuery(CallbackInfo ci) {
+        if (customhud$openGlGpuTimer != null) {
+            customhud$openGlGpuTimer.close();
+            customhud$openGlGpuTimer = null;
+        }
     }
 
 
