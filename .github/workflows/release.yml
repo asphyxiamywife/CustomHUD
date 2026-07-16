@@ -1,4 +1,4 @@
-name: build-and-release
+name: release
 
 on:
   push:
@@ -11,31 +11,59 @@ jobs:
 
     permissions:
       contents: write
+      attestations: write
+      artifact-metadata: write
+      id-token: write
 
     steps:
       - name: checkout repository
-        uses: actions/checkout@v6
-
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
+        uses: actions/checkout@v7
 
       - name: setup jdk
         uses: actions/setup-java@v5
         with:
           java-version: '25'
-          distribution: 'microsoft'
+          distribution: microsoft
+
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v6
 
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
       - name: build
-        run: ./gradlew build
+        run: ./gradlew --non-interactive build
+
+      - name: locate release jar
+        id: jar
+        shell: bash
+        run: |
+          mapfile -t jars < <(
+            find build/libs -maxdepth 1 -type f \
+              -name '*.jar' \
+              ! -name '*-sources.jar' \
+              ! -name '*-javadoc.jar' |
+              sort
+          )
+
+          if [[ ${#jars[@]} -ne 1 ]]; then
+            printf 'Expected exactly one release jar, found %s:\n' "${#jars[@]}" >&2
+            printf '%s\n' "${jars[@]}" >&2
+            exit 1
+          fi
+
+          echo "path=${jars[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: attest release jar
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ steps.jar.outputs.path }}
 
       - name: create release and upload jar
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
-          files: build/libs/*.jar
+          files: ${{ steps.jar.outputs.path }}
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
