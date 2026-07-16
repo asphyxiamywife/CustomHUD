@@ -16,14 +16,15 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven {
-		url = "https://maven.terraformersmc.com/releases/"
-	}
 	maven { url = 'https://jitpack.io' }
-	maven {
-		name = "Modrinth"
-		url = "https://api.modrinth.com/maven"
-		content {
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
 			includeGroup "maven.modrinth"
 		}
 	}
@@ -44,9 +45,7 @@ dependencies {
 
 //	implementation include('com.github.oshi:oshi-core-java11:6.6.0')
 
-	modImplementation ("com.terraformersmc:modmenu:${project.modmenu_version}") {
-		exclude module: "fabric-api"
-	}
+	modImplementation "maven.modrinth:mOgUt4GM:j2vTurvl"
 
 //	implementation include("com.fifesoft:rsyntaxtextarea:3.3.3")
 //	implementation include("com.formdev:flatlaf:3.1.1")

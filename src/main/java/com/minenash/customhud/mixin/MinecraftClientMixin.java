@@ -54,7 +54,13 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;getFramebuffer()Lnet/minecraft/client/gl/Framebuffer;"))
     public void getGpuUsage(boolean tick, CallbackInfo ci) {
-        ComplexData.gpuUsage = gpuUtilizationPercentage > 100 ? 100 : gpuUtilizationPercentage;
+        Profile profile = ProfileManager.getActive();
+        if (profile == null || !profile.enabled.gpuMetrics) {
+            ComplexData.resetGpuUsage();
+            return;
+        }
+
+        ComplexData.updateGpuUsage(gpuUtilizationPercentage);
     }
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/debug/DebugHudProfile;isEntryVisible(Lnet/minecraft/util/Identifier;)Z"))

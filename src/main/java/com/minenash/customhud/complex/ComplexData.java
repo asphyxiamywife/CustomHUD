@@ -77,6 +77,33 @@ public class ComplexData {
     private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
     public static double cpuLoad = 0;
     public static double gpuUsage = 0;
+    private static double gpuUsageSampleSum = 0;
+    private static int gpuUsageSampleCount = 0;
+    private static long gpuUsageLastUpdate = 0;
+
+    public static void updateGpuUsage(double usage) {
+        if (!Double.isFinite(usage))
+            return;
+
+        usage = Math.max(0, Math.min(100, usage));
+        gpuUsageSampleSum += usage;
+        gpuUsageSampleCount++;
+
+        long now = System.currentTimeMillis();
+        if (gpuUsageLastUpdate == 0 || now - gpuUsageLastUpdate >= 250) {
+            gpuUsage = gpuUsageSampleSum / gpuUsageSampleCount;
+            gpuUsageSampleSum = 0;
+            gpuUsageSampleCount = 0;
+            gpuUsageLastUpdate = now;
+        }
+    }
+
+    public static void resetGpuUsage() {
+        gpuUsage = 0;
+        gpuUsageSampleSum = 0;
+        gpuUsageSampleCount = 0;
+        gpuUsageLastUpdate = 0;
+    }
 
     public static int[] clicksSoFar = new int[]{0,0};
     public static int[] clicksPerSeconds = new int[]{0,0};
