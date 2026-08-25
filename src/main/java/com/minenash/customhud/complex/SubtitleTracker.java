@@ -42,7 +42,7 @@ public class SubtitleTracker implements SoundEventListener {
                     }
                 }
             }
-            SubtitleOverlay.Subtitle entry = new SubtitleOverlay.Subtitle(text, range, new Vec3(sound.getX(), sound.getY(), sound.getZ()));
+            SubtitleOverlay.Subtitle entry = new SubtitleOverlay.Subtitle(text, range, new Vec3(sound.getX(), sound.getY(), sound.getZ()), sound.isLooping());
             ((SubtitleEntryDuck)entry).customhud$setSoundID(sound.getIdentifier());
             this.entries.add(entry);
         }

@@ -36,10 +36,14 @@ public class EntryNumberSuppliers {
     private static double toMiB(long bytes) { return bytes / 1024D / 1024D; }
 
     public static boolean isNoise() { return ComplexData.serverWorld.getChunkSource().getGenerator() instanceof NoiseBasedChunkGenerator; }
-    public static NoiseRouter sampler() { return ComplexData.serverWorld.getChunkSource().randomState().router(); }
+    public static NoiseRouter sampler() {
+        return ((NoiseBasedChunkGenerator) ComplexData.serverWorld.getChunkSource().getGenerator())
+                .generatorSettings().value().noiseRouter();
+    }
     public static double sample(DensityFunction function) {
         BlockPos pos = client.player.blockPosition();
-        return function.compute(new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
+        return ComplexData.serverWorld.getChunkSource().randomState()
+                .sampleBlockValueUncached(function, pos.getX(), pos.getY(), pos.getZ());
     }
 
     public static final Entry ACTIONBAR_REMAINING = of( () -> ((HudAccessor) client.gui.hud).getOverlayMessageTime(), 0, StatFormatters.MIL_HMS);
@@ -129,7 +133,7 @@ public class EntryNumberSuppliers {
     public static final Entry NOISE_ROUTER_DEPTH = of( () -> isNoise() ? sample(sampler().depth()) : Double.NaN, 3);
     public static final Entry NOISE_ROUTER_RIDGES = of( () -> isNoise() ? sample(sampler().ridges()) : Double.NaN, 3);
     public static final Entry NOISE_ROUTER_PEAKS = of( () -> isNoise() ? NoiseRouterData.peaksAndValleys((float)sample(sampler().ridges())) : Double.NaN, 3);
-    public static final Entry NOISE_ROUTER_INIT_DENSITY = of( () -> isNoise() ? sample(sampler().preliminarySurfaceLevel()) : Double.NaN, 3);
+    public static final Entry NOISE_ROUTER_INIT_DENSITY = of( () -> isNoise() ? sample(sampler().chunkSurfaceLevel()) : Double.NaN, 3);
     public static final Entry NOISE_ROUTER_FINAL_DENSITY = of( () -> isNoise() ? sample(sampler().finalDensity()) : Double.NaN, 3);
 
     @Deprecated public static final Entry ITEM_DURABILITY_PERCENT = of( () -> client.player.getMainHandItem().getDamageValue() / (float) client.player.getMainHandItem().getMaxDamage() * 100, 0);
