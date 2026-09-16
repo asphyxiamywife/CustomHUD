@@ -1,5 +1,6 @@
 package com.minenash.customhud.gui;
 
+import com.mojang.blaze3d.Blaze3D;
 import com.minenash.customhud.ConfigManager;
 import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.ProfileManager;
@@ -23,9 +24,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -59,7 +60,7 @@ public class NewConfigScreen extends Screen {
         addRenderableWidget(profiles);
 
         this.addRenderableWidget( Button.builder(Component.literal("Open Folder"),
-                button -> new Thread(() -> Util.getPlatform().openFile(CustomHud.PROFILE_FOLDER.toFile())).start())
+                button -> Blaze3D.openPath(CustomHud.PROFILE_FOLDER))
                 .pos(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
 
         this.addRenderableWidget( Button.builder(CommonComponents.GUI_DONE, button -> onClose())
@@ -73,11 +74,11 @@ public class NewConfigScreen extends Screen {
                 .pos(6, 6).size(86, 16).build() );
 
         this.addRenderableWidget( Button.builder(linkText("D", " Support"),
-                button -> Util.getPlatform().openUri("https://jakobt.dev/discord"))
+                button -> Blaze3D.openUri(URI.create("https://jakobt.dev/discord")))
                 .pos(width - 68 - 4, 6).size(68, 16).build() );
 
         this.addRenderableWidget( Button.builder( Component.literal("Wiki / Docs"),
-                button -> Util.getPlatform().openUri("https://customhud.dev/v3/getting_started"))
+                button -> Blaze3D.openUri(URI.create("https://customhud.dev/v3/getting_started")))
                 .pos(width - 68 - 4 - 68 - 4, 6).size(68, 16).build() );
 
 
