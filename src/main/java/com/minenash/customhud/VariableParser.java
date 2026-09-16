@@ -17,6 +17,7 @@ import com.minenash.customhud.HudElements.text.ActionbarMsgElement;
 import com.minenash.customhud.HudElements.text.TextSupplierElement;
 import com.minenash.customhud.HudElements.text.TitleMsgElement;
 import com.minenash.customhud.complex.ComplexData;
+import com.minenash.customhud.complex.ElytraPitchHelperTracker;
 import com.minenash.customhud.complex.VelocityTracker;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
@@ -1075,6 +1076,10 @@ public class VariableParser {
 
     private static Supplier<Number> getIntegerSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "eph_cycle_ticks" -> ElytraPitchHelperTracker.CYCLE_TICKS;
+            case "eph_glyphs_reached" -> ElytraPitchHelperTracker.GLYPHS_REACHED;
+            case "eph_pull_up_ticks" -> ElytraPitchHelperTracker.PULL_UP_TICKS;
+            case "eph_release_down_ticks" -> ElytraPitchHelperTracker.RELEASE_DOWN_TICKS;
             case "profile_errors" -> PROFILE_ERRORS;
             case "fps" -> FPS;
             case "biome_blend" -> BIOME_BLEND;
@@ -1254,6 +1259,13 @@ public class VariableParser {
 
     private static NumberSupplierElement.Entry getDecimalSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "eph_cycle_dy" -> NumberSupplierElement.of(ElytraPitchHelperTracker.CYCLE_DY, 2);
+            case "eph_cycle_dx" -> NumberSupplierElement.of(ElytraPitchHelperTracker.CYCLE_DX, 0);
+            case "eph_cycle_dx_per_second" -> NumberSupplierElement.of(ElytraPitchHelperTracker.CYCLE_DX_PER_SECOND, 2);
+            case "eph_swing" -> NumberSupplierElement.of(ElytraPitchHelperTracker.SWING, 1);
+            case "eph_cycle_seconds" -> NumberSupplierElement.of(ElytraPitchHelperTracker.CYCLE_SECONDS, 1);
+            case "eph_pull_up_seconds" -> NumberSupplierElement.of(ElytraPitchHelperTracker.PULL_UP_SECONDS, 2);
+            case "eph_release_down_seconds" -> NumberSupplierElement.of(ElytraPitchHelperTracker.RELEASE_DOWN_SECONDS, 2);
             case "x" -> X;
             case "y" -> Y;
             case "z" -> Z;

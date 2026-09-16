@@ -2,6 +2,8 @@ package com.minenash.customhud;
 
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.EstimatedTick;
+import com.minenash.customhud.complex.ElytraPitchHelperTracker;
+import com.minenash.customhud.complex.Log4jRecordListener;
 import com.minenash.customhud.data.DisableElement;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
@@ -62,6 +64,8 @@ public class CustomHud implements ModInitializer {
 	@Override
 	public void onInitialize() {
 //		UpdateChecker.check();
+		ElytraPitchHelperTracker.initialize();
+		Log4jRecordListener.initialize();
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("custom_hud", "hud"), CustomHudRenderer3::extractRenderState);
 
@@ -76,6 +80,7 @@ public class CustomHud implements ModInitializer {
 			if (profile != null)
 				profile.boolEvents.add("join");
 		});
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ElytraPitchHelperTracker.reset());
 
 
 	}
