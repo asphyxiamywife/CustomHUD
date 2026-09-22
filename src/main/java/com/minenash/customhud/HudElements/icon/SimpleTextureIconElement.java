@@ -4,7 +4,7 @@ import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import java.io.IOException;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
