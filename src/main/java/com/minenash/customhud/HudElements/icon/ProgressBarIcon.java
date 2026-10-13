@@ -42,7 +42,7 @@ public class ProgressBarIcon extends IconElement {
             matrices.scale(scale, scale);
             rotate(matrices, 182, 5);
 
-            style.extractRenderState(context, (float) Mth.clamp(numerator.getValue() / denominator.getValue(), 0, 1), background);
+            style.extractRenderState(context, (float) Math.clamp(numerator.getValue() / denominator.getValue(), 0, 1), background);
         }
         finally {
             matrices.popMatrix();

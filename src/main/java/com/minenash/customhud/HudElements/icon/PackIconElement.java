@@ -8,7 +8,7 @@ import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureResources;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
@@ -69,8 +69,9 @@ public class PackIconElement extends IconElement {
                 Identifier identifier = Identifier.fromNamespaceAndPath("minecraft", "pack/" + safeName + "/" + Hashing.sha1().hashUnencodedChars(name) + "/icon");
 
                 try (InputStream inputStream = inputSupplier.get()) {
-                    NativeImage nativeImage = NativeImage.read(inputStream);
-                    textureManager.register(identifier, new DynamicTexture(identifier::toString, nativeImage));
+                    try (NativeImage nativeImage = NativeImage.read(inputStream)) {
+                        textureManager.register(identifier, TextureResources.from2dImage(identifier::toString, nativeImage));
+                    }
                     return identifier;
                 }
             }

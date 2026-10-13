@@ -45,7 +45,7 @@ public class StatusEffectIconElement extends IconElement {
             Identifier texture = Hud.getMobEffectSprite(effect.getEffect());
             int m = effect.getDuration();
             float f = !effect.endsWithin(200) ? 1.0f :
-                Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((float)(10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
+                Math.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Math.clamp((float)(10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
 
             context.pose().translate(piece.x + shiftX, y + shiftY);
             rotate(context.pose(), renderWidth, renderWidth);

@@ -15,10 +15,11 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
+import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryList;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -87,8 +88,8 @@ public abstract class MinecraftClientMixin {
             ComplexData.updateGpuUsage(getGpuUtilization());
     }
 
-    @WrapOperation(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/debug/DebugScreenEntryList;isCurrentlyEnabled(Lnet/minecraft/resources/Identifier;)Z"))
-    public boolean getGpuUsageAndOtherPerformanceMetrics(DebugScreenEntryList instance, Identifier entryId, Operation<Boolean> original) {
+    @WrapOperation(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/debug/DebugScreenEntryList;isCurrentlyEnabled(Lnet/minecraft/resources/ResourceKey;)Z"))
+    public boolean getGpuUsageAndOtherPerformanceMetrics(DebugScreenEntryList instance, ResourceKey<DebugScreenEntry> entryId, Operation<Boolean> original) {
         Profile profile = ProfileManager.getActive();
         return original.call(instance, entryId)
                 || (DebugScreenEntries.GPU_UTILIZATION.equals(entryId)

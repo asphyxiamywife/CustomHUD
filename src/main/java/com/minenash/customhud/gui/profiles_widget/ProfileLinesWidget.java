@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.minecraft.util.Mth;
 
 public class ProfileLinesWidget extends ContainerObjectSelectionList<LineEntry> {
 
@@ -53,7 +52,7 @@ public class ProfileLinesWidget extends ContainerObjectSelectionList<LineEntry> 
     public void move(ProfileLineEntry entry, int direction) {
         List<LineEntry> children = access().getChildren();
 
-        int index = Mth.clamp(children.indexOf(entry) + direction, 0, children.size()-1);
+        int index = Math.clamp(children.indexOf(entry) + direction, 0, children.size()-1);
 
         children.remove(entry);
         children.add(index, entry);

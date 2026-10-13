@@ -4,7 +4,6 @@ import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.mixin.accessors.HudAccessor;
 import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -23,6 +22,6 @@ public class TitleMsgElement extends TextSupplierElement {
         if (hud.getTitleTime() <= hud.getTitleFadeOutTime())
             l = (int)(hud.getTitleTime() * 255.0F / hud.getTitleFadeOutTime());
 
-        return (current & 0xFFFFFF) | Mth.clamp(l, 0, 255) << 24 & 0xFF000000;
+        return (current & 0xFFFFFF) | Math.clamp(l, 0, 255) << 24 & 0xFF000000;
     }
 }
