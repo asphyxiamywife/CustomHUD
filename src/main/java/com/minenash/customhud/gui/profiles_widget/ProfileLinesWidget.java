@@ -84,7 +84,7 @@ public class ProfileLinesWidget extends ContainerObjectSelectionList<LineEntry> 
     }
 
     @Override
-    public void extractWidgetRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        super.extractWidgetRenderState(context, mouseX, mouseY, delta);
+    public void extractWidgetRenderState(GuiGraphicsExtractor context) {
+        super.extractWidgetRenderState(context);
     }
 }

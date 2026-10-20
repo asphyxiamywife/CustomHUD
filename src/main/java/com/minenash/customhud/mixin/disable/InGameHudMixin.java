@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.customhud.CustomHud;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Hud;
@@ -21,13 +20,13 @@ import static com.minenash.customhud.data.DisableElement.*;
 public abstract class InGameHudMixin {
 
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
-    public void customhud$disableHotbar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    public void customhud$disableHotbar(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(HOTBAR))
             ci.cancel();
     }
 
     @Inject(method = "extractBossOverlay", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableBossBar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    public void customhud$disableBossBar(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(BOSSBARS))
             ci.cancel();
     }
@@ -68,7 +67,7 @@ public abstract class InGameHudMixin {
     }
 
     @Inject(method = "extractSelectedItemName", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableHotbar(GuiGraphicsExtractor context, CallbackInfo ci) {
+    public void customhud$disableItemTooltip(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(ITEM_TOOLTIP))
             ci.cancel();
     }
@@ -84,26 +83,26 @@ public abstract class InGameHudMixin {
             ci.cancel();
     }
 
-    @Inject(method = "extractScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableScoreboard(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    @Inject(method = "extractScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V", at = @At(value = "HEAD"), cancellable = true)
+    public void customhud$disableScoreboard(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(SCOREBOARD))
             ci.cancel();
     }
 
     @Inject(method = "extractChat", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableChat(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    public void customhud$disableChat(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(CHAT))
             ci.cancel();
     }
 
     @Inject(method = "extractTitle", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableTitles(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    public void customhud$disableTitles(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(TITLES))
             ci.cancel();
     }
 
     @Inject(method = "extractOverlayMessage", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableActionbarMsg(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    public void customhud$disableActionbarMsg(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (CustomHud.isDisabled(ACTIONBAR))
             ci.cancel();
     }

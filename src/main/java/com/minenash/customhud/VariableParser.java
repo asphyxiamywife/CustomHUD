@@ -844,7 +844,7 @@ public class VariableParser {
             case "target_block_icon", "target_icon", "tbicon": enabled.targetBlock = enabled.world = true;
                 return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetBlock == null ? null : new ItemStack(ComplexData.targetBlock.getBlock()), flags, false), flags);
             case "target_fluid_icon", "tficon": enabled.targetFluid = enabled.world = true;
-                return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetFluid == null ? null : new ItemStack(ComplexData.targetFluid.getType().getBucket()), flags, false), flags);
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetFluid == null ? null : new ItemStack(BuiltInRegistries.ITEM.getValueOrThrow(ComplexData.targetFluid.getType().getBucket())), flags, false), flags);
             case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsgElement(flags), flags);
             case "title_msg", "title": return Flags.wrap(new TitleMsgElement(TITLE_MSG, flags), flags);
             case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);

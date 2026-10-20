@@ -93,8 +93,8 @@ public class NewConfigScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context) {
+        super.extractRenderState(context);
         context.centeredText(font, Component.translatable("config.custom_hud.title"), this.width / 2, 11, 0xFFFFFFFF);
         context.centeredText(font, "§oDrag and drop profile files here to add it", this.width / 2, this.height-46, 0xFF888888);
 

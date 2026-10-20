@@ -11,7 +11,6 @@ import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.*;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
@@ -32,7 +31,7 @@ public class CustomHudRenderer3 {
     public static FontDescription font;
     public static HudTheme theme;
 
-    public static void extractRenderState(GuiGraphicsExtractor context, DeltaTracker tick) {
+    public static void extractRenderState(GuiGraphicsExtractor context) {
 
         Profile profile = ProfileManager.getActive();
         if (profile == null || client.getDebugOverlay().showDebugScreen() && client.debugEntries.isOverlayVisible()

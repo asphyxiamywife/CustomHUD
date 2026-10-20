@@ -13,10 +13,10 @@ import net.minecraft.network.chat.Component;
 public abstract class LineEntry extends ContainerObjectSelectionList.Entry<LineEntry> {
     public void update() {}
 
-    protected void posAndRender(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, int x, int y, int width, Button widget, int xOffset) {
+    protected void posAndRender(GuiGraphicsExtractor context, int x, int y, int width, Button widget, int xOffset) {
         widget.setX(x + (xOffset < 0 ? width + xOffset : xOffset + 16));
         widget.setY(y);
-        widget.extractRenderState(context, mouseX, mouseY, delta);
+        widget.extractRenderState(context);
     }
 
     protected static Button button(String text, int width, Button.OnPress action) {
@@ -49,16 +49,16 @@ public abstract class LineEntry extends ContainerObjectSelectionList.Entry<LineE
         }
 
         @Override
-        public void extractContent(GuiGraphicsExtractor context, int mX, int mY, boolean hovered, float delta) {
+        public void extractContent(GuiGraphicsExtractor context, boolean hovered) {
             int x = getContentX();
             int y = getContentY();
             int width = getContentWidth();
             if (parent.screen.mode != Mode.NORMAL)
-                posAndRender(context, mX, mY, delta, x, y, width, deleteDone, 2);
+                posAndRender(context, x, y, width, deleteDone, 2);
             else {
-                posAndRender(context, mX, mY, delta, x, y, width, newProfile, 2);
-                posAndRender(context, mX, mY, delta, x, y, width, reorderProfiles, 2 + 50);
-                posAndRender(context, mX, mY, delta, x, y, width, deleteProfiles, 2 + 50 + 74);
+                posAndRender(context, x, y, width, newProfile, 2);
+                posAndRender(context, x, y, width, reorderProfiles, 2 + 50);
+                posAndRender(context, x, y, width, deleteProfiles, 2 + 50 + 74);
             }
         }
 

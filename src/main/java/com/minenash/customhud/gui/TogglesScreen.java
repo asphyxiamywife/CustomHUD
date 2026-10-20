@@ -67,10 +67,10 @@ public class TogglesScreen extends Screen {
         ConfigManager.save();
     }
 
-    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context) {
+        super.extractRenderState(context);
 
-        this.listWidget.extractRenderState(context, mouseX, mouseY, delta);
+        this.listWidget.extractRenderState(context);
         context.centeredText(this.font, this.title, this.width / 2, 11, 0xFFFFFFFF);
     }
 
@@ -157,7 +157,7 @@ public class TogglesScreen extends Screen {
             public ToggleEntryHeader(boolean noEntries) { this.noEntries = noEntries; }
 
             @Override
-            public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            public void extractContent(GuiGraphicsExtractor context, boolean hovered) {
                 int x = getContentX();
                 int y = getContentY();
                 int entryWidth = getContentWidth();
@@ -173,13 +173,13 @@ public class TogglesScreen extends Screen {
 
         public class ToggleEntrySeparator extends TEntry {
             @Override
-            public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            public void extractContent(GuiGraphicsExtractor context, boolean hovered) {
                 context.centeredText(font, "§nPrior Bound Toggles from this Profile", getContentX() + getContentWidth()/2, getContentY()+4, 0xFFFFFFFF);
             }
         }
         public class BlankSeparator extends TEntry {
             @Override
-            public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {}
+            public void extractContent(GuiGraphicsExtractor context, boolean hovered) {}
         }
 
         @Environment(EnvType.CLIENT)
@@ -212,7 +212,8 @@ public class TogglesScreen extends Screen {
                 this.modifier.active = !toggle.direct;
             }
 
-            public void extractContent(GuiGraphicsExtractor context, int mX, int mY, boolean hovered, float delta) {
+            public void extractContent(GuiGraphicsExtractor context, boolean hovered) {
+                int mX = context.mouseX();
                 int x = getContentX();
                 int y = getContentY();
                 int eWidth = getContentWidth();
@@ -221,7 +222,7 @@ public class TogglesScreen extends Screen {
                 if (!toggle.inProfile) {
                     remove.setY(y);
                     remove.setX(x + 2 - 10);
-                    remove.extractRenderState(context, mX, mY, delta);
+                    remove.extractRenderState(context);
                 }
                 else
                     context.centeredText(font, getLines(), x+0, y+4, 0xFFFFFFFF);
@@ -231,11 +232,11 @@ public class TogglesScreen extends Screen {
 
                 modifier.setY(y);
                 modifier.setX(x+eWidth-80-80-4+15);
-                modifier.extractRenderState(context, mX, mY, delta);
+                modifier.extractRenderState(context);
 
                 key.setY(y);
                 key.setX(x+eWidth-80+15);
-                key.extractRenderState(context, mX, mY, delta);
+                key.extractRenderState(context);
             }
 
             private Component getLines() {

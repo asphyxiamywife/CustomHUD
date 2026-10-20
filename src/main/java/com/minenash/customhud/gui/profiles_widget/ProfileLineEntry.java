@@ -85,7 +85,9 @@ public class ProfileLineEntry extends LineEntry {
     }
 
     @Override
-    public void extractContent(GuiGraphicsExtractor context, int mX, int mY, boolean hovered, float delta) {
+    public void extractContent(GuiGraphicsExtractor context, boolean hovered) {
+        int mX = context.mouseX();
+        int mY = context.mouseY();
         int x = getContentX();
         int y = getContentY();
         int eWidth = getContentWidth();
@@ -95,7 +97,7 @@ public class ProfileLineEntry extends LineEntry {
         editName.setWidth(eWidth - 16 - 20 - 16 - 42 - 82 - 18 - (profile.toggles.isEmpty() ? 0 : 50) - 3);
 
         if (editName.isHoveredOrFocused() || editName.isMouseOver(mX, mY))
-            editName.extractRenderState(context, mX, mY, delta);
+            editName.extractRenderState(context);
         else {
             if (!editName.getValue().equals(profile.name)) {
                 ProfileManager.rename(profile, editName.getValue());
@@ -105,31 +107,31 @@ public class ProfileLineEntry extends LineEntry {
         }
 
         selected.setMessage(Component.literal(ProfileManager.getActive() == profile ? "☑" : "☐"));
-        posAndRender(context, mX, mY, delta, x, y, eWidth, selected, 2);
+        posAndRender(context, x, y, eWidth, selected, 2);
 
         if (widget.screen.mode == Mode.DELETE) {
-            posAndRender(context, mX, mY, delta, x, y, eWidth, delete, -16-42);
+            posAndRender(context, x, y, eWidth, delete, -16-42);
             return;
         }
         if (widget.screen.mode == Mode.REORDER) {
             down.active = widget.children().get(widget.children().size()-2) != this;
             down.setMessage(Component.literal(down.active ? "§c↓" : "§4↓"));
-            posAndRender(context, mX, mY, delta, x, y, eWidth, down, -16-18);
+            posAndRender(context, x, y, eWidth, down, -16-18);
 
             up.active = widget.children().get(0) != this;
             up.setMessage(Component.literal(up.active ? "§a↑" : "§2↑"));
-            posAndRender(context, mX, mY, delta, x, y, eWidth, up, -16-18-18);
+            posAndRender(context, x, y, eWidth, up, -16-18-18);
             return;
         }
 
         if (Errors.hasErrors(profile.name))
-            posAndRender(context, mX, mY, delta, x, y, eWidth, error, -16);
-        posAndRender(context, mX, mY, delta, x, y, eWidth, edit, -16-42);
-        posAndRender(context, mX, mY, delta, x, y, eWidth, keybind, -16-42-82);
-        posAndRender(context, mX, mY, delta, x, y, eWidth, cycled, -16-42-82-18);
+            posAndRender(context, x, y, eWidth, error, -16);
+        posAndRender(context, x, y, eWidth, edit, -16-42);
+        posAndRender(context, x, y, eWidth, keybind, -16-42-82);
+        posAndRender(context, x, y, eWidth, cycled, -16-42-82-18);
         toggles.active = !profile.toggles.isEmpty();
         if (toggles.active)
-            posAndRender(context, mX, mY, delta, x, y, eWidth, toggles, -16-42-82-18-50);
+            posAndRender(context, x, y, eWidth, toggles, -16-42-82-18-50);
 
     }
 

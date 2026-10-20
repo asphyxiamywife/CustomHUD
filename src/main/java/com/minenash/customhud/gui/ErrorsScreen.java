@@ -95,15 +95,15 @@ public class ErrorsScreen extends Screen {
         CLIENT.gui.setScreen(parent);
     }
 
-    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context) {
+        super.extractRenderState(context);
 
         y_offset = 0;
-        this.listWidget.extractRenderState(context, mouseX, mouseY, delta);
+        this.listWidget.extractRenderState(context);
         context.centeredText(this.font, this.title, this.width / 2, 11, 0xFFFFFFFF);
 
         for (var d : renderables)
-            d.extractRenderState(context, mouseX, mouseY, delta);
+            d.extractRenderState(context);
     }
 
     class ErrorListWidget extends AbstractSelectionList<ErrorListWidget.ErrorEntry> {
@@ -166,7 +166,7 @@ public class ErrorsScreen extends Screen {
             }
 
             @Override
-            public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            public void extractContent(GuiGraphicsExtractor context, boolean hovered) {
                 int y = getY();
                 context.centeredText(font, error.line().formatted(ChatFormatting.UNDERLINE), lineColumnX, y + y_offset, 0xFFFFFFFF);
                 context.text(font, Component.literal(collapsedSource).withStyle(ChatFormatting.UNDERLINE), 36, y + y_offset, 0xFFFFFFFF);
@@ -214,7 +214,9 @@ public class ErrorsScreen extends Screen {
                 }
             }
 
-            public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            public void extractContent(GuiGraphicsExtractor context, boolean hovered) {
+                int mouseX = context.mouseX();
+                int mouseY = context.mouseY();
                 int y = getY();
                 if (hovered) {
                     int extendedHeight = ErrorListWidget.this.getSelected() == this ? (18 * expandedMsg.size()) : 0;
