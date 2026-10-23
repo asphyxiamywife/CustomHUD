@@ -1353,8 +1353,8 @@ public class VariableParser {
 
             case "item_durability_percent", "item_dur_per" -> ITEM_DURABILITY_PERCENT;
             case "offhand_item_durability_percent", "oitem_dur_per" -> OFFHAND_ITEM_DURABILITY_PERCENT;
-            case "local_difficulty" -> { enabled.localDifficulty = enabled.world = true; yield LOCAL_DIFFICULTY; }
-            case "clamped_local_difficulty" -> { enabled.localDifficulty = enabled.world = true; yield CLAMPED_LOCAL_DIFFICULTY; }
+            case "local_difficulty" -> { enabled.localDifficulty = enabled.world = enabled.clientChunk = enabled.serverWorld = enabled.serverChunk = true; yield LOCAL_DIFFICULTY; }
+            case "clamped_local_difficulty" -> { enabled.localDifficulty = enabled.world = enabled.clientChunk = enabled.serverWorld = enabled.serverChunk = true; yield CLAMPED_LOCAL_DIFFICULTY; }
 
             case "actionbar_remaining" -> ACTIONBAR_REMAINING;
             case "title_remaining" -> TITLE_REMAINING;

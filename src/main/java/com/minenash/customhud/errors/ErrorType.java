@@ -79,7 +79,7 @@ public enum ErrorType {
     EMPTY_TOGGLE ("WIP", "references/v4_wip", "No toggle name"),
     UNKNOWN_KEY("WIP", "references/v4_wip", "Invalid key name: §e"),
     GIZMO_NO_ROTATE("WIP", "references/v4_wip", "Gizmo can't be rotated"),
-    GIZMO_NO_WORK("WIP", "references/v4_wip", "Due to changes in 1.21.6, {gizmo} no longer works"),
+    GIZMO_NO_WORK("WIP", "references/v4_wip", "{gizmo} no longer works, enable §e3d_crosshair§r in Debug Options (F3 + F6) instead"),
 
     NOT_A_WHOLE_NUMBER (null, null, "Not a whole number: §e"),
 

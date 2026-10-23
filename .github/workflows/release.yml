@@ -7,11 +7,13 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
 
     permissions:
       contents: write
       attestations: write
+      artifact-metadata: write
       id-token: write
 
     steps:
@@ -19,15 +21,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-
-      - name: setup jdk
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'microsoft'
 
       - name: setup gradle
         uses: gradle/actions/setup-gradle@v6
@@ -38,13 +31,20 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: build
-        run: ./gradlew --non-interactive build
+        run: ./gradlew --non-interactive clean build
 
       - name: locate release jar
         id: jar
         shell: bash
         run: |
-          mapfile -t jars < <(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' | sort)
+          jars=()
+          for jar in build/libs/*.jar; do
+            [[ -f "$jar" ]] || continue
+            case "$jar" in
+              *-sources.jar|*-javadoc.jar|*-dev.jar) continue ;;
+            esac
+            jars+=("$jar")
+          done
           if [[ ${#jars[@]} -ne 1 ]]; then
             printf 'Expected exactly one release jar, found %s:\n' "${#jars[@]}" >&2
             printf '%s\n' "${jars[@]}" >&2

@@ -4,6 +4,7 @@ import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.SettingsElement;
 import com.minenash.customhud.mixin.accessors.GameOptionsAccessor;
+import net.fabricmc.fabric.api.client.renderer.v1.Renderer;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.GraphicsPreset;
 import net.minecraft.client.Minecraft;
@@ -136,7 +137,7 @@ public class SpecialSupplierElement implements HudElement {
                                                     () -> {var r = renderer(); return r != null ? r.getClass().getSimpleName().length() : 7;},
                                                     () -> renderer() != null);
 
-    public static Object renderer() { return null; }
+    public static Renderer renderer() { try {return Renderer.get();} catch (Exception e) { return null;}}
 
     public static final Entry CAMERA_PERSPECTIVE = of (
             () -> switch (client.options.getCameraType()) {
