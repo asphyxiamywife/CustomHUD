@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom' version '1.19-SNAPSHOT'
 	id 'maven-publish'
 	id 'java'
 }
@@ -12,7 +12,16 @@ java {
 base {
 	archivesName = project.archives_base_name
 }
-version = project.mod_version
+def snapshotBuild = providers.gradleProperty("snapshotBuild")
+		.map { it.equalsIgnoreCase("true") }
+		.orElse(false)
+def actionsCommit = providers.environmentVariable("GITHUB_SHA")
+		.map { it.take(7) }
+		.orElse("")
+
+version = snapshotBuild.get() && !actionsCommit.get().isBlank()
+		? "${project.mod_version}.actions.${actionsCommit.get()}"
+		: project.mod_version
 group = project.maven_group
 
 repositories {
@@ -55,10 +64,11 @@ dependencies {
 }
 
 processResources {
-	inputs.property "version", project.version
+	def version = project.version
+	inputs.property "version", version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": version
 	}
 }
 

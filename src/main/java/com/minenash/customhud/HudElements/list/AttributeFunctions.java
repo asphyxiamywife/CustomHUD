@@ -180,17 +180,17 @@ public class AttributeFunctions {
 
 
     // BLOCK STATES
-    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_NAME = (property) -> property == null ? null : property.getKey().getName();
-    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_VALUE = (property) -> property == null ? null : property.getValue().toString();
-    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_FULL_TYPE = (property) -> property == null ? null : property.getKey().getValueClass().getSimpleName();
-    public static final Entry<Map.Entry<Property<?>,Comparable<?>> > BLOCK_STATE_TYPE = new Entry<> (
-            (property) -> property == null ? null : switch (blockstate$getPropertyType(property.getKey().getValueClass())) {
+    public static final Function<Property.Value<?>,String> BLOCK_STATE_NAME = (property) -> property == null ? null : property.property().getName();
+    public static final Function<Property.Value<?>,String> BLOCK_STATE_VALUE = (property) -> property == null ? null : property.value().toString();
+    public static final Function<Property.Value<?>,String> BLOCK_STATE_FULL_TYPE = (property) -> property == null ? null : property.property().getValueClass().getSimpleName();
+    public static final Entry<Property.Value<?>> BLOCK_STATE_TYPE = new Entry<> (
+            (property) -> property == null ? null : switch (blockstate$getPropertyType(property.property().getValueClass())) {
                 case 1 -> "Boolean";
                 case 2 -> "Number";
                 case 3 -> "Enum";
                 default -> "String"; },
-            (property) -> property == null ? null : blockstate$getPropertyType(property.getKey().getValueClass()),
-            (property) -> property == null ? null : blockstate$getPropertyType(property.getKey().getValueClass()) != 0);
+            (property) -> property == null ? null : blockstate$getPropertyType(property.property().getValueClass()),
+            (property) -> property == null ? null : blockstate$getPropertyType(property.property().getValueClass()) != 0);
 
 
     // BLOCK/ITEM TAGS
