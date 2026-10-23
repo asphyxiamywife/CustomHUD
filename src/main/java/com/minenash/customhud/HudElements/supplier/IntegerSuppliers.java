@@ -81,7 +81,7 @@ public class IntegerSuppliers {
     public static final Supplier<Number> QUEUED_TASKS = () -> chunkBuilder().getCompileQueueSize();
     public static final Supplier<Number> UPLOAD_QUEUE = () -> 0;
     public static final Supplier<Number> BUFFER_COUNT = () -> chunkBuilder().getFreeBufferCount();
-    public static final Supplier<Number> ENTITIES_RENDERED = () -> 0;
+    public static final Supplier<Number> ENTITIES_RENDERED = () -> worldRender().levelRenderState.lastEntityRenderStateCount;
     public static final Supplier<Number> ENTITIES_LOADED = () -> client.level.getEntityCount();
 
     public static final Supplier<Number> FORCED_LOADED_CHUNKS = () -> ComplexData.world instanceof ServerLevel ? ((ServerLevel)ComplexData.world).getForceLoadedChunks().size() : null;
@@ -198,10 +198,10 @@ public class IntegerSuppliers {
     public static final Supplier<Number> LUNAR_TIME = () -> client.level.getOverworldClockTime();
 
     public static final Supplier<Number> PARTICLES = () -> client.particleEngine.particles.values().stream().mapToInt(ParticleGroup::size).sum();
-    public static final Supplier<Number> STREAMING_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.staticChannels.getUsedCount();
-    public static final Supplier<Number> MAX_STREAMING_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.staticChannels.getMaxCount();
-    public static final Supplier<Number> STATIC_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.streamingChannels.getUsedCount();
-    public static final Supplier<Number> MAX_STATIC_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.streamingChannels.getMaxCount();
+    public static final Supplier<Number> STREAMING_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.streamingChannels.getUsedCount();
+    public static final Supplier<Number> MAX_STREAMING_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.streamingChannels.getMaxCount();
+    public static final Supplier<Number> STATIC_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.staticChannels.getUsedCount();
+    public static final Supplier<Number> MAX_STATIC_SOUNDS = () -> CLIENT.getSoundManager().soundEngine.library.staticChannels.getMaxCount();
 
     public static final Supplier<Number> SLOTS_USED = () -> ComplexData.slots_used;
     public static final Supplier<Number> SLOTS_EMPTY = () -> ComplexData.slots_empty;

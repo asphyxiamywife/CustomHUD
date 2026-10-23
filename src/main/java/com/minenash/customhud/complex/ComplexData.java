@@ -24,6 +24,7 @@ import net.minecraft.util.profiling.ResultField;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -35,6 +36,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
@@ -227,8 +229,10 @@ public class ComplexData {
 
         if (profile.enabled.localDifficulty) {
             Profiler.get().push("localDifficulty");
+            float moonBrightness = serverChunk == null ? 0 : DimensionType.MOON_BRIGHTNESS_PER_PHASE[
+                    world.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, client.getCameraEntity().blockPosition()).index()];
             localDifficulty = new DifficultyInstance(world.getDifficulty(), world.getOverworldClockTime(),
-                    serverChunk == null ? 0 : serverChunk.getInhabitedTime(), world.getOverworldClockTime());
+                    serverChunk == null ? 0 : serverChunk.getInhabitedTime(), moonBrightness);
             Profiler.get().pop();
         }
 

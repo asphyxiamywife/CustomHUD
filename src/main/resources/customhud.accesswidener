@@ -65,3 +65,4 @@ accessible	field	net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayed
 accessible	field	net/minecraft/world/item/ItemCooldowns	cooldowns	Ljava/util/Map;
 accessible	field	net/minecraft/world/item/ItemCooldowns	tickCount	I
 accessible	class	net/minecraft/world/item/ItemCooldowns$CooldownInstance
+accessible	field	net/minecraft/client/renderer/LevelRenderer	levelRenderState	Lnet/minecraft/client/renderer/state/level/LevelRenderState;
