@@ -79,9 +79,9 @@ public class ListSuppliers {
     SUBTITLES = () -> SubtitleTracker.INSTANCE.entries,
 
     TARGET_BLOCK_STATES = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : ComplexData.targetBlock.getValues().toList(),
-    TARGET_BLOCK_TAGS = () -> Collections.EMPTY_LIST,
+    TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetBlock.typeHolder().tags().toArray()),
     TARGET_FLUID_STATES = () -> ComplexData.targetFluid == null ? Collections.EMPTY_LIST : ComplexData.targetFluid.getValues().toList(),
-    TARGET_FLUID_TAGS = () -> Collections.EMPTY_LIST,
+    TARGET_FLUID_TAGS = () -> ComplexData.targetFluid == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetFluid.typeHolder().tags().toArray()),
 
     TARGET_BLOCK_POWERS = () -> {
         if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
@@ -194,7 +194,7 @@ public class ListSuppliers {
     public static final Function<ItemStack, List<?>> ITEM_LORE_LINES = AttributeHelpers::getLore;
     public static final Function<ItemStack, List<?>> ITEM_CAN_DESTROY = (stack) -> getCanX(stack, DataComponents.CAN_BREAK);
     public static final Function<ItemStack, List<?>> ITEM_CAN_PLAY_ON = (stack) -> getCanX(stack, DataComponents.CAN_PLACE_ON);
-    public static final Function<ItemStack, List<?>> ITEM_TAGS = (stack) -> Collections.EMPTY_LIST;
+    public static final Function<ItemStack, List<?>> ITEM_TAGS = (stack) -> stack.typeHolder().tags().toList();
     public static final Function<ItemStack, List<?>> ITEM_ITEMS = (stack) -> getItemItems(stack, false);
     public static final Function<ItemStack, List<?>> ITEM_ITEMS_COMPACT = (stack) -> compactItems(getItemItems(stack, false));
 

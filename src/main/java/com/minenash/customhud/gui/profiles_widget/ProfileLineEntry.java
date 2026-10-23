@@ -61,7 +61,15 @@ public class ProfileLineEntry extends LineEntry {
         this.up = button("§a↑", 16, b -> widget.move(this, -1));
         this.down = button("§c↓", 16, b -> widget.move(this, 1));
 
-        this.editName = new EditBox(CLIENT.font, 0, 0, 200, 16, Component.literal("Edit Name"));
+        this.editName = new EditBox(CLIENT.font, 0, 0, 200, 16, Component.literal("Edit Name")) {
+            @Override
+            public void insertText(String input) {
+                for (int i = 0; i < input.length(); i++)
+                    if (invalidCharacters.contains(input.charAt(i)))
+                        return;
+                super.insertText(input);
+            }
+        };
         this.editName.setValue(profile.name);
         this.editName.setTooltip(Tooltip.create(Component.literal("Click to edit name")));
         this.editName.setCanLoseFocus(true);

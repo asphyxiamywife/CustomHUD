@@ -238,6 +238,26 @@ public class CustomHudRenderer3 {
 
         }
 
+        if (profile.charts) {
+            int right = context.guiWidth();
+            int center = right / 2;
+            int bottom = context.guiHeight();
+
+            DebugScreenOverlay hud = client.getDebugOverlay();
+            switch (profile.leftChart) {
+                case FPS -> hud.fpsChart.extractRenderState(context, 0, hud.fpsChart.getWidth(center), bottom);
+                case TICK -> hud.tpsChart.extractRenderState(context, 0, hud.tpsChart.getWidth(center), bottom);
+                case PING -> hud.pingChart.extractRenderState(context, 0, hud.pingChart.getWidth(center), bottom);
+                case PACKET_SIZE -> hud.bandwidthChart.extractRenderState(context, 0, hud.bandwidthChart.getWidth(center), bottom);
+            }
+            switch (profile.rightChart) {
+                case FPS -> { int w = hud.fpsChart.getWidth(center); hud.fpsChart.extractRenderState(context, right - w, w, bottom); }
+                case TICK -> { int w = hud.tpsChart.getWidth(center); hud.tpsChart.extractRenderState(context, right - w, w, bottom); }
+                case PING -> { int w = hud.pingChart.getWidth(center); hud.pingChart.extractRenderState(context, right - w, w, bottom); }
+                case PACKET_SIZE -> { int w = hud.bandwidthChart.getWidth(center); hud.bandwidthChart.extractRenderState(context, right - w, w, bottom); }
+            }
+        }
+
         Profiler.get().pop();
         }
         finally {

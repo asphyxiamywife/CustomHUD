@@ -83,8 +83,16 @@ public class StringSupplierElement implements HudElement {
     public static final Supplier<String> CPU_NAME = () -> ComplexData.cpu == null ? null : ((CentralProcessor)ComplexData.cpu).getProcessorIdentifier().getName().trim();
     public static final Supplier<String> GPU_NAME = () -> RenderSystem.getDevice().getDeviceInfo().name();
     public static final Supplier<String> GPU_VENDOR = () -> RenderSystem.getDevice().getDeviceInfo().vendorName();
-    public static final Supplier<String> GL_VERSION = () -> RenderSystem.getDevice().getDeviceInfo().backendName();
-    public static final Supplier<String> GPU_DRIVER = () -> RenderSystem.getDevice().getDeviceInfo().driverInfo();
+    public static final Supplier<String> GL_VERSION = () -> {
+        String info = RenderSystem.getDevice().getDeviceInfo().driverInfo();
+        int space = info.indexOf(' ');
+        return space == -1 ? info : info.substring(0, space);
+    };
+    public static final Supplier<String> GPU_DRIVER = () -> {
+        String info = RenderSystem.getDevice().getDeviceInfo().driverInfo();
+        int space = info.indexOf(' ');
+        return space == -1 ? "" : info.substring(space + 1);
+    };
 
     public static final Supplier<String> MUSIC_NAME = () -> MusicAndRecordTracker.isMusicPlaying ? MusicAndRecordTracker.musicName : null;
 

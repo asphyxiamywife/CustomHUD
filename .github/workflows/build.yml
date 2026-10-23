@@ -1,23 +1,20 @@
-# automatic builds are temporarily disabled.
-
-
-
 name: build
-on: [workflow_dispatch]
+on: [pull_request, push]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
     steps:
       - name: checkout repository
         uses: actions/checkout@v7
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-      - name: setup jdk
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'microsoft'
       - name: setup gradle
         uses: gradle/actions/setup-gradle@v6
         with:
