@@ -32,7 +32,7 @@ public final class VanillaHudIntegration {
 
         HudElementRegistry.replaceElement(VanillaHudElements.CROSSHAIR, original -> graphics -> {
             var profile = ProfileManager.getActive();
-            if (profile == null || profile.crosshair == Crosshairs.NORMAL || profile.crosshair == Crosshairs.VANILLA)
+            if (profile == null || profile.crosshair != Crosshairs.NONE)
                 original.extractRenderState(graphics);
         });
     }

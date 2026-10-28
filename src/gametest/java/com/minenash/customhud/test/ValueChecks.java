@@ -27,7 +27,7 @@ final class ValueChecks {
             number(player, "food", client.player.getFoodData().getFoodLevel());
             number(player, "armor", client.player.getArmorValue());
             number(player, "xp_level", client.player.experienceLevel);
-            number(player, "air", 20); 
+            number(player, "air", 20);
             number(player, "x", client.player.getX());
             number(player, "y", client.player.getY());
             number(player, "z", client.player.getZ());

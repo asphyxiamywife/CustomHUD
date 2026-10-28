@@ -1,17 +1,30 @@
 package com.minenash.customhud.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Crosshairs;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.Hud;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(Hud.class)
+@Mixin(value = Hud.class, priority = 900)
 public abstract class InGameHudMixin {
+
     @ModifyExpressionValue(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/debug/DebugScreenEntryList;isCurrentlyEnabled(Lnet/minecraft/resources/ResourceKey;)Z"))
     private boolean getDebugCrosshairEnable(boolean original) {
-        var profile = ProfileManager.getActive();
-        return original && (profile == null || profile.crosshair == Crosshairs.VANILLA);
+        return original && !isDebugCrosshair();
+    }
+
+    @WrapWithCondition(method = "extractCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lnet/minecraft/client/gui/GuiPipeline;Lnet/minecraft/resources/Identifier;IIII)V", ordinal = 0))
+    private boolean skipNormalCrosshairRendering0(GuiGraphicsExtractor instance, GuiPipeline pipeline, Identifier sprite, int x, int y, int width, int height) {
+        return !isDebugCrosshair();
+    }
+
+    private static boolean isDebugCrosshair() {
+        return ProfileManager.getActive() != null && ProfileManager.getActive().crosshair == Crosshairs.DEBUG;
     }
 }
