@@ -15,9 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             backend: vulkan
-          - os: macos-15
+          - os: macos-26
             backend: opengl
           - os: windows-2025
             backend: opengl
