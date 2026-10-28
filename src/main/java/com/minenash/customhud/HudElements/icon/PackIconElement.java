@@ -7,7 +7,7 @@ import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.renderer.texture.TextureResources;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
@@ -45,7 +45,7 @@ public class PackIconElement extends IconElement {
             int width = (int) (11*scale);
             rotate(matrices, width, width);
 
-            context.blit(RenderPipelines.GUI_TEXTURED, getPackIconTexture(pack), 0, 0, 0, 0, width, width, width, width);
+            context.blit(GuiPipeline.TEXTURED, getPackIconTexture(pack), 0, 0, 0, 0, width, width, width, width);
         }
         finally {
             matrices.popMatrix();

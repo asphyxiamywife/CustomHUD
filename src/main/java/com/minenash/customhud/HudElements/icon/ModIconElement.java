@@ -8,7 +8,7 @@ import org.joml.Matrix3x2fStack;
 
 import java.util.UUID;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.Identifier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
@@ -47,7 +47,7 @@ public class ModIconElement extends IconElement {
             int w = (int) (11 * scale);
             rotate(matrices, w, w);
 
-            context.blit(RenderPipelines.GUI_TEXTURED, id, 0, 0, 0, 0, w, w, w, w);
+            context.blit(GuiPipeline.TEXTURED, id, 0, 0, 0, 0, w, w, w, w);
         }
         finally {
             matrices.popMatrix();

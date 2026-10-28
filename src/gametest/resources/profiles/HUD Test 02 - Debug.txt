@@ -1,0 +1,7 @@
+==crosshair:debug==
+==whenhudhidden:hide==
+==section:topleft==
+&bHUD Test 02 - Debug
+&f3D axis crosshair even with the debug screen off. No 2D crosshair.
+&7CustomHUD client compatibility fixture
+&7Use the CustomHUD cycle-profile key to switch tests.

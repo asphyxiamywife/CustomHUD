@@ -12,7 +12,9 @@ public class GameRendererMixin {
 
     @ModifyExpressionValue(method = "render3dHud", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/state/level/LevelRenderState;render3dCrosshair:Z"))
     private boolean getDebugCrosshairEnable(boolean original) {
-        return original || (ProfileManager.getActive() != null && ProfileManager.getActive().crosshair == Crosshairs.DEBUG);
+        var profile = ProfileManager.getActive();
+        return profile == null || profile.crosshair == Crosshairs.VANILLA
+                ? original : profile.crosshair == Crosshairs.DEBUG;
     }
 
 

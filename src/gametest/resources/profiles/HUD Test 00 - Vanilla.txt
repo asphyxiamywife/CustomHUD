@@ -1,0 +1,7 @@
+==crosshair:vanilla==
+==whenhudhidden:hide==
+==section:topleft==
+&bHUD Test 00 - Vanilla
+&fVanilla HUD visible. Crosshair follows Minecraft debug settings.
+&7CustomHUD client compatibility fixture
+&7Use the CustomHUD cycle-profile key to switch tests.

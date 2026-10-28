@@ -10,7 +10,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -99,8 +98,8 @@ public class RichItemSupplierIconElement extends IconElement {
             if (showDur && stack.isBarVisible()) {
                 int i = stack.getBarWidth();
                 int j = stack.getBarColor();
-                context.fill(RenderPipelines.GUI, 2, 13, 2 + 13, 13 + 2, -16777216);
-                context.fill(RenderPipelines.GUI, 2, 13, 2 + i, 13 + 1, j | -16777216);
+                context.fill(2, 13, 2 + 13, 13 + 2, -16777216);
+                context.fill(2, 13, 2 + i, 13 + 1, j | -16777216);
             }
 
             if (showCooldown) {
@@ -108,7 +107,7 @@ public class RichItemSupplierIconElement extends IconElement {
                 if (f > 0.0F) {
                     int k = Mth.floor(16.0F * (1.0F - f));
                     int l = k + Mth.ceil(16.0F * f);
-                    context.fill(RenderPipelines.GUI, 0, k, 16, l, Integer.MAX_VALUE);
+                    context.fill(0, k, 16, l, Integer.MAX_VALUE);
                 }
             }
 

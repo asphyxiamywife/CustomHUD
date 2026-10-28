@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -51,8 +51,8 @@ public class StatusEffectIconElement extends IconElement {
             rotate(context.pose(), renderWidth, renderWidth);
 
             if (background)
-                context.blitSprite(RenderPipelines.GUI_TEXTURED, effect.isAmbient() ? EFFECT_BACKGROUND_AMBIENT_TEXTURE : EFFECT_BACKGROUND_TEXTURE, 0, 0, renderWidth, renderWidth);
-            context.blitSprite(RenderPipelines.GUI_TEXTURED, texture, effectOffset, effectOffset, (int)(9*scale), (int)(9*scale), ARGB.white(f));
+                context.blitSprite(GuiPipeline.TEXTURED, effect.isAmbient() ? EFFECT_BACKGROUND_AMBIENT_TEXTURE : EFFECT_BACKGROUND_TEXTURE, 0, 0, renderWidth, renderWidth);
+            context.blitSprite(GuiPipeline.TEXTURED, texture, effectOffset, effectOffset, (int)(9*scale), (int)(9*scale), ARGB.white(f));
         }
         finally {
             context.pose().popMatrix();

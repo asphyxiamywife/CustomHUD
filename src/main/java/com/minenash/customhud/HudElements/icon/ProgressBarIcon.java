@@ -5,7 +5,7 @@ import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.BossHealthOverlay;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
@@ -141,9 +141,9 @@ public class ProgressBarIcon extends IconElement {
         public TextureStyle(Identifier fg, Identifier bg) {this.fg = fg; this.bg = bg;}
         public void extractRenderState(GuiGraphicsExtractor context, float progress, boolean background) {
             if (background)
-                context.blitSprite(RenderPipelines.GUI_TEXTURED, bg, 0, 0, 182, 5);
+                context.blitSprite(GuiPipeline.TEXTURED, bg, 0, 0, 182, 5);
             if (progress > 0)
-                context.blitSprite(RenderPipelines.GUI_TEXTURED, fg, 182, 5, 0, 0, 0, 0, (int)(progress*182), 5);
+                context.blitSprite(GuiPipeline.TEXTURED, fg, 182, 5, 0, 0, 0, 0, (int)(progress*182), 5);
 
         }
     }
@@ -154,9 +154,9 @@ public class ProgressBarIcon extends IconElement {
         public VillagerTextureStyle(Identifier fg) {this.fg = fg;}
         public void extractRenderState(GuiGraphicsExtractor context, float progress, boolean background) {
             if (background)
-                context.blitSprite(RenderPipelines.GUI_TEXTURED, EXPERIENCE_BAR_BACKGROUND_TEXTURE, 0, 0, 102, 5);
+                context.blitSprite(GuiPipeline.TEXTURED, EXPERIENCE_BAR_BACKGROUND_TEXTURE, 0, 0, 102, 5);
             if (progress > 0)
-                context.blitSprite(RenderPipelines.GUI_TEXTURED, fg, 102, 5, 0, 0, 0, 0, (int)(progress*102), 5);
+                context.blitSprite(GuiPipeline.TEXTURED, fg, 102, 5, 0, 0, 0, 0, (int)(progress*102), 5);
         }
 
     }

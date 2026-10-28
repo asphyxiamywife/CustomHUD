@@ -42,6 +42,59 @@ loom {
 	accessWidenerPath = file("src/main/resources/customhud.accesswidener")
 }
 
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = 'custom_hud_tests'
+		enableGameTests = false
+		enableClientGameTests = true
+		clearRunDirectory = true
+	}
+}
+
+loom.runs.clientGameTest {
+	runDir = 'build/run/clientGameTest'
+	programArgs '--graphicsBackend', providers.gradleProperty('testGraphicsBackend').getOrElse('default')
+}
+
+tasks.named('runClientGameTest') {
+	timeout = Duration.ofMinutes(8)
+}
+
+def clientTestDirectory = layout.buildDirectory.dir('run/clientGameTest')
+def clientGalleryTemplate = layout.projectDirectory.file('src/gametest/resources/gallery.html')
+tasks.register('checkClientGameTest') {
+	group = 'verification'
+	description = 'Runs the client suite and requires completed assertions and screenshot artifacts.'
+	dependsOn tasks.named('runClientGameTest')
+	doLast {
+		def runDirectory = clientTestDirectory.get().asFile.toPath()
+		def report = runDirectory.resolve('hud-test-results.txt')
+		if (!java.nio.file.Files.exists(report)) {
+			throw new GradleException('Client suite did not finish; inspect the client logs and crash reports.')
+		}
+		def results = java.nio.file.Files.readString(report)
+		if (!['PASS: mixin audit;', 'PASS: GPU inversion', 'PASS: evaluated', 'PASS: real F3'].every { results.contains(it) }) {
+			throw new GradleException('Client suite did not complete all test groups:\n' + results)
+		}
+		def images
+		try (def screenshots = java.nio.file.Files.list(runDirectory.resolve('screenshots'))) {
+			images = screenshots.filter { it.fileName.toString().endsWith('.png') }.sorted().toList()
+		}
+		if (images.size() < 75) {
+			throw new GradleException('Client suite did not produce all 75 screenshots.')
+		}
+		def figures = images.collect { path ->
+			def name = path.fileName.toString()
+			def label = name.replace('&', '&amp;').replace('<', '&lt;').replace('"', '&quot;')
+			def url = new URI(null, null, 'screenshots/' + name, null).toASCIIString()
+			"<figure><a href=\"${url}\"><img loading=\"lazy\" src=\"${url}\" alt=\"${label}\"></a><figcaption>${label}</figcaption></figure>"
+		}.join('\n')
+		def template = java.nio.file.Files.readString(clientGalleryTemplate.asFile.toPath())
+		java.nio.file.Files.writeString(runDirectory.resolve('index.html'), template.replace('<!-- SCREENSHOTS -->', figures))
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"

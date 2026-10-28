@@ -1,0 +1,7 @@
+==crosshair:normal==
+==whenhudhidden:hide==
+==section:topleft==
+&bHUD Test 01 - Normal
+&f2D crosshair, including when the 3D debug crosshair is enabled.
+&7CustomHUD client compatibility fixture
+&7Use the CustomHUD cycle-profile key to switch tests.

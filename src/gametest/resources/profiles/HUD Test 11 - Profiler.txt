@@ -1,0 +1,9 @@
+==crosshair:normal==
+==leftchart:profiler==
+==nicescale:1==
+==section:topleft==
+&bForced profiler regression
+&fFPS: {fps} | Tick time: {ms_ticks -p2}
+&fCPU: {cpu_usage -p1}% | GPU: {gpu -p1}%
+&fMemory: {memory_used}/{memory_total} MB
+&fF3+B and F3+G must still work with this chart visible.

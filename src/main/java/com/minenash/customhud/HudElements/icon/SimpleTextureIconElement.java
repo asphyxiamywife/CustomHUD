@@ -4,12 +4,11 @@ import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import java.io.IOException;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 
@@ -24,14 +23,14 @@ public class SimpleTextureIconElement extends IconElement {
     private final int height;
     private final int yOffset;
     private final int textWidth;
-    private final RenderPipeline pipeline;
+    private final GuiPipeline pipeline;
 
     private final boolean iconAvailable;
 
 
     public SimpleTextureIconElement(Identifier texture, boolean crosshair, Flags flags) {
         super(flags, 0);
-        this.pipeline = crosshair ? RenderPipelines.CROSSHAIR : RenderPipelines.GUI_TEXTURED;
+        this.pipeline = crosshair ? GuiPipeline.CROSSHAIR : GuiPipeline.TEXTURED;
 
         NativeImage img = null;
         try {

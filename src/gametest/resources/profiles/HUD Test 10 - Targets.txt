@@ -1,0 +1,15 @@
+==crosshair:normal==
+==section:topleft==
+&bTarget values and property lists
+&fEntity: {target_entity} | ID: {target_entity_id}
+&fEntity position: {tex -p1}, {tey -p1}, {tez -p1}
+&fEntity distance: {target_entity_distance -p2}
+&fBlock: {target_block} | ID: {target_block_id}
+&fBlock position: {tbx}, {tby}, {tbz}
+&fFluid: {target_fluid} | ID: {target_fluid_id}
+=for: target_block_properties=
+&fProperty {p:name}: {p:value}
+=endfor=
+=for: target_block_tags=
+&7Tag: {t:id}
+=endfor=

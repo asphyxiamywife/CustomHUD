@@ -4,7 +4,7 @@ import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.mixin.accessors.DebugHudAccessor;
 import com.minenash.customhud.registry.CustomHudRegistry;
 import com.mojang.datafixers.DataFixUtils;
-import oshi.SystemInfo;
+import oshi.ffm.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
 import java.lang.reflect.Field;
@@ -184,7 +184,7 @@ public class ComplexData {
 
             if (hit.getType() == HitResult.Type.BLOCK) {
                 targetBlockPos = ((BlockHitResult)hit).getBlockPos();
-                targetBlock = world.getBlockState(targetBlockPos);
+                targetBlock = client.level.getBlockState(targetBlockPos);
             }
             else {
                 targetBlockPos = null;
@@ -199,7 +199,7 @@ public class ComplexData {
 
             if (hit.getType() == HitResult.Type.BLOCK) {
                 targetFluidPos = ((BlockHitResult)hit).getBlockPos();
-                targetFluid = world.getFluidState(targetFluidPos);
+                targetFluid = client.level.getFluidState(targetFluidPos);
             }
             else {
                 targetFluidPos = null;

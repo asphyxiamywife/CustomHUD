@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.BossHealthOverlay;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.BossEvent;
 
@@ -56,9 +56,9 @@ public class BossbarIcon extends IconElement {
     }
 
     public static void extractBar(GuiGraphicsExtractor context, BossEvent bossBar, int width, Identifier[] barSprites, Identifier[] overlaySprites) {
-        context.blitSprite(RenderPipelines.GUI_TEXTURED, barSprites[bossBar.getColor().ordinal()], 182, 5, 0, 0, 0, 0, width, 5);
+        context.blitSprite(GuiPipeline.TEXTURED, barSprites[bossBar.getColor().ordinal()], 182, 5, 0, 0, 0, 0, width, 5);
         if (bossBar.getOverlay() != BossEvent.BossBarOverlay.PROGRESS)
-            context.blitSprite(RenderPipelines.GUI_TEXTURED, overlaySprites[bossBar.getOverlay().ordinal() - 1], 182, 5, 0, 0, 0, 0, width, 5);
+            context.blitSprite(GuiPipeline.TEXTURED, overlaySprites[bossBar.getOverlay().ordinal() - 1], 182, 5, 0, 0, 0, 0, width, 5);
     }
 
 }
