@@ -16,7 +16,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryList;
-import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +36,7 @@ public abstract class MinecraftClientMixin {
     @Shadow public abstract double getGpuUtilization();
 
     @Shadow @Final public Gui gui;
+    @Shadow @Final public DebugScreenEntryList debugEntries;
     @Shadow public abstract DebugScreenOverlay getDebugOverlay();
 
     @Shadow @Nullable public ClientLevel level;
@@ -51,11 +51,6 @@ public abstract class MinecraftClientMixin {
             ComplexData.clicksSoFar[1]++;
 
         return p;
-    }
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(GameConfig args, CallbackInfo ci) {
-        CustomHud.delayedInitialize();
     }
 
     @Inject(method = "renderFrame", at = @At("HEAD"))
@@ -126,7 +121,7 @@ public abstract class MinecraftClientMixin {
 
         Profile p = ProfileManager.getActive();
         return original.call(instance) ||
-                (!gui.hud.isHidden() && !getDebugOverlay().showDebugScreen() && level != null
+                (!gui.hud.isHidden() && !debugEntries.isOverlayVisible() && level != null
                         && p != null && (p.enabled.profilerTimings || p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER) );
     }
 }

@@ -1,0 +1,15 @@
+==crosshair:none==
+==disable:lower==
+==disable:bossbars==
+==disable:status_effects==
+==disable:subtitles==
+==disable:scoreboard==
+==disable:chat==
+==disable:titles==
+==disable:actionbar==
+==whenhudhidden:hide==
+==section:topleft==
+&bHUD Test 04 - Hidden
+&fVanilla HUD elements hidden; this CustomHUD text remains.
+&7CustomHUD client compatibility fixture
+&7Use the CustomHUD cycle-profile key to switch tests.

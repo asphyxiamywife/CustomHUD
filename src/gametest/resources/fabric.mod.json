@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "custom_hud_tests",
+  "version": "1.0.0",
+  "name": "CustomHUD client tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "com.minenash.customhud.test.HudClientTest",
+      "com.minenash.customhud.test.InversionClientTest"
+    ]
+  },
+  "depends": {
+    "custom_hud": "*",
+    "fabric-client-gametest-api-v1": "*"
+  },
+  "mixins": [
+    "customhud-test.mixins.json"
+  ]
+}

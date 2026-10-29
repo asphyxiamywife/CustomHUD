@@ -1,0 +1,95 @@
+name: client tests
+on: [pull_request, push, workflow_dispatch]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: client-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  client-tests:
+    name: client (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-26.04
+            backend: vulkan
+          - os: macos-26
+            backend: opengl
+          - os: windows-2025
+            backend: opengl
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      ALSOFT_DRIVERS: 'null'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Install Linux software graphics and virtual display
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb mesa-vulkan-drivers libgl1-mesa-dri libglx-mesa0
+      - name: Install Windows software OpenGL
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./.github/scripts/install-mesa.ps1
+      - name: Run client tests (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x ./gradlew
+          xvfb-run -a ./gradlew checkClientGameTest -PtestGraphicsBackend=${{ matrix.backend }} --console=plain
+      - name: Run client tests (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          chmod +x ./gradlew
+          ./gradlew checkClientGameTest -PtestGraphicsBackend=${{ matrix.backend }} --console=plain
+      - name: Run client tests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          GALLIUM_DRIVER: llvmpipe
+        run: ./gradlew.bat checkClientGameTest -PtestGraphicsBackend=${{ matrix.backend }} --console=plain
+      - name: Upload screenshots, results and diagnostics
+        if: always()
+        id: artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: client-tests-${{ matrix.os }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            build/run/clientGameTest/screenshots/
+            build/run/clientGameTest/hud-test-results.txt
+            build/run/clientGameTest/index.html
+            build/run/clientGameTest/logs/
+            build/run/clientGameTest/crash-reports/
+            build/reports/problems/
+      - name: Summarize results
+        if: always()
+        shell: bash
+        env:
+          ARTIFACT_URL: ${{ steps.artifacts.outputs.artifact-url }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          {
+            echo '## Client tests — ${{ matrix.os }}'
+            echo "Status: $JOB_STATUS"
+            echo
+            if [[ -f build/run/clientGameTest/hud-test-results.txt ]]; then
+              cat build/run/clientGameTest/hud-test-results.txt
+            else
+              echo 'Tests did not complete. See the logs for startup or graphics errors.'
+            fi
+            if [[ -n "$ARTIFACT_URL" ]]; then
+              echo
+              echo "[Download screenshots and diagnostics]($ARTIFACT_URL)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
