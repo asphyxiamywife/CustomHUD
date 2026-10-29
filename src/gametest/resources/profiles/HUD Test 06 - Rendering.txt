@@ -1,0 +1,14 @@
+==crosshair:normal==
+==whenhudhidden:hide==
+==section:topleft==
+&bHUD Test 06 - Rendering
+&fCPU values and icons should render without errors.
+&7CustomHUD client compatibility fixture
+&7Use the CustomHUD cycle-profile key to switch tests.
+&fCPU: {cpu_name}
+&fCores: {cpu_cores} | Threads: {cpu_threads} | Usage: {cpu_usage}%
+&fItem: {icon:minecraft:diamond}
+&fMain hand with durability/cooldown: {item:main:icon -rich}
+&fWhole texture: {icon:minecraft:textures/item/diamond.png}
+&fCropped texture: {icon:minecraft:textures/item/diamond.png,0,0,16,16,16,16}
+&fInverted texture: {crosshair:minecraft:textures/item/diamond.png}

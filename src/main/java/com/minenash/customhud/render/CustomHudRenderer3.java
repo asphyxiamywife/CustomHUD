@@ -40,6 +40,10 @@ public class CustomHudRenderer3 {
                 || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.gui.hud.isHidden() && client.gui.screen() == null))
             return;
 
+        HudScale.extract(context, profile, () -> extractRenderState(context, profile));
+    }
+
+    private static void extractRenderState(GuiGraphicsExtractor context, Profile profile) {
         boolean isChatOpen = client.gui.screen() instanceof ChatScreen;
 
         List<RenderPiece> pieces = new ArrayList<>();
@@ -240,11 +244,14 @@ public class CustomHudRenderer3 {
         }
 
         if (profile.charts) {
-            int right = context.guiWidth();
+            float chartScale = profile.baseTheme.getScale();
+            int right = (int) (context.guiWidth() / chartScale);
             int center = right / 2;
-            int bottom = context.guiHeight();
+            int bottom = (int) (context.guiHeight() / chartScale);
 
             DebugScreenOverlay hud = client.getDebugOverlay();
+            if (profile.leftChart == DebugCharts.PROFILER || profile.rightChart == DebugCharts.PROFILER)
+                hud.getProfilerPieChart().extractRenderState(context, right, bottom);
             switch (profile.leftChart) {
                 case FPS -> hud.fpsChart.extractRenderState(context, 0, hud.fpsChart.getWidth(center), bottom);
                 case TICK -> hud.tpsChart.extractRenderState(context, 0, hud.tpsChart.getWidth(center), bottom);

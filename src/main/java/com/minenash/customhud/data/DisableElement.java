@@ -42,7 +42,7 @@ public enum DisableElement {
 
                     default -> null;
                 };
-                if (elements != null)
+                if (element != null)
                     elements.add(element);
                 else
                     return false;

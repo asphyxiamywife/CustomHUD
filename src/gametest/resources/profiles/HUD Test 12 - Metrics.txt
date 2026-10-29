@@ -1,0 +1,15 @@
+==crosshair:normal==
+==leftchart:fps==
+==rightchart:tick==
+==section:topleft==
+&bPerformance and formatting values
+&fFPS: {fps} | Tick: {ms_ticks -p2} ms | TPS: {tps -p1}
+&fTPS min/avg/max: {tps_min -p1}/{tps_avg -p1}/{tps_max -p1}
+&fPing: {ping} | Packets: {tx}/{rx}
+&fGPU: {gpu -p1}% | CPU: {cpu_usage -p1}%
+&fMemory: {memory_used_percentage -p1}% | Allocated: {memory_allocated_percentage -p1}%
+&fChunks: {chunks_rendered}/{chunks_loaded} | Entities: {entities_rendered}/{entities_loaded}
+&fParticles: {particles} | Sounds: {sounds}/{max_sounds}
+&aGreen &bCyan &cRed &lBold&r &oItalic&r
+==section:bottomright==
+&bBottom anchor: {profile_name}

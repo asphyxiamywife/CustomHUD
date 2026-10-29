@@ -1,0 +1,7 @@
+==crosshair:none==
+==whenhudhidden:hide==
+==section:topleft==
+&bHUD Test 03 - None
+&fNo 2D crosshair or attack indicator.
+&7CustomHUD client compatibility fixture
+&7Use the CustomHUD cycle-profile key to switch tests.
