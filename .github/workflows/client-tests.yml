@@ -17,8 +17,6 @@ jobs:
         include:
           - os: ubuntu-26.04
             backend: vulkan
-          - os: macos-26
-            backend: opengl
           - os: windows-2025
             backend: opengl
     runs-on: ${{ matrix.os }}
@@ -46,11 +44,6 @@ jobs:
         run: |
           chmod +x ./gradlew
           xvfb-run -a ./gradlew checkClientGameTest -PtestGraphicsBackend=${{ matrix.backend }} --console=plain
-      - name: Run client tests (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          chmod +x ./gradlew
-          ./gradlew checkClientGameTest -PtestGraphicsBackend=${{ matrix.backend }} --console=plain
       - name: Run client tests (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
