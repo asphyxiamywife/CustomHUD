@@ -1,0 +1,9 @@
+==crosshair:normal==
+==backgroundcolor:none==
+==section:topleft==
+&bHUD Test 07 - Inversion
+&fNormal diamond: {icon:minecraft:textures/item/diamond.png -s2}
+&fBlended diamond: {crosshair:minecraft:textures/item/diamond.png -s2}
+&fWhite crosshair mask: {crosshair:minecraft:textures/gui/sprites/hud/crosshair.png -s2}
+&7Colored inversion can lose contrast over some backgrounds.
+&7The white mask is the reference for background inversion.

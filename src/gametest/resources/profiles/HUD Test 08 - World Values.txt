@@ -1,0 +1,13 @@
+==crosshair:normal==
+==section:topleft==
+&bWorld and position values
+&fWorld: {world} | Dimension: {dimension_id}
+&fXYZ: {x -p2}, {y -p2}, {z -p2}
+&fBlock: {bx}, {by}, {bz} | Chunk: {cx}, {cy}, {cz}
+&fFacing: {facing} | Yaw: {yaw -p1} Pitch: {pitch -p1}
+&fBiome: {biome_id}
+&fLight: {light} / Sky: {light_sky} / Block: {light_block}
+&fDay: {day} | Time: {hour24}:{minute}
+&fDifficulty: {local_difficulty -p2} / {clamped_local_difficulty -p2}
+&fWorld Y: {world_min_y} to {world_max_y}
+&fSurvival: {survival} | Singleplayer: {singleplayer}

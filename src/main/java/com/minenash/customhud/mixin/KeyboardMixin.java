@@ -22,7 +22,7 @@ public class KeyboardMixin {
     public boolean shouldShowProfiler(DebugScreenOverlay instance, Operation<Boolean> original) {
         Profile p = ProfileManager.getActive();
         return original.call(instance) ||
-                (!minecraft.options.hideGui && !minecraft.gui.getDebugOverlay().showDebugScreen() && minecraft.level != null
+                (!minecraft.options.hideGui && !minecraft.debugEntries.isOverlayVisible() && minecraft.level != null
                         && p != null && (p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER) );
     }
 

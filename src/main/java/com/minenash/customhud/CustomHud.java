@@ -10,9 +10,11 @@ import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.gui.TogglesScreen;
 import com.minenash.customhud.render.CustomHudRenderer3;
+import com.minenash.customhud.render.VanillaHudIntegration;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -63,6 +65,9 @@ public class CustomHud implements ModInitializer {
 	@Override
 	public void onInitialize() {
 //		UpdateChecker.check();
+
+		VanillaHudIntegration.register();
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> delayedInitialize());
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("custom_hud", "hud"), CustomHudRenderer3::extractRenderState);
 
@@ -182,9 +187,6 @@ public class CustomHud implements ModInitializer {
 		return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), KeyMappingHelper.getBoundKeyOf(key).getValue());
 	}
 
-	public static boolean isNotDisabled(DisableElement element) {
-		return ProfileManager.getActive() == null || !ProfileManager.getActive().disabled.contains(element);
-	}
 	public static boolean isDisabled(DisableElement element) {
 		return ProfileManager.getActive() != null && ProfileManager.getActive().disabled.contains(element);
 	}

@@ -40,6 +40,10 @@ public class CustomHudRenderer3 {
                 || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.options.hideGui && client.screen == null))
             return;
 
+        HudScale.extract(context, profile, () -> extractRenderState(context, profile));
+    }
+
+    private static void extractRenderState(GuiGraphicsExtractor context, Profile profile) {
         boolean isChatOpen = client.screen instanceof ChatScreen;
 
         List<RenderPiece> pieces = new ArrayList<>();
@@ -240,10 +244,21 @@ public class CustomHudRenderer3 {
         }
 
         if (profile.charts) {
-            int right = context.guiWidth();
+            float chartScale = profile.baseTheme.getScale();
+            int right = (int) (context.guiWidth() / chartScale);
             int center = right / 2;
+            int bottom = (int) (context.guiHeight() / chartScale);
+
+            context.pose().pushMatrix();
+            context.pose().translate(0, bottom - context.guiHeight());
 
             DebugScreenOverlay hud = client.getDebugOverlay();
+            if (profile.leftChart == DebugCharts.PROFILER || profile.rightChart == DebugCharts.PROFILER) {
+                int shift = profile.leftChart == DebugCharts.PROFILER ? 0 : right - context.guiWidth();
+                context.pose().translate(shift, 0);
+                hud.getProfilerPieChart().extractRenderState(context);
+                context.pose().translate(-shift, 0);
+            }
             switch (profile.leftChart) {
                 case FPS -> hud.fpsChart.extractRenderState(context, 0, hud.fpsChart.getWidth(center));
                 case TICK -> hud.tpsChart.extractRenderState(context, 0, hud.tpsChart.getWidth(center));
@@ -256,6 +271,7 @@ public class CustomHudRenderer3 {
                 case PING -> { int w = hud.pingChart.getWidth(center); hud.pingChart.extractRenderState(context, right - w, w); }
                 case PACKET_SIZE -> { int w = hud.bandwidthChart.getWidth(center); hud.bandwidthChart.extractRenderState(context, right - w, w); }
             }
+            context.pose().popMatrix();
         }
 
         Profiler.get().pop();

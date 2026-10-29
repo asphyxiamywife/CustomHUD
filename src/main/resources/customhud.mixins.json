@@ -6,6 +6,7 @@
   "client": [
     "BossBarS2CPacketMixin",
     "ClientPlayNetworkHandlerMixin",
+    "DebugScreenOverlayMixin",
     "GameRendererMixin",
     "InGameHudMixin",
     "KeyBindingMixin",
@@ -28,7 +29,6 @@
     "accessors.KeyBindingAccessor",
     "accessors.PlayerListHudAccess",
     "disable.ExperienceBarMixin",
-    "disable.InGameHudMixin",
     "disable.JumpBarMixin",
     "disable.LocatorBarMixin",
     "events.ChatHudMixin",

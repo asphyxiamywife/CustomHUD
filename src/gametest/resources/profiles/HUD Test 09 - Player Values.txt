@@ -1,0 +1,13 @@
+==crosshair:normal==
+==section:topleft==
+&bPlayer and inventory values
+&fUser: {username}
+&fHealth: {health}/{max_health} | Food: {food} | Saturation: {saturation}
+&fArmor: {armor} | Air: {air}
+&fXP level: {xp_level} | Points: {xp} | Needed: {xp_needed}
+&fSlots used: {slots_used} | Empty: {slots_empty}
+&fMain hand: {item:main} {item:main:icon -rich}
+&fChest: {item:chest} {item:chest:icon -rich}
+&fHeld durability: {item:main:dur}/{item:main:max_dur}
+{{survival, "&aSurvival condition passed", "&cUnexpected game mode"}}
+{{health > 0, "&aHealth condition passed", "&cUnexpected health"}}

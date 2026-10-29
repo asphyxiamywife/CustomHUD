@@ -1,0 +1,13 @@
+==crosshair:vanilla==
+==hudscale:2==
+==whenhudhidden:hide==
+==section:topleft==
+&bHUD Test 05 - HUD Scale
+&fVanilla HUD uses GUI scale 2. Switch to Vanilla to restore it.
+&7CustomHUD client compatibility fixture
+&7Use the CustomHUD cycle-profile key to switch tests.
+&fIcon: {icon:minecraft:diamond}
+==section:topright==
+&bTop right anchor
+==section:bottomright==
+&bBottom right anchor

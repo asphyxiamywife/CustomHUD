@@ -184,7 +184,7 @@ public class ComplexData {
 
             if (hit.getType() == HitResult.Type.BLOCK) {
                 targetBlockPos = ((BlockHitResult)hit).getBlockPos();
-                targetBlock = world.getBlockState(targetBlockPos);
+                targetBlock = client.level.getBlockState(targetBlockPos);
             }
             else {
                 targetBlockPos = null;
@@ -199,7 +199,7 @@ public class ComplexData {
 
             if (hit.getType() == HitResult.Type.BLOCK) {
                 targetFluidPos = ((BlockHitResult)hit).getBlockPos();
-                targetFluid = world.getFluidState(targetFluidPos);
+                targetFluid = client.level.getFluidState(targetFluidPos);
             }
             else {
                 targetFluidPos = null;
