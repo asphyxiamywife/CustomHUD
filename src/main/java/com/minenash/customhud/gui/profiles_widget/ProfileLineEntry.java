@@ -104,7 +104,7 @@ public class ProfileLineEntry extends LineEntry {
         editName.setY(y);
         editName.setWidth(eWidth - 16 - 20 - 16 - 42 - 82 - 18 - (profile.toggles.isEmpty() ? 0 : 50) - 3);
 
-        if (editName.isHoveredOrFocused() || editName.isMouseOver(mX, mY))
+        if (editName.isHovered() || editName.isFocused() || editName.isMouseOver(mX, mY))
             editName.extractRenderState(context);
         else {
             if (!editName.getValue().equals(profile.name)) {

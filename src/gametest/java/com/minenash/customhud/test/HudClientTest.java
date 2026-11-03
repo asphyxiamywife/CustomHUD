@@ -70,6 +70,7 @@ public final class HudClientTest implements FabricClientGameTest {
 
             ValueChecks.run(context, world, profiles);
             DebugShortcutChecks.run(context, world, profiles);
+            KeybindChecks.run(context, profiles);
 
             Profile scaled = profiles.get("HUD Test 05 - HUD Scale");
             check(scaled != null, "Missing scaling fixture");
@@ -109,7 +110,7 @@ public final class HudClientTest implements FabricClientGameTest {
             check(profiles.get("HUD Test 03 - None").crosshair == Crosshairs.NONE, "None mode parsed incorrectly");
             ProfileFixtures.report(
                     "PASS: mixin audit; thirteen fixtures and bundled profiles; twelve scale combinations; "
-                            + "rendered normal/debug/vanilla crosshairs; anchor/pose restoration; no override; exception cleanup; world/chat/pause screenshots; resource reload");
+                            + "rendered normal/debug/vanilla crosshairs; anchor/pose restoration; no override; exception cleanup; keyboard/mouse profile keybinds; world/chat/pause screenshots; resource reload");
         });
     }
 }

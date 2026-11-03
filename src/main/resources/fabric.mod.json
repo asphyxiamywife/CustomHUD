@@ -29,7 +29,7 @@
   "accessWidener": "customhud.accesswidener",
   "depends": {
     "fabricloader": "*",
-    "fabric-api": ">=0.165.1",
-    "minecraft": ">=26.4-alpha.6"
+    "fabric-api": ">=0.165.4",
+    "minecraft": ">=26.4-alpha.7"
   }
 }
