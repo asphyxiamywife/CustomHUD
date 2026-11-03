@@ -55,6 +55,7 @@ fabricApi {
 loom.runs.clientGameTest {
 	runDir = 'build/run/clientGameTest'
 	programArgs '--graphicsBackend', providers.gradleProperty('testGraphicsBackend').getOrElse('default')
+    vmArg '-Drenderpearl.vulkan.allowcpudevice=true'
 }
 
 tasks.named('runClientGameTest') {
